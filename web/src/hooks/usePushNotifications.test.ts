@@ -131,6 +131,10 @@ describe('usePushNotifications VAPID rotation', () => {
     })
 
     it('refreshes the hub language when the UI language changes', async () => {
+        // A stored VAPID key matching the hub marks the browser subscription as
+        // current, which is what gates the refresh.
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
         const existing = createSubscription('https://push.test/current', true)
         const replacement = createSubscription('https://push.test/current', true)
         setupPushEnvironment(existing, replacement)
@@ -146,12 +150,31 @@ describe('usePushNotifications VAPID rotation', () => {
             language: 'en'
         }))
 
+        localStorage.setItem('hapi-lang', 'ru')
         rerender({ language: 'ru' })
 
         await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledWith({
             endpoint: existing.endpoint,
             keys: { p256dh: 'p256dh', auth: 'auth' },
             language: 'ru'
+        }))
+    })
+
+    it('registers the browser language when the web UI ships no matching locale', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        const existing = createSubscription('https://push.test/current', true)
+        const replacement = createSubscription('https://push.test/current', true)
+        setupPushEnvironment(existing, replacement)
+        const api = createApi()
+        // The web UI falls back to `en` for an unsupported browser language;
+        // the hub should still get the browser's own tag so its push text can
+        // be localized.
+        renderHook(() => usePushNotifications(api as unknown as ApiClient, 'en'))
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledWith({
+            endpoint: existing.endpoint,
+            keys: { p256dh: 'p256dh', auth: 'auth' },
+            language: 'en-US'
         }))
     })
 })

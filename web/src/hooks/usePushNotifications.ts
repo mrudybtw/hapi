@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ApiClient } from '@/api/client'
 
 function isPushSupported(): boolean {
@@ -23,16 +23,19 @@ function base64UrlToUint8Array(base64Url: string): Uint8Array {
 
 /**
  * Language reported to the hub with the subscription so web-push payloads can
- * be rendered in the user's language. Mirrors what the i18n provider stores.
+ * be rendered in the user's language: the language the user picked in the web
+ * UI, else the browser's own tag (which may be one the web UI does not ship,
+ * e.g. `ru-RU`), else the caller's fallback.
  */
-function notificationLanguage(): string | undefined {
+function notificationLanguage(fallback?: string): string | undefined {
     try {
         const stored = localStorage.getItem('hapi-lang')
         if (stored) return stored
     } catch {
         // Storage can be unavailable (private mode / blocked cookies).
     }
-    return typeof navigator !== 'undefined' ? navigator.language : undefined
+    if (typeof navigator !== 'undefined' && navigator.language) return navigator.language
+    return fallback
 }
 
 /**
@@ -166,7 +169,7 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
                     p256dh: keys.p256dh,
                     auth: keys.auth
                 },
-                language: language ?? notificationLanguage()
+                language: notificationLanguage(language)
             })
             // Only record the key after the hub registration succeeded. A
             // failed registration must leave the previous key in place so the
@@ -208,10 +211,19 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
         }
     }, [api])
 
+    const lastSentLanguage = useRef<string | undefined>(undefined)
+
     useEffect(() => {
-        if (!language) return
-        void refreshSubscriptionLanguage(language)
-    }, [language, refreshSubscriptionLanguage])
+        // Only touch a subscription this hook considers current (existing
+        // browser subscription + matching VAPID key); otherwise the refresh
+        // could resurrect an endpoint that `subscribe()` is about to replace.
+        if (!isSubscribed) return
+
+        const next = notificationLanguage(language)
+        if (!next || next === lastSentLanguage.current) return
+        lastSentLanguage.current = next
+        void refreshSubscriptionLanguage(next)
+    }, [isSubscribed, language, refreshSubscriptionLanguage])
 
     const unsubscribe = useCallback(async (): Promise<boolean> => {
         if (!api || !isPushSupported()) {
