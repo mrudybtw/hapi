@@ -58,6 +58,8 @@ export type StoredUser = {
     platform: string
     platformUserId: string
     namespace: string
+    /** Last seen Telegram/BCP-47 language tag, if the platform reports one. */
+    language: string | null
     createdAt: number
 }
 
