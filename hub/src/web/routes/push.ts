@@ -10,7 +10,7 @@ const subscriptionSchema = z.object({
         auth: z.string().min(1)
     }),
     /** Browser UI language (BCP-47 tag); used for localized notification text. */
-    language: z.string().trim().min(1).max(35).optional()
+    language: z.string().trim().min(1).max(35).optional().nullable()
 })
 
 const unsubscribeSchema = z.object({
