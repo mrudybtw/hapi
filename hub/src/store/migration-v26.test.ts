@@ -44,4 +44,32 @@ describe('schema migration v26 to v27', () => {
 
         migrated.close()
     })
+
+    it('finishes migration when a legacy database has no users table', () => {
+        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v26-legacy-'))
+        tempDirs.push(dir)
+        const dbPath = join(dir, 'hapi.db')
+
+        new Store(dbPath).close()
+
+        const legacy = new Database(dbPath)
+        legacy.exec(`
+            PRAGMA foreign_keys = OFF;
+            DROP TABLE users;
+            PRAGMA user_version = 26;
+        `)
+        legacy.close()
+
+        const migrated = new Store(dbPath)
+        const internalDb = (migrated as unknown as { db: Database }).db
+        const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
+        expect(version.user_version).toBe(27)
+
+        const usersTable = internalDb
+            .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'")
+            .get()
+        expect(usersTable).toBeNull()
+
+        migrated.close()
+    })
 })
