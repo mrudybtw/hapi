@@ -67,7 +67,12 @@ const en = {
     'toolArgs.args': 'Args: {value}',
     'toolArgs.chars': '{n} chars',
     'toolArgs.updatingTodos': 'Updating {n} todo items',
-    'toolArgs.unknownFile': 'unknown'
+    'toolArgs.unknownFile': 'unknown',
+    'push.ready.title': 'Ready for input',
+    'push.ready.body': '{agent} is waiting in {session}',
+    'push.permission.title': 'Permission Request',
+    'push.task.completed': 'Task completed',
+    'push.task.failed': 'Task failed'
 } as const
 
 export type HubMessageKey = keyof typeof en
@@ -120,7 +125,12 @@ const ru: Record<HubMessageKey, string> = {
     'toolArgs.args': 'Аргументы: {value}',
     'toolArgs.chars': '{n} символов',
     'toolArgs.updatingTodos': 'Обновление элементов todo: {n}',
-    'toolArgs.unknownFile': 'неизвестно'
+    'toolArgs.unknownFile': 'неизвестно',
+    'push.ready.title': 'Готов к вводу',
+    'push.ready.body': '{agent} ждёт в сессии {session}',
+    'push.permission.title': 'Запрос разрешения',
+    'push.task.completed': 'Задача выполнена',
+    'push.task.failed': 'Задача не удалась'
 }
 
 const catalogs: Record<HubLocale, Record<HubMessageKey, string>> = { en, ru }

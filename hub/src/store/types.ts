@@ -69,6 +69,8 @@ export type StoredPushSubscription = {
     endpoint: string
     p256dh: string
     auth: string
+    /** BCP-47 tag reported by the browser at subscribe time, if any. */
+    language: string | null
     createdAt: number
 }
 

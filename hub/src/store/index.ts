@@ -42,7 +42,7 @@ export {
     WorkGraphValidationError
 } from './workGraph'
 
-const SCHEMA_VERSION: number = 27
+const SCHEMA_VERSION: number = 28
 const REQUIRED_TABLES = [
     'sessions',
     'machines',
@@ -349,6 +349,7 @@ export class Store {
             24: () => this.migrateFromV24ToV25(),
             25: () => this.migrateFromV25ToV26(),
             26: () => this.migrateFromV26ToV27(),
+            27: () => this.migrateFromV27ToV28(),
         })
 
         if (currentVersion === 0) {
@@ -489,6 +490,7 @@ export class Store {
                 endpoint TEXT NOT NULL,
                 p256dh TEXT NOT NULL,
                 auth TEXT NOT NULL,
+                language TEXT,
                 created_at INTEGER NOT NULL,
                 UNIQUE(namespace, endpoint)
             );
@@ -1003,6 +1005,14 @@ export class Store {
         const columns = this.db.prepare('PRAGMA table_info(users)').all() as Array<{ name: string }>
         if (columns.length > 0 && !columns.some((column) => column.name === 'language')) {
             this.db.exec('ALTER TABLE users ADD COLUMN language TEXT')
+        }
+    }
+
+    /** v27→v28: remember each web-push subscription's language for localized notifications. */
+    private migrateFromV27ToV28(): void {
+        const columns = this.db.prepare('PRAGMA table_info(push_subscriptions)').all() as Array<{ name: string }>
+        if (columns.length > 0 && !columns.some((column) => column.name === 'language')) {
+            this.db.exec('ALTER TABLE push_subscriptions ADD COLUMN language TEXT')
         }
     }
 

@@ -31,7 +31,7 @@ describe('schema migration v26 to v27', () => {
         const migrated = new Store(dbPath)
         const internalDb = (migrated as unknown as { db: Database }).db
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
-        expect(version.user_version).toBe(27)
+        expect(version.user_version).toBe(28)
 
         const columns = internalDb.prepare('PRAGMA table_info(users)').all() as Array<{ name: string }>
         expect(columns.some((column) => column.name === 'language')).toBe(true)
@@ -63,7 +63,7 @@ describe('schema migration v26 to v27', () => {
         const migrated = new Store(dbPath)
         const internalDb = (migrated as unknown as { db: Database }).db
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
-        expect(version.user_version).toBe(27)
+        expect(version.user_version).toBe(28)
 
         const usersTable = internalDb
             .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'")
