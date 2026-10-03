@@ -1218,7 +1218,7 @@ export default {
   'install.ios.step2.after': '添加到主屏幕',
   'install.ios.step3.before': '点击',
   'install.ios.step3.emphasis': '添加',
-  'install.ios.step3.after': '位于右上角',
+  'install.ios.step3.after': '（位于右上角）',
 
   // Queued messages bar
   'queuedMessages.title': '队列中的消息',
