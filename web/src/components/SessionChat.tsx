@@ -111,6 +111,7 @@ import {
 } from '@/lib/sessionChatCursorModel'
 import { buildCursorEffortPickerOptionsWithDefaultFirst } from '@/lib/cursorModelOptions'
 import { useOpencodeModels } from '@/hooks/queries/useOpencodeModels'
+import { useDshModels } from '@/hooks/queries/useDshModels'
 import { useGrokModels } from '@/hooks/queries/useGrokModels'
 import { useCopilotModels } from '@/hooks/queries/useCopilotModels'
 import { useKimiModelsForSession } from '@/hooks/queries/useKimiModelsForSession'
@@ -1037,6 +1038,21 @@ function SessionChatInner(props: SessionChatProps) {
         sessionId: props.session.id,
         enabled: agentFlavor === 'opencode' && props.session.active
     })
+    const dshModelsState = useDshModels({
+        api: props.api,
+        sessionId: props.session.id,
+        enabled: agentFlavor === 'dsh' && props.session.active
+    })
+    const dshModelOptions = useMemo(() => {
+        if (agentFlavor !== 'dsh') {
+            return undefined
+        }
+
+        return dshModelsState.availableModels.map((dshModel) => ({
+            value: dshModel.modelId,
+            label: dshModel.name ?? dshModel.modelId
+        }))
+    }, [agentFlavor, dshModelsState.availableModels])
     const opencodeReasoningEffortState = useOpencodeReasoningEffortOptions({
         api: props.api,
         sessionId: props.session.id,
@@ -2083,6 +2099,8 @@ function SessionChatInner(props: SessionChatProps) {
                                     )
                                     : agentFlavor === 'opencode'
                                         ? opencodeModelOptions
+                                        : agentFlavor === 'dsh'
+                                            ? dshModelOptions
                                         : agentFlavor === 'grok'
                                             ? grokModelOptions
                                         : agentFlavor === 'copilot'

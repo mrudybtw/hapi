@@ -48,6 +48,7 @@ import type {
     ListDirectoryResponse,
     MachineListDirectoryResponse,
     MachinePathsExistsResponse,
+    DshModelsResponse,
     OpencodeModelsResponse,
     OpencodeModelVariantsResponse,
     OpencodeReasoningEffortResponse,
@@ -901,6 +902,12 @@ export class ApiClient {
     async getSessionOpencodeModels(sessionId: string): Promise<OpencodeModelsResponse> {
         return await this.request<OpencodeModelsResponse>(
             `/api/sessions/${encodeURIComponent(sessionId)}/opencode-models`
+        )
+    }
+
+    async getSessionDshModels(sessionId: string): Promise<DshModelsResponse> {
+        return await this.request<DshModelsResponse>(
+            `/api/sessions/${encodeURIComponent(sessionId)}/dsh-models`
         )
     }
 

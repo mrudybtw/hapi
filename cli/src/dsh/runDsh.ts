@@ -3,9 +3,11 @@ import { MessageQueue2 } from '@/utils/MessageQueue2'
 import { registerKillSessionHandler } from '@/claude/registerKillSessionHandler'
 import { createRunnerLifecycle, setControlledByUser } from '@/agent/runnerLifecycle'
 import { bootstrapExistingSession, bootstrapSession } from '@/agent/sessionFactory'
+import { registerSessionConfigRpc } from '@/agent/sessionConfigRpc'
 import { formatMessageWithAttachments } from '@/utils/attachmentFormatter'
 import { getInvokedCwd } from '@/utils/invokedCwd'
 import { logger } from '@/ui/logger'
+import type { PermissionMode } from '@hapi/protocol/types'
 import type { AgentState } from '@/api/types'
 import { DshRemoteLauncher } from './dshRemoteLauncher'
 import { DshSession } from './session'
@@ -78,6 +80,20 @@ export async function runDsh(opts: {
     const launcher = new DshRemoteLauncher(dshSession)
     sessionRef.current = dshSession
     launcherRef.current = launcher
+
+    // Model picked in the HAPI UI arrives as the generic `set-session-config`
+    // RPC. Record it on the session; the launcher applies it through ACP
+    // (`session/set_config_option`) at the next turn boundary.
+    registerSessionConfigRpc<PermissionMode>({
+        rpcHandlerManager: session.rpcHandlerManager,
+        flavor: 'dsh',
+        modelMode: 'nullable',
+        onApply: (config) => {
+            if (config.model !== undefined) {
+                dshSession.setModel(config.model)
+            }
+        }
+    })
 
     let crashed = false
     try {

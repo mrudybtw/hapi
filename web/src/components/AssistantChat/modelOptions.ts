@@ -143,6 +143,12 @@ export function getModelOptionsForFlavor(
     if (flavor === 'opencode') {
         return []
     }
+    // DSH (DeepSeek Harness) also discovers models dynamically via the
+    // listDshModels RPC; same rule as OpenCode — an empty list until the ACP
+    // catalog arrives, never the Claude presets.
+    if (flavor === 'dsh') {
+        return []
+    }
     if (flavor === 'cursor') {
         return withCurrentModelOption([{ value: 'auto', label: CURSOR_AUTO_MODEL_LABEL }], currentModel)
     }
@@ -208,6 +214,11 @@ export function getNextModelForFlavor(
     // OpenCode session and the next turn would attempt `session/set_model` with a
     // Claude id. Keep the current model unchanged instead.
     if (flavor === 'opencode') {
+        return normalizeCurrentModel(currentModel)
+    }
+    // DSH: same guard — the Ctrl/Cmd+M cycler must not post Claude model ids
+    // into a DeepSeek Harness session before its ACP catalog arrives.
+    if (flavor === 'dsh') {
         return normalizeCurrentModel(currentModel)
     }
     if (flavor === 'cursor') {

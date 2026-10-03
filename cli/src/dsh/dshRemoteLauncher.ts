@@ -1,4 +1,5 @@
 import React from 'react'
+import { RPC_METHODS } from '@hapi/protocol/rpcMethods'
 import { logger } from '@/ui/logger'
 import { convertAgentMessage } from '@/agent/messageConverter'
 import type { AgentMessage, PromptContent } from '@/agent/types'
@@ -16,6 +17,8 @@ export class DshRemoteLauncher extends RemoteLauncherBase {
     private backend: ReturnType<typeof createDshBackend> | null = null
     private permissionHandler: AcpPermissionHandler | null = null
     private abortController = new AbortController()
+    /** Model the ACP server is currently running; tracks pending switches. */
+    private currentBackendModel: string | null = null
 
     constructor(private readonly session: DshSession) {
         super(process.env.DEBUG ? session.logPath : undefined)
@@ -55,6 +58,23 @@ export class DshRemoteLauncher extends RemoteLauncherBase {
         })
         this.session.sessionId = acpSessionId
 
+        // The `dsh-acp` server advertises its model catalog through the
+        // `configOptions` block of `session/new`; AcpSdkBackend merges that into
+        // availableModels/currentModelId. Expose it over the session RPC so the
+        // hub can forward it to the web UI's model selector.
+        this.currentBackendModel = backend.getSessionModelsMetadata?.(acpSessionId)?.currentModelId ?? null
+        this.session.client.rpcHandlerManager.registerHandler(RPC_METHODS.ListDshModels, async () => {
+            const metadata = backend.getSessionModelsMetadata?.(acpSessionId)
+            if (!metadata) {
+                return { success: false, error: 'DSH model metadata is not available' }
+            }
+            return {
+                success: true,
+                availableModels: metadata.availableModels,
+                currentModelId: metadata.currentModelId
+            }
+        })
+
         this.permissionHandler = new AcpPermissionHandler(
             this.session.client,
             backend,
@@ -71,6 +91,11 @@ export class DshRemoteLauncher extends RemoteLauncherBase {
                 if (this.abortController.signal.aborted && !this.shouldExit) continue
                 break
             }
+
+            // Apply a model picked in the HAPI UI before the turn starts. The
+            // switch is serialized here (outside session/prompt) so it can never
+            // interleave with an in-flight turn.
+            await this.applyPendingModel(backend, acpSessionId)
 
             this.session.onThinkingChange(true)
             this.messageBuffer.addMessage(batch.message, 'user')
@@ -127,6 +152,47 @@ export class DshRemoteLauncher extends RemoteLauncherBase {
                 const _exhaustive: never = message
                 return _exhaustive
             }
+        }
+    }
+
+    /**
+     * Applies a model selected in the HAPI UI. `dsh-acp` implements the ACP
+     * session config option (configId "model"), so that is the primary path;
+     * `session/set_model` is only a fallback for other DSH ACP servers.
+     */
+    private async applyPendingModel(
+        backend: ReturnType<typeof createDshBackend>,
+        acpSessionId: string
+    ): Promise<void> {
+        const requested = this.session.getModel()
+        if (typeof requested !== 'string' || requested.trim().length === 0) return
+        const target = requested.trim()
+        if (target === this.currentBackendModel) return
+
+        // Use the config id the agent actually advertises instead of assuming "model".
+        const optionId = backend.getConfigOptionByCategory?.(acpSessionId, 'model')?.id ?? 'model'
+        try {
+            try {
+                await backend.setConfigOption(acpSessionId, optionId, target)
+            } catch (error) {
+                const message = error instanceof Error ? error.message : String(error)
+                if (!/method not found/i.test(message)) throw error
+                // Legacy ACP servers expose only session/set_model.
+                await backend.setModel(acpSessionId, target, { flavor: 'dsh' })
+            }
+            this.currentBackendModel = target
+            logger.debug(`[dsh-acp] model switched to ${target}`)
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error)
+            logger.warn('[dsh-acp] model switch failed', { message })
+            // Roll the session back so the hub and UI do not advertise a model
+            // the agent is not actually running.
+            this.session.setModel(this.currentBackendModel)
+            this.session.pushKeepAlive()
+            this.session.sendSessionEvent({
+                type: 'message',
+                message: `Failed to switch model to ${target}: ${message}. Continuing with ${this.currentBackendModel ?? 'the agent default'}.`
+            })
         }
     }
 

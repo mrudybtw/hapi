@@ -809,6 +809,15 @@ export type OpencodeModelsResponse = {
 
 export type ListOpencodeModelsResponse = OpencodeModelsResponse
 
+/**
+ * DSH (DeepSeek Harness) model catalog. The `dsh-acp` ACP server advertises its
+ * models through the `configOptions` block of `session/new`; HAPI's ACP backend
+ * merges those into the same `availableModels` shape OpenCode uses.
+ */
+export type DshModelsResponse = OpencodeModelsResponse
+
+export type ListDshModelsResponse = DshModelsResponse
+
 /** Variant values keyed by `providerId/modelId` from the OpenCode server catalog. */
 export type OpencodeModelVariantsResponse = {
     success: boolean

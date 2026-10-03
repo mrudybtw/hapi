@@ -38,6 +38,8 @@ export const RPC_METHODS = {
     ListOpencodeModels: 'listOpencodeModels',
     ListOpencodeModelVariants: 'listOpencodeModelVariants',
     ListOpencodeModelsForCwd: 'listOpencodeModelsForCwd',
+    /** DSH (DeepSeek Harness) ACP model catalog, exposed per session. */
+    ListDshModels: 'listDshModels',
     ListGrokModelsForCwd: 'listGrokModelsForCwd',
     ListGrokModels: 'listGrokModels',
     ListGrokReasoningEffortOptions: 'listGrokReasoningEffortOptions',

@@ -22,6 +22,7 @@ import type {
     GeneratedImageResponse,
     ImplementCodexPlanResult,
     CopilotModelsResponse,
+    DshModelsResponse,
     GrokModelsResponse,
     KimiModelsResponse,
     GrokReasoningEffortResponse,
@@ -111,6 +112,7 @@ export type RpcListCursorModelsResponse = CursorModelsResponse
 export type RpcCursorChatStoreStatus = CursorChatStoreStatus
 export type RpcOpencodeModel = OpencodeModelSummary
 export type RpcListOpencodeModelsResponse = OpencodeModelsResponse
+export type RpcListDshModelsResponse = DshModelsResponse
 export type RpcListOpencodeModelVariantsResponse = OpencodeModelVariantsResponse
 export type RpcListGrokModelsResponse = GrokModelsResponse
 export type RpcListCopilotModelsResponse = CopilotModelsResponse
@@ -479,6 +481,10 @@ export class RpcGateway {
 
     async listOpencodeModelsForSession(sessionId: string): Promise<RpcListOpencodeModelsResponse> {
         return await this.sessionRpc(sessionId, RPC_METHODS.ListOpencodeModels, {}) as RpcListOpencodeModelsResponse
+    }
+
+    async listDshModelsForSession(sessionId: string): Promise<RpcListDshModelsResponse> {
+        return await this.sessionRpc(sessionId, RPC_METHODS.ListDshModels, {}) as RpcListDshModelsResponse
     }
 
     async listOpencodeModelsForCwd(machineId: string, cwd: string): Promise<RpcListOpencodeModelsResponse> {

@@ -25,6 +25,7 @@ export const queryKeys = {
     sessionPiModels: (sessionId: string) => ['session-pi-models', sessionId] as const,
     machineCursorModels: (machineId: string) => ['machine-cursor-models', machineId] as const,
     sessionOpencodeModels: (sessionId: string) => ['session-opencode-models', sessionId] as const,
+    sessionDshModels: (sessionId: string) => ['session-dsh-models', sessionId] as const,
     sessionOpencodeReasoningEffortOptions: (sessionId: string) => ['session-opencode-reasoning-effort-options', sessionId] as const,
     machineOpencodeModelsForCwd: (machineId: string, cwd: string) => ['machine-opencode-models', machineId, cwd] as const,
     machineOpencodeModelVariants: (machineId: string) => ['machine-opencode-model-variants', machineId] as const,

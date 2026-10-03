@@ -1,6 +1,7 @@
 import { ApiClient, ApiSessionClient } from '@/lib'
 import { MessageQueue2 } from '@/utils/MessageQueue2'
 import { AgentSessionBase } from '@/agent/sessionBase'
+import type { SessionModel } from '@/api/types'
 import type { DshMode } from './types'
 
 /** Remote-only HAPI session wrapper for the fresh-session DSH ACP server. */
@@ -41,5 +42,13 @@ export class DshSession extends AgentSessionBase<DshMode> {
 
     sendSessionEvent = (event: Parameters<ApiSessionClient['sendSessionEvent']>[0]): void => {
         this.client.sendSessionEvent(event)
+    }
+
+    /**
+     * Records the model requested by the hub. The launcher applies it to the
+     * ACP session on the next turn boundary; it never switches mid-prompt.
+     */
+    setModel = (model: SessionModel): void => {
+        this.model = model
     }
 }
