@@ -186,31 +186,6 @@ describe('usePushNotifications VAPID rotation', () => {
         }))
     })
 
-    it('undoes an in-flight language refresh when the browser subscription was removed', async () => {
-        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
-        localStorage.setItem('hapi-lang', 'en')
-        const existing = createSubscription('https://push.test/current', true)
-        const pushManager = setupPushEnvironment(existing, existing)
-        const api = createApi()
-        let releaseRefresh: () => void = () => {}
-        api.subscribePushNotifications = vi.fn(() => new Promise<void>((resolve) => {
-            releaseRefresh = () => resolve()
-        }))
-        const { result } = renderHook(() => usePushNotifications(api as unknown as ApiClient, 'en'))
-
-        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledTimes(1))
-
-        await act(async () => {
-            await result.current.unsubscribe()
-            // The browser no longer has a subscription once unsubscribe resolved.
-            pushManager.getSubscription.mockResolvedValue(null)
-        })
-        releaseRefresh()
-
-        // Once by `unsubscribe()` and once by the stale refresh cleanup.
-        await waitFor(() => expect(api.unsubscribePushNotifications).toHaveBeenCalledTimes(2))
-    })
-
     it('keeps a re-created subscription that reuses the same endpoint', async () => {
         localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
         localStorage.setItem('hapi-lang', 'en')

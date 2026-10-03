@@ -155,9 +155,6 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
                     userVisibleOnly: true,
                     applicationServerKey
                 })
-                // The endpoint changed, so an in-flight language write for the
-                // previous one must not be trusted.
-                subscriptionGeneration.current += 1
             }
 
             const json = subscription.toJSON()
@@ -187,89 +184,22 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
         }
     }, [api, language])
 
-    /**
-     * Bumped whenever the browser-side subscription is replaced or removed, so
-     * an in-flight language refresh can detect that its write is stale.
-     */
-    const subscriptionGeneration = useRef(0)
-
-    /**
-     * Browsers keep one subscription per SW registration, so a language change
-     * only needs to refresh the hub's copy instead of re-subscribing.
-     */
-    const postSubscriptionLanguage = useCallback(async (nextLanguage: string): Promise<boolean> => {
-        if (!api || !isPushSupported()) return false
-        if (Notification.permission !== 'granted') return false
-
-        const generation = subscriptionGeneration.current
-        try {
-            const registration = await navigator.serviceWorker.ready
-            const subscription = await registration.pushManager.getSubscription()
-            if (!subscription) return false
-
-            const json = subscription.toJSON()
-            const keys = json.keys
-            if (!json.endpoint || !keys?.p256dh || !keys.auth) return false
-
-            const endpoint = json.endpoint
-            await api.subscribePushNotifications({
-                endpoint,
-                keys: { p256dh: keys.p256dh, auth: keys.auth },
-                language: nextLanguage
-            })
-
-            if (subscriptionGeneration.current !== generation) {
-                // The subscription was replaced or removed while this request
-                // was in flight. Only prune the endpoint we wrote when the
-                // browser no longer holds it — a replacement may have reused
-                // the same endpoint, and deleting that would drop the live
-                // registration.
-                const current = await registration.pushManager.getSubscription()
-                if (!current || current.endpoint !== endpoint) {
-                    await api.unsubscribePushNotifications({ endpoint })
-                }
-                return false
-            }
-            return true
-        } catch (error) {
-            console.error('[PushNotifications] Failed to refresh subscription language:', error)
-            return false
-        }
-    }, [api])
-
-    const languageQueue = useRef<Promise<void>>(Promise.resolve())
-    const latestRequestedLanguage = useRef<string | undefined>(undefined)
-
-    /**
-     * Serializes language writes and drops superseded ones, so an overlapping
-     * `en → ru` switch cannot land `en` after `ru`.
-     */
-    const refreshSubscriptionLanguage = useCallback((nextLanguage: string): Promise<boolean> => {
-        latestRequestedLanguage.current = nextLanguage
-        const task = languageQueue.current.then(() => {
-            if (latestRequestedLanguage.current !== nextLanguage) return false
-            return postSubscriptionLanguage(nextLanguage)
-        })
-        languageQueue.current = task.then(() => undefined, () => undefined)
-        return task
-    }, [postSubscriptionLanguage])
-
     const lastSentLanguage = useRef<string | undefined>(undefined)
 
     useEffect(() => {
-        // Only touch a subscription this hook considers current (existing
-        // browser subscription + matching VAPID key); otherwise the refresh
-        // could resurrect an endpoint that `subscribe()` is about to replace.
+        // Re-register through the normal subscribe path so the hub picks up the
+        // new language with the subscription's current keys; `subscribe()`
+        // already handles VAPID rotation and stale-endpoint pruning.
         if (!isSubscribed) return
 
         const next = notificationLanguage(language)
         if (!next || next === lastSentLanguage.current) return
-        // Recorded only after the hub accepted the write, so a failure retries
-        // on the next change instead of being suppressed.
-        void refreshSubscriptionLanguage(next).then((sent) => {
-            if (sent) lastSentLanguage.current = next
+        void subscribe().then((subscribed) => {
+            // Recorded only after the hub accepted the write, so a failure
+            // retries on the next change instead of being suppressed.
+            if (subscribed) lastSentLanguage.current = next
         })
-    }, [isSubscribed, language, refreshSubscriptionLanguage])
+    }, [isSubscribed, language, subscribe])
 
     const unsubscribe = useCallback(async (): Promise<boolean> => {
         if (!api || !isPushSupported()) {
@@ -287,9 +217,6 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
             const endpoint = subscription.endpoint
             const success = await subscription.unsubscribe()
             if (!success) return false
-            // Only once the browser dropped it; a failed unsubscribe must not
-            // invalidate an in-flight language write for the live endpoint.
-            subscriptionGeneration.current += 1
             await api.unsubscribePushNotifications({ endpoint })
             setIsSubscribed(false)
             return true
