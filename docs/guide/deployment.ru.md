@@ -85,7 +85,7 @@ HAPI_LISTEN_HOST=0.0.0.0 hapi hub
 
 ```bash
 mkdir -p ~/.hapi/logs
-nohup hapi hub > ~/.hapi/logs/hub.log 2>&1 &
+nohup hapi hub --relay > ~/.hapi/logs/hub.log 2>&1 &
 nohup hapi runner start-sync > ~/.hapi/logs/runner.log 2>&1 &
 
 tail -f ~/.hapi/logs/hub.log
@@ -220,18 +220,15 @@ loginctl enable-linger $USER   # чтобы работало и после вы�
 
 ### DeepSeek Harness (DSH)
 
-HAPI управляет DSH через ACP-сервер (`dsh-acp`, пакет `deepseek-harness-acp`). Переменные окружения:
+HAPI запускает DSH через ACP. По умолчанию используется официальный `dsh-acp-demo`; исполняемый файл и его аргументы можно переопределить без разбора шелла:
 
 ```bash
-export HAPI_DSH_ACP_COMMAND="dsh-acp"          # ACP-сервер
-export DEEPSEEK_API_KEY="..."                  # ключ модели
-export DSH_PERMISSION_MODE="workspace-write"   # политика доступа агента к файлам
+export HAPI_DSH_ACP_COMMAND=dsh-acp-demo
+export HAPI_DSH_ACP_CONFIG=/path/to/deepseek-harness/examples/acp-agent/cordis.yml
+hapi dsh
 ```
 
-Режимы доступа:
-
-- `workspace-write` — запись только внутри рабочего каталога, опасные действия спрашивают подтверждение в HAPI (рекомендуется);
-- `danger-full-access` — без ограничений и без подтверждений (осторожно!).
+Официальный ACP-демо работает только со свежими сессиями: он не поддерживает нативный resume, переключение моделей, инъекцию MCP и живую телеметрию инструментов/рассуждений. Общую политику разрешений определяет ACP-композиция; HAPI не объявляет для DSH resume или управление моделями.
 
 ## Telegram Mini App
 
@@ -247,5 +244,4 @@ hapi hub
 - Токен доступа (`CLI_API_TOKEN`) — это фактически пароль: храните его в секрете, он используется для сопряжения приложений.
 - Публичное реле шифрует трафик сквозным образом (WireGuard + TLS).
 - Не включайте `NODE_TLS_REJECT_UNAUTHORIZED=0` в публичных сетях.
-- `DSH_PERMISSION_MODE=danger-full-access` отключает подтверждения — используйте только на доверенных машинах.
 
