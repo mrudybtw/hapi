@@ -102,17 +102,15 @@ const en = {
     'auth.logout.done': 'Cleared local credentials (token and machineId).',
     'auth.logout.note': 'Note: If CLI_API_TOKEN is set via environment variable, it will still be used.',
     'auth.error.unknownSubcommand': 'Unknown auth subcommand: {subcommand}',
-    'auth.help': `hapi auth - Authentication management
-
-Usage:
-  hapi auth status            Show current configuration
-  hapi auth login             Enter and save CLI_API_TOKEN
-  hapi auth logout            Clear saved credentials
-
-Token priority (highest to lowest):
-  1. CLI_API_TOKEN environment variable
-  2. ~/.hapi/settings.json
-  3. Interactive prompt (on first run)`,
+    'auth.help.tagline': 'Authentication management',
+    'auth.help.usage': 'Usage:',
+    'auth.help.status': 'Show current configuration',
+    'auth.help.login': 'Enter and save CLI_API_TOKEN',
+    'auth.help.logout': 'Clear saved credentials',
+    'auth.help.priority': 'Token priority (highest to lowest):',
+    'auth.help.priority1': '1. CLI_API_TOKEN environment variable',
+    'auth.help.priority2': '2. ~/.hapi/settings.json',
+    'auth.help.priority3': '3. Interactive prompt (on first run)',
 
     'token.missing.title': 'No CLI_API_TOKEN found.',
     'token.missing.where': 'Where to find the token:',
@@ -189,17 +187,15 @@ const ru: Record<keyof typeof en, string> = {
     'auth.logout.done': 'Локальные учётные данные удалены (токен и machineId).',
     'auth.logout.note': 'Учтите: если CLI_API_TOKEN задан через переменную окружения, он всё ещё будет использоваться.',
     'auth.error.unknownSubcommand': 'Неизвестная подкоманда auth: {subcommand}',
-    'auth.help': `hapi auth - управление аутентификацией
-
-Использование:
-  hapi auth status            Показать текущую конфигурацию
-  hapi auth login             Ввести и сохранить CLI_API_TOKEN
-  hapi auth logout            Удалить сохранённые учётные данные
-
-Приоритет токена (от высшего к низшему):
-  1. Переменная окружения CLI_API_TOKEN
-  2. ~/.hapi/settings.json
-  3. Интерактивный запрос (при первом запуске)`,
+    'auth.help.tagline': 'Управление аутентификацией',
+    'auth.help.usage': 'Использование:',
+    'auth.help.status': 'Показать текущую конфигурацию',
+    'auth.help.login': 'Ввести и сохранить CLI_API_TOKEN',
+    'auth.help.logout': 'Удалить сохранённые учётные данные',
+    'auth.help.priority': 'Приоритет токена (от высшего к низшему):',
+    'auth.help.priority1': '1. Переменная окружения CLI_API_TOKEN',
+    'auth.help.priority2': '2. ~/.hapi/settings.json',
+    'auth.help.priority3': '3. Интерактивный запрос (при первом запуске)',
 
     'token.missing.title': 'CLI_API_TOKEN не найден.',
     'token.missing.where': 'Где взять токен:',
