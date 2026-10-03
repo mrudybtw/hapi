@@ -202,11 +202,12 @@ export HAPI_DSH_ACP_ARGS_JSON='["--dir", "/path/to/deepseek-harness", "run", "de
 
 ### Язык
 
-Сообщения `hapi auth` и запросы учётных данных доступны на английском и русском. Локаль определяется так: `HAPI_LANG` → `language` в `~/.hapi/settings.json` → `LC_ALL` / `LC_MESSAGES` / `LANG` → английский.
+Сообщения `hapi auth` и `hapi runner`, а также запросы учётных данных доступны на английском и русском. Локаль определяется так: `HAPI_LANG` → `language` в `~/.hapi/settings.json` → `LC_ALL` / `LC_MESSAGES` / `LANG` → английский (`LC_ALL` побеждает, даже если он равен `C`).
 
 ```bash
 export HAPI_LANG=ru        # или: {"language": "ru"} в ~/.hapi/settings.json
 hapi auth status
+hapi runner
 ```
 
 ### Раннер
