@@ -185,21 +185,64 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
     }, [api, language])
 
     const lastSentLanguage = useRef<string | undefined>(undefined)
+    const languageWrites = useRef<Promise<void>>(Promise.resolve())
+    const latestLanguage = useRef<string | undefined>(undefined)
+
+    /**
+     * Writes the subscription's language to the hub on a serialized queue, so
+     * overlapping switches cannot land out of order. After the write it checks
+     * that the browser still holds the subscription: an `unsubscribe()` during
+     * the request would otherwise leave the hub with a dead endpoint.
+     */
+    const writeSubscriptionLanguage = useCallback((nextLanguage: string): Promise<boolean> => {
+        latestLanguage.current = nextLanguage
+        const task = languageWrites.current.then(async () => {
+            if (latestLanguage.current !== nextLanguage) return false
+            if (!api || !isPushSupported()) return false
+            if (Notification.permission !== 'granted') return false
+
+            try {
+                const registration = await navigator.serviceWorker.ready
+                const subscription = await registration.pushManager.getSubscription()
+                if (!subscription) return false
+
+                const json = subscription.toJSON()
+                const keys = json.keys
+                if (!json.endpoint || !keys?.p256dh || !keys.auth) return false
+
+                const endpoint = json.endpoint
+                await api.subscribePushNotifications({
+                    endpoint,
+                    keys: { p256dh: keys.p256dh, auth: keys.auth },
+                    language: nextLanguage
+                })
+
+                const current = await registration.pushManager.getSubscription()
+                if (!current) {
+                    await api.unsubscribePushNotifications({ endpoint })
+                    return false
+                }
+                return true
+            } catch (error) {
+                console.error('[PushNotifications] Failed to refresh subscription language:', error)
+                return false
+            }
+        })
+        languageWrites.current = task.then(() => undefined, () => undefined)
+        return task
+    }, [api])
 
     useEffect(() => {
-        // Re-register through the normal subscribe path so the hub picks up the
-        // new language with the subscription's current keys; `subscribe()`
-        // already handles VAPID rotation and stale-endpoint pruning.
         if (!isSubscribed) return
 
         const next = notificationLanguage(language)
         if (!next || next === lastSentLanguage.current) return
-        void subscribe().then((subscribed) => {
+        void writeSubscriptionLanguage(next).then((sent) => {
             // Recorded only after the hub accepted the write, so a failure
             // retries on the next change instead of being suppressed.
-            if (subscribed) lastSentLanguage.current = next
+            if (sent) lastSentLanguage.current = next
         })
-    }, [isSubscribed, language, subscribe])
+    }, [isSubscribed, language, writeSubscriptionLanguage])
 
     const unsubscribe = useCallback(async (): Promise<boolean> => {
         if (!api || !isPushSupported()) {
