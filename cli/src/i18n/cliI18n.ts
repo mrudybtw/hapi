@@ -257,6 +257,98 @@ const en = {
     'doctor.inline.ok': '✓ Inline media path available',
     'doctor.inline.noSession': '⚠ No active session with hapiMcpUrl — start or resume a remote session first.',
     'doctor.inline.failed': '✗ Inline media checks failed — fix items marked ✗ above.',
+    'agent.hubUnreachable': 'Unable to connect to HAPI hub',
+    'agent.hubUrlLabel': 'Hub URL',
+    'agent.checkNetwork': '  Please check your network connection or hub status',
+    'agent.machineAccessDenied': 'Machine access denied.',
+    'agent.machineAccessDenied.hint1': '  This machineId is already registered under a different namespace.',
+    'agent.machineAccessDenied.hint2': '  Fix: run `hapi auth logout`, or set a separate HAPI_HOME per namespace.',
+    'agent.sessionAccessDenied': 'Session access denied.',
+    'agent.sessionAccessDenied.hint1': '  This session belongs to a different namespace.',
+    'agent.sessionAccessDenied.hint2': '  Use the matching CLI_API_TOKEN or switch namespaces.',
+    'agent.authError': 'Authentication error:',
+    'agent.authHint': '  Run: hapi auth login',
+    'agent.protocolHint.hubBehind': '  Hint: hub protocol version ({hub}) is behind CLI ({cli}). Please update the hub.',
+    'agent.protocolHint.cliBehind': '  Hint: CLI protocol version ({cli}) is behind hub ({hub}). Please update the CLI.',
+    'cli.help': `HAPI - Coding agents with remote control
+
+Usage:
+  hapi                       Choose an agent interactively
+  hapi <agent> [options]      Start an agent session
+  hapi <command> [options]    Run a HAPI command
+
+Agents:
+{agents}
+
+Commands:
+  hapi auth                  Manage authentication
+  hapi resume [id]           Choose or resume an existing HAPI session
+  hapi hub [--relay]         Start the API + web hub
+  hapi server                Alias for hapi hub
+  hapi runner                Manage the background runner
+  hapi doctor                Run diagnostics and troubleshooting
+  hapi ping-peer             List peers or message another session
+  hapi inspect-peer <id>     Read another session's metadata and messages
+  hapi mcp                   Start the MCP stdio bridge
+
+Options:
+  -h, --help                 Show HAPI help
+  -v, --version              Show HAPI version
+
+Examples:
+  hapi                       Choose an installed agent
+  hapi claude --resume       Resume a Claude session
+  hapi codex --yolo          Start Codex with automatic approvals
+  hapi auth login            Configure authentication
+
+Agent options belong after the agent name; supported options vary by agent.
+Scripts and non-interactive shells must specify an agent explicitly.`,
+    'selectAgent.none': 'No supported agents are available:',
+    'selectAgent.hint': 'Install an agent or fix its configuration, then run hapi again or use hapi <agent> [options].',
+    'hub.shuttingDown': 'Shutting down...',
+    'runCli.version': 'hapi version: {version}',
+    'runCli.needsInteractive': 'Agent selection requires an interactive terminal. Run: hapi <agent> [options]',
+    'runCli.unknownOption': 'Unknown option: {name}',
+    'runCli.unknownCommand': 'Unknown command: {name}',
+    'runCli.hint': 'Run hapi to choose an agent, or use hapi <agent> [options]. See hapi --help.',
+    'autoStart.starting': 'Starting HAPI hub in background...',
+    'autoStart.timeout': 'Warning: Hub did not start within expected time',
+    'autoStart.tryManual': '  Try running `hapi hub` manually to see errors',
+    'autoStart.started': 'HAPI hub started',
+    'autoStart.failed': 'Warning: Failed to auto-start hub',
+    'autoStart.error': '  Error: {error}',
+    'runner.run.alreadyRunning': 'Runner already running with matching version',
+    'runner.run.banner.started': 'Hapi runner started.',
+    'runner.run.banner.workspaceRoots': '  Workspace roots: {roots}',
+    'runner.run.banner.workspaceRootsNone': '(not set — browsing and spawning are unrestricted)',
+    'runner.run.banner.hubUrl': '  Hub URL:        {url}',
+    'runner.run.banner.machineId': '  Machine ID:     {id}',
+    'runner.run.banner.controlPort': '  Control port:   {port}',
+    'runner.run.banner.waiting': 'Waiting for sessions. Press Ctrl+C to stop.',
+    'pingPeer.help.tagline': 'Resume a HAPI session (if needed) and send it a message',
+    'pingPeer.help.usage': 'Usage:',
+    'pingPeer.help.stdinComment': 'read message from stdin',
+    'pingPeer.help.notes': 'Notes:',
+    'pingPeer.help.note1': 'Do not reinvent JWT + curl for peer handoffs. Prefer this command or MCP ping_peer / list_peers.',
+    'pingPeer.help.note2': 'Resolves by id prefix (8 chars OK). Same hub token/namespace as this CLI.',
+    'pingPeer.help.note3': 'Inactive sessions are resumed via POST /api/sessions/:id/resume, then messaged.',
+    'pingPeer.help.note4': 'When a user cites [title](/sessions/<id>) or Copy-reference',
+    'pingPeer.help.note5': 'See session "…" (/sessions/<id>) for context, pass that <id> here.',
+    'pingPeer.help.note6': 'On a remote runner, --list needs HAPI_API_URL set to the runner hub, plus',
+    'pingPeer.help.note7': 'CLI_API_TOKEN or `hapi auth login` for the token. Inside a session prefer MCP list_peers.',
+    'pingPeer.help.env': 'Env:',
+    'pingPeer.help.env2': 'HAPI_WAIT_ACTIVE_SECS (default 60; overridable with --wait)',
+    'pingPeer.ok': 'hapi ping-peer: OK - delivered to {id}',
+    'inspectPeer.help.tagline': "Read another HAPI session's metadata + recent messages",
+    'inspectPeer.help.usage': 'Usage:',
+    'inspectPeer.help.notes': 'Notes:',
+    'inspectPeer.help.note1': 'Read-only twin of ping-peer. Prefer this (or MCP inspect_peer) over JWT+curl.',
+    'inspectPeer.help.note2': 'Resolves by id prefix (8 chars OK; full UUID best). Same hub token/namespace.',
+    'inspectPeer.help.note3': 'Does NOT resume inactive sessions.',
+    'inspectPeer.help.note4': 'When a user cites [title](/sessions/<id>) or Copy-reference',
+    'inspectPeer.help.note5': 'See session "…" (/sessions/<id>) for context, pass that <id> here.',
+    'inspectPeer.help.note6': '/sessions/<id> is a hub path - not a local filesystem path.',
+    'inspectPeer.help.env': 'Env:',
     'doctor.clean.errors': 'Errors:'
 
 }
@@ -443,6 +535,98 @@ const ru: Record<keyof typeof en, string> = {
     'doctor.inline.ok': '✓ Инлайн-путь медиа доступен',
     'doctor.inline.noSession': '⚠ Нет активной сессии с hapiMcpUrl — сначала запустите или возобновите удалённую сессию.',
     'doctor.inline.failed': '✗ Проверки инлайн-медиа не прошли — исправьте пункты, отмеченные ✗ выше.',
+    'agent.hubUnreachable': 'Не удалось подключиться к хабу HAPI',
+    'agent.hubUrlLabel': 'URL хаба',
+    'agent.checkNetwork': '  Проверьте сетевое подключение или состояние хаба',
+    'agent.machineAccessDenied': 'Доступ машины запрещён.',
+    'agent.machineAccessDenied.hint1': '  Этот machineId уже зарегистрирован в другом пространстве имён.',
+    'agent.machineAccessDenied.hint2': '  Исправление: выполните `hapi auth logout` или задайте отдельный HAPI_HOME для каждого пространства имён.',
+    'agent.sessionAccessDenied': 'Доступ к сессии запрещён.',
+    'agent.sessionAccessDenied.hint1': '  Эта сессия принадлежит другому пространству имён.',
+    'agent.sessionAccessDenied.hint2': '  Используйте подходящий CLI_API_TOKEN или переключите пространство имён.',
+    'agent.authError': 'Ошибка аутентификации:',
+    'agent.authHint': '  Выполните: hapi auth login',
+    'agent.protocolHint.hubBehind': '  Подсказка: версия протокола хаба ({hub}) старше CLI ({cli}). Обновите хаб.',
+    'agent.protocolHint.cliBehind': '  Подсказка: версия протокола CLI ({cli}) старше хаба ({hub}). Обновите CLI.',
+    'cli.help': `HAPI — агенты для программирования с удалённым управлением
+
+Использование:
+  hapi                       Выбрать агента интерактивно
+  hapi <agent> [options]      Запустить сессию агента
+  hapi <command> [options]    Выполнить команду HAPI
+
+Агенты:
+{agents}
+
+Команды:
+  hapi auth                  Управление аутентификацией
+  hapi resume [id]           Выбрать или возобновить существующую сессию HAPI
+  hapi hub [--relay]         Запустить API + веб-хаб
+  hapi server                Псевдоним hapi hub
+  hapi runner                Управление фоновым раннером
+  hapi doctor                Диагностика и устранение неполадок
+  hapi ping-peer             Список пиров или сообщение другой сессии
+  hapi inspect-peer <id>     Метаданные и сообщения другой сессии
+  hapi mcp                   Запустить MCP-мост через stdio
+
+Опции:
+  -h, --help                 Показать справку HAPI
+  -v, --version              Показать версию HAPI
+
+Примеры:
+  hapi                       Выбрать установленного агента
+  hapi claude --resume       Возобновить сессию Claude
+  hapi codex --yolo          Запустить Codex с автоматическими одобрениями
+  hapi auth login            Настроить аутентификацию
+
+Опции агента указываются после его имени; набор опций зависит от агента.
+Скрипты и неинтерактивные оболочки должны явно указывать агента.`,
+    'selectAgent.none': 'Нет доступных поддерживаемых агентов:',
+    'selectAgent.hint': 'Установите агента или исправьте его конфигурацию, затем снова запустите hapi или используйте hapi <agent> [options].',
+    'hub.shuttingDown': 'Завершение работы...',
+    'runCli.version': 'версия hapi: {version}',
+    'runCli.needsInteractive': 'Для выбора агента нужен интерактивный терминал. Запустите: hapi <agent> [options]',
+    'runCli.unknownOption': 'Неизвестный параметр: {name}',
+    'runCli.unknownCommand': 'Неизвестная команда: {name}',
+    'runCli.hint': 'Запустите hapi, чтобы выбрать агента, или используйте hapi <agent> [options]. См. hapi --help.',
+    'autoStart.starting': 'Запускаем хаб HAPI в фоне...',
+    'autoStart.timeout': 'Предупреждение: хаб не запустился за ожидаемое время',
+    'autoStart.tryManual': '  Попробуйте запустить `hapi hub` вручную, чтобы увидеть ошибки',
+    'autoStart.started': 'Хаб HAPI запущен',
+    'autoStart.failed': 'Предупреждение: не удалось автоматически запустить хаб',
+    'autoStart.error': '  Ошибка: {error}',
+    'runner.run.alreadyRunning': 'Раннер уже запущен с подходящей версией',
+    'runner.run.banner.started': 'Раннер Hapi запущен.',
+    'runner.run.banner.workspaceRoots': '  Рабочие каталоги: {roots}',
+    'runner.run.banner.workspaceRootsNone': '(не заданы — просмотр и запуск без ограничений)',
+    'runner.run.banner.hubUrl': '  URL хаба:        {url}',
+    'runner.run.banner.machineId': '  ID машины:       {id}',
+    'runner.run.banner.controlPort': '  Порт управления: {port}',
+    'runner.run.banner.waiting': 'Ожидание сессий. Нажмите Ctrl+C, чтобы остановить.',
+    'pingPeer.help.tagline': 'Возобновить сессию HAPI (при необходимости) и отправить ей сообщение',
+    'pingPeer.help.usage': 'Использование:',
+    'pingPeer.help.stdinComment': 'прочитать сообщение из stdin',
+    'pingPeer.help.notes': 'Примечания:',
+    'pingPeer.help.note1': 'Не изобретайте JWT + curl для передачи между сессиями. Используйте эту команду или MCP ping_peer / list_peers.',
+    'pingPeer.help.note2': 'Ищет по префиксу id (8 символов достаточно). Тот же токен и пространство имён хаба, что и у этого CLI.',
+    'pingPeer.help.note3': 'Неактивные сессии возобновляются через POST /api/sessions/:id/resume, затем им отправляется сообщение.',
+    'pingPeer.help.note4': 'Когда пользователь ссылается на [title](/sessions/<id>) или Copy-reference',
+    'pingPeer.help.note5': 'See session "…" (/sessions/<id>) for context — передайте этот <id> сюда.',
+    'pingPeer.help.note6': 'На удалённом раннере для --list нужен HAPI_API_URL, указывающий на хаб раннера, а также',
+    'pingPeer.help.note7': 'CLI_API_TOKEN или `hapi auth login` для токена. Внутри сессии предпочтителен MCP list_peers.',
+    'pingPeer.help.env': 'Переменные окружения:',
+    'pingPeer.help.env2': 'HAPI_WAIT_ACTIVE_SECS (по умолчанию 60; переопределяется через --wait)',
+    'pingPeer.ok': 'hapi ping-peer: OK — доставлено в {id}',
+    'inspectPeer.help.tagline': 'Метаданные и последние сообщения другой сессии HAPI',
+    'inspectPeer.help.usage': 'Использование:',
+    'inspectPeer.help.notes': 'Примечания:',
+    'inspectPeer.help.note1': 'Read-only аналог ping-peer. Предпочитайте это (или MCP inspect_peer) вместо JWT+curl.',
+    'inspectPeer.help.note2': 'Ищет по префиксу id (8 символов достаточно; лучше полный UUID). Тот же токен и пространство имён хаба.',
+    'inspectPeer.help.note3': 'НЕ возобновляет неактивные сессии.',
+    'inspectPeer.help.note4': 'Когда пользователь ссылается на [title](/sessions/<id>) или Copy-reference',
+    'inspectPeer.help.note5': 'See session "…" (/sessions/<id>) for context — передайте этот <id> сюда.',
+    'inspectPeer.help.note6': '/sessions/<id> — это путь хаба, а не локальный путь файловой системы.',
+    'inspectPeer.help.env': 'Переменные окружения:',
     'doctor.clean.errors': 'Ошибки:'
 
 }
