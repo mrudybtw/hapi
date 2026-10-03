@@ -102,7 +102,7 @@
 | Метод и путь | Запрос | Применяется к |
 |---|---|---|
 | `POST /api/sessions/:id/permission-mode` | `{mode: PermissionMode}` | Все flavor кроме `pi` и `dsh` (наборы, допускаемые для flavor, в `modes.ts`) |
-| `POST /api/sessions/:id/model` | `{model: string \| {provider, modelId} \| null}` | Flavor с `supportsModelChange`; только удалённо для codex/cursor/grok. `dsh` применяет переключение через опцию конфигурации ACP `model` на следующей границе хода, поэтому сервер должен объявлять её |
+| `POST /api/sessions/:id/model` | `{model: string \| {provider, modelId} \| null}` | Flavor с `supportsModelChange` (кроме `dsh`); только удалённо для codex/cursor/grok |
 | `POST /api/sessions/:id/effort` | `{effort: string \| null}` | claude, grok, pi (`supportsEffort`) |
 | `POST /api/sessions/:id/model-reasoning-effort` | `{modelReasoningEffort: string \| null}` | codex, opencode (только удалённо) |
 | `POST /api/sessions/:id/service-tier` | `{serviceTier: 'fast' \| 'standard'}` | codex (только удалённо) |
@@ -138,7 +138,7 @@
 
 | Метод и путь | Примечания |
 |---|---|
-| `GET /api/sessions/:id/codex-models`, `/opencode-models`, `/cursor-models`, `/grok-models`, `/copilot-models`, `/kimi-models`, `/pi-models`, `/dsh-models` | Активная сессия соответствующего flavor; иначе 400. `dsh-models` пуст, если настроенный ACP-сервер DSH не объявляет опцию конфигурации `model` |
+| `GET /api/sessions/:id/codex-models`, `/opencode-models`, `/cursor-models`, `/grok-models`, `/copilot-models`, `/kimi-models`, `/pi-models` | Активная сессия соответствующего flavor; иначе 400 |
 | `GET /api/sessions/:id/opencode-reasoning-effort-options`, `/grok-reasoning-effort-options` | Тот же шаблон |
 | `GET /api/machines/:id/agy-models`, `/pi-models`, `/codex-models`, `/cursor-models` | Уровень машины (пикеры до запуска). `agy-models` принимает `?refresh=true`, чтобы пропустить кешированный каталог машины, и может ответить `success: true` с рекомендательной `error` (см. [Ошибки](./errors.ru.md#эндпоинты-в-обёртке-rpc)) |
 | `GET /api/machines/:id/opencode-models?cwd=`, `/grok-models?cwd=`, `/copilot-models?cwd=`, `/kimi-models?cwd=` | Query `cwd` обязателен (400 без него) |
