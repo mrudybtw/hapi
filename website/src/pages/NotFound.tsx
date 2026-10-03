@@ -17,6 +17,8 @@ export default function NotFound() {
     <>
       <Helmet>
         <html lang={i18n.language} />
+        <title>{`${t("notFound.title")} | HAPI`}</title>
+        <meta name="description" content={t("notFound.desc")} />
       </Helmet>
       <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <Card className="w-full max-w-lg mx-4 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
