@@ -129,4 +129,29 @@ describe('usePushNotifications VAPID rotation', () => {
         })
         expect(localStorage.getItem(VAPID_STORAGE_KEY)).toBe(CURRENT_VAPID_KEY)
     })
+
+    it('refreshes the hub language when the UI language changes', async () => {
+        const existing = createSubscription('https://push.test/current', true)
+        const replacement = createSubscription('https://push.test/current', true)
+        setupPushEnvironment(existing, replacement)
+        const api = createApi()
+        const { rerender } = renderHook(
+            ({ language }: { language: string }) => usePushNotifications(api as unknown as ApiClient, language),
+            { initialProps: { language: 'en' } }
+        )
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledWith({
+            endpoint: existing.endpoint,
+            keys: { p256dh: 'p256dh', auth: 'auth' },
+            language: 'en'
+        }))
+
+        rerender({ language: 'ru' })
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledWith({
+            endpoint: existing.endpoint,
+            keys: { p256dh: 'p256dh', auth: 'auth' },
+            language: 'ru'
+        }))
+    })
 })
