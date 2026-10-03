@@ -67,6 +67,20 @@ describe('devices routes', () => {
         expect((await register('en-US')).status).toBe(200)
         expect(store.fcm.getDevicesByNamespace('default', ['phone'])[0]?.language).toBe('en-US')
 
+        // An explicit null (clients that serialise optional fields) is fine too.
+        expect((await app.request('/api/devices/register', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                token: 'fcm-lang',
+                platform: 'phone',
+                deviceId: 'phone-lang',
+                pushKey: Buffer.alloc(32, 5).toString('base64'),
+                language: null
+            })
+        })).status).toBe(200)
+        expect(store.fcm.getDevicesByNamespace('default', ['phone'])[0]?.language).toBeNull()
+
         // Omitting the field on a later registration keeps the row valid.
         expect((await register()).status).toBe(200)
         expect(store.fcm.getDevicesByNamespace('default', ['phone'])[0]?.language).toBeNull()
