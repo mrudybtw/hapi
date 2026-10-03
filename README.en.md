@@ -1,5 +1,7 @@
 # HAPI
 
+> 🇷🇺 [Русская версия](README.md)
+
 Run official Claude Code / Codex / Cursor Agent / Grok Build / OpenCode / Kimi / Copilot / Antigravity / Pi / DeepSeek Harness sessions and control them remotely through native iOS / Android apps, Web / PWA, or Telegram Mini App.
 
 > **Why HAPI?** HAPI is a local-first alternative to Happy. See [Why Not Happy?](docs/guide/why-hapi.md) for the key differences.
@@ -39,6 +41,8 @@ The hub displays a URL and two QR codes. Open the web URL in a browser, or pair 
 For self-hosted options (Cloudflare Tunnel, Tailscale), see [Installation](docs/guide/installation.md)
 
 ## Docs
+
+> Russian translations of these guides are kept next to the English originals as `*.ru.md` — see [README.md](README.md).
 
 - [Native apps (iOS / Android)](docs/guide/native-apps.md)
 - [Web / PWA](docs/guide/pwa.md)

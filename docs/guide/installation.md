@@ -1,78 +1,78 @@
-# Установка
+# Installation
 
-Установите CLI HAPI и настройте хаб. О сборке и сопряжении клиентов для телефона
-см. [Нативные приложения (iOS / Android)](./native-apps.md); об установке в браузере —
-см. [PWA](./pwa.md).
+Install the HAPI CLI and set up the hub. For phone client builds and pairing,
+see [Native apps (iOS / Android)](./native-apps.md); for browser installation,
+see [PWA](./pwa.md).
 
-## Предварительные требования
+## Prerequisites
 
-- Установлен хотя бы один поддерживаемый CLI агента (Claude Code, Codex, Cursor Agent, Grok Build, OpenCode, ACP-сервер DeepSeek Harness и другие — см. [Поддерживаемые агенты](./agents.md))
+- At least one supported agent CLI installed (Claude Code, Codex, Cursor Agent, Grok Build, OpenCode, DeepSeek Harness ACP server, and more — see [Supported Agents](./agents.md))
 
-Проверьте, что ваш CLI установлен:
+Verify your CLI is installed:
 
 ```bash
-# Для Claude Code
+# For Claude Code
 claude --version
 
-# Для OpenAI Codex CLI
+# For OpenAI Codex CLI
 codex --version
 
-# Для Cursor Agent CLI
+# For Cursor Agent CLI
 agent --version
 
-# Для Grok Build CLI
+# For Grok Build CLI
 grok --version
 
-# Для OpenCode CLI
+# For OpenCode CLI
 opencode --version
 ```
 
-## Архитектура
+## Architecture
 
-HAPI использует такие роли времени выполнения:
+HAPI uses these runtime roles:
 
-| Компонент | Роль | Обязателен |
+| Component | Role | Required |
 |-----------|------|----------|
-| **CLI** | Оборачивает ИИ-агентов, запускает сессии | Да |
-| **Hub** | Центральный координатор: хранение, синхронизация в реальном времени, удалённый доступ | Да |
-| **Runner** | Фоновый сервис для удалённого запуска сессий | Опционально |
-| **Client** | Нативные iOS/Android, Web/PWA или Telegram Mini App | Один клиент для удалённого управления |
+| **CLI** | Wraps AI coding agents, runs sessions | Yes |
+| **Hub** | Central coordinator: persistence, real-time sync, remote access | Yes |
+| **Runner** | Background service for remote session spawning | Optional |
+| **Client** | Native iOS/Android, Web/PWA or Telegram Mini App | One client for remote control |
 
-### Как они работают вместе
+### How they work together
 
-CLI и Runner подключаются к хабу по Socket.IO; клиенты отправляют действия
-через REST и получают живые обновления по SSE. Runner запускает CLI-сессии,
-когда их запрашивают через хаб. См. [обзор архитектуры](./how-it-works.md).
+The CLI and Runner connect to the hub over Socket.IO; clients send actions
+through REST and receive live updates through SSE. The Runner spawns CLI
+sessions when requested through the hub. See the [architecture overview](./how-it-works.md#architecture-overview).
 
-- **CLI**: выберите агента командой `hapi` или запустите напрямую `hapi <agent>`. CLI оборачивает вашего ИИ-агента и синхронизируется с хабом. В скриптах агента нужно указывать явно.
-- **Hub**: выполните `hapi hub`. Хранит сессии, обрабатывает разрешения, обеспечивает удалённый доступ.
-- **Runner**: выполните `hapi runner start`. Позволяет запускать сессии из нативных или веб-клиентов, не держа терминал открытым.
-- **Client**: сопрягите нативное приложение с HTTPS-адресом хаба и токеном доступа или войдите через веб-приложение.
+- **CLI**: Choose an agent with `hapi`, or start one directly with `hapi <agent>`. The CLI wraps your AI agent and syncs with the hub. Scripts must specify the agent explicitly.
+- **Hub**: Run `hapi hub`. Stores sessions, handles permissions, enables remote access.
+- **Runner**: Run `hapi runner start`. Lets you spawn sessions from native or web clients without keeping a terminal open.
+- **Client**: Pair a native app with the HTTPS hub origin and access token, or log in through the web app.
 
-### Типичные сценарии
+### Typical workflows
 
-**Только локально**: `hapi hub` → `hapi` → работа в терминале
+**Local only**: `hapi hub` → `hapi` → work in terminal
 
-**Удалённый доступ**: `hapi hub --relay` → `hapi runner start` → сопрягите нативное приложение или откройте веб-приложение
+**Remote access**: `hapi hub --relay` → `hapi runner start` → pair a native app or open the web app
 
-## Установка CLI
+## Install the CLI
 
 ```bash
 npm install -g @twsxtd/hapi --registry=https://registry.npmjs.org
 ```
 
-> Рекомендация: используйте официальный npm-реестр для глобальной установки. Некоторые зеркала могут не синхронизировать платформенные пакеты вовремя.
+> Recommendation: use the official npm registry for global install. Some mirrors may not sync platform packages in time.
 
-Или через Homebrew:
+Or with Homebrew:
 
 ```bash
 brew install tiann/tap/hapi
 ```
 
-## Другие способы установки
+## Other install options
 
 <details>
-<summary>npx (без установки)</summary>
+<summary>npx (no install)</summary>
 
 ```bash
 npx @twsxtd/hapi
@@ -80,9 +80,9 @@ npx @twsxtd/hapi
 </details>
 
 <details>
-<summary>Готовый бинарь</summary>
+<summary>Prebuilt binary</summary>
 
-Скачайте последний релиз из [GitHub Releases](https://github.com/tiann/hapi/releases).
+Download the latest release from [GitHub Releases](https://github.com/tiann/hapi/releases).
 
 ```bash
 xattr -d com.apple.quarantine ./hapi
@@ -92,9 +92,9 @@ sudo mv ./hapi /usr/local/bin/
 </details>
 
 <details>
-<summary>Сборка из исходников</summary>
+<summary>Build from source</summary>
 
-Требуется Bun 1.4.0.
+Requires Bun 1.4.0.
 
 ```bash
 git clone https://github.com/tiann/hapi.git
@@ -105,122 +105,122 @@ bun build:single-exe
 ./cli/dist-exe/<target>/hapi
 ```
 
-`<target>` — цель сборки Bun (например, `bun-linux-x64`, `bun-darwin-arm64`); по умолчанию — платформа и архитектура хоста.
+`<target>` is the Bun build target (e.g., `bun-linux-x64`, `bun-darwin-arm64`); it defaults to the host platform and architecture.
 </details>
 
-## Настройка хаба
+## Hub setup
 
-Хаб можно развернуть на:
+The hub can be deployed on:
 
-- **Локальном компьютере** (по умолчанию) — запуск на вашей машине разработки
-- **Удалённом хосте** — разверните хаб на VPS, облачном хосте или любой машине с доступом к сети
+- **Local desktop** (default) - Run on your development machine
+- **Remote host** - Deploy the hub on a VPS, cloud host, or any machine with network access
 
-### По умолчанию: публичное реле (рекомендуется)
+### Default: Public Relay (recommended)
 
 ```bash
 hapi hub --relay
 ```
 
-Терминал отображает URL и QR-код. Отсканируйте, чтобы получить доступ отовсюду.
+The terminal displays a URL and QR code. Scan to access from anywhere.
 
-`hapi server` остаётся поддерживаемым псевдонимом.
+`hapi server` remains supported as an alias.
 
-- **Сквозное шифрование** через WireGuard + TLS
-- Настройка не требуется
-- Работает за NAT, файрволами и в любой сети
+- **End-to-end encrypted** with WireGuard + TLS
+- No configuration needed
+- Works behind NAT, firewalls, and any network
 
-Об управлении ключами реле, TCP-fallback и self-hosted альтернативах туннелей см. [Развёртывание](./deployment.md).
+For relay key management, TCP fallback, and self-hosted tunnel alternatives, see [Deployment](./deployment.md#relay-tunnel-details).
 
-### Только локально
+### Local Only
 
 ```bash
 hapi hub
-# или
+# or
 hapi hub --no-relay
 ```
 
-По умолчанию хаб слушает на `http://localhost:3006`.
+The hub listens on `http://localhost:3006` by default.
 
-При первом запуске HAPI:
+On first run, HAPI:
 
-1. Создаёт `~/.hapi/`
-2. Генерирует безопасный токен доступа
-3. Печатает токен и сохраняет его в `~/.hapi/settings.json`
+1. Creates `~/.hapi/`
+2. Generates a secure access token
+3. Prints the token and saves it to `~/.hapi/settings.json`
 
 <details>
-<summary>Файлы конфигурации</summary>
+<summary>Config files</summary>
 
 ```
 ~/.hapi/
-├── settings.json      # Основная конфигурация
-├── hapi.db           # База данных SQLite (хаб)
-├── runner.state.json  # Состояние процесса раннера
-└── logs/             # Файлы логов
+├── settings.json      # Main configuration
+├── hapi.db           # SQLite database (hub)
+├── runner.state.json  # Runner process state
+└── logs/             # Log files
 ```
 </details>
 
 <details>
-<summary>Переменные окружения</summary>
+<summary>Environment variables</summary>
 
-| Переменная | По умолчанию | settings.json | Описание |
+| Variable | Default | settings.json | Description |
 |----------|---------|---------------|-------------|
-| `CLI_API_TOKEN` | Автогенерация | `cliApiToken` | Общий секрет для аутентификации |
-| `HAPI_API_URL` | `http://localhost:3006` | `apiUrl` | URL хаба для подключений CLI |
-| `HAPI_EXTRA_HEADERS_JSON` | - | `extraHeaders` | JSON-объект дополнительных исходящих заголовков для HTTP/WebSocket-запросов CLI → хаб |
-| `HAPI_LISTEN_HOST` | `127.0.0.1` | `listenHost` | Адрес привязки HTTP хаба |
-| `HAPI_LISTEN_PORT` | `3006` | `listenPort` | HTTP-порт хаба |
-| `HAPI_PUBLIC_URL` | - | `publicUrl` | Публичный URL для внешнего доступа |
-| `CORS_ORIGINS` | - | `corsOrigins` | Разрешённые CORS-origin (через запятую) |
-| `TELEGRAM_BOT_TOKEN` | - | `telegramBotToken` | Токен Telegram Bot API |
-| `TELEGRAM_NOTIFICATION` | `true` | `telegramNotification` | Включить уведомления Telegram |
-| `SERVERCHAN_SENDKEY` | - | `serverChanSendKey` | SendKey Server酱 (ServerChan) для push-уведомлений |
-| `SERVERCHAN_NOTIFICATION` | `true` | `serverChanNotification` | Включить уведомления ServerChan |
-| `SERVERCHAN_BACKGROUND_ONLY` | `false` | `serverChanBackgroundOnly` | Отправлять уведомления ServerChan только когда в пространстве имён нет видимого подключения HAPI |
-| `HAPI_RELAY_API` | `relay.hapi.run` | - | Домен API реле для публичного реле |
-| `HAPI_RELAY_AUTH` | Ключ на хаб, выдаваемый реле | `relayAuthKey` | Переопределение ключа аутентификации реле (задавайте только если оператор выдал ключ) |
-| `HAPI_RELAY_FORCE_TCP` | `false` | - | Принудительный TCP-режим для реле |
-| `HAPI_OFFICIAL_WEB_URL` | `https://app.hapi.run` | - | Origin официального веб-приложения, добавляется в CORS при включённом реле |
-| `VAPID_SUBJECT` | `mailto:admin@hapi.run` | - | Контактная информация Web Push |
-| `HAPI_ANDROID_PUSH` | `auto` | `androidPushMode` | Android push: официальное реле по умолчанию, прямой FCM при настроенных приватных учётных данных; также принимает `relay`, `fcm`, `off` |
-| `HAPI_IOS_PUSH` | `relay` | `iosPushMode` | iOS push: `relay`, прямой `apns` или `off` |
-| `HAPI_PUSH_RELAY_URL` | `https://push.hapi.run` | `iosPushRelayUrl` | Общее push-реле Android/iOS, независимое от сетевого туннеля |
-| `FCM_SERVICE_ACCOUNT_PATH` | - | `fcmServiceAccountPath` | Прямые учётные данные FCM для приватных сборок с тем же проектом Firebase |
-| `HAPI_HOME` | `~/.hapi` | - | Путь каталога конфигурации |
-| `DB_PATH` | `~/.hapi/hapi.db` | - | Путь файла базы данных |
-| `HAPI_EXPERIMENTAL` | - | - | CLI: включить экспериментальные функции (`true`/`1`/`yes`) |
-| `ELEVENLABS_API_KEY` | - | Settings / env | API-ключ ElevenLabs для голоса + диктовки |
-| `ELEVENLABS_AGENT_ID` | Автосоздание | - | Пользовательский ID агента ElevenLabs |
-| `GEMINI_API_KEY` / `GOOGLE_API_KEY` | - | Settings / env | Голосовой ассистент Gemini Live |
-| `DASHSCOPE_API_KEY` / `QWEN_API_KEY` | - | Settings / env | Голосовой ассистент Qwen Realtime |
-| `VOICE_BACKEND` | Автоопределение | - | Бэкенд ассистента по умолчанию: `elevenlabs`, `gemini-live` или `qwen-realtime` |
-| `OPENAI_API_KEY` | - | Settings / env | API-ключ OpenAI для диктовки (`gpt-transcribe` / `gpt-live-transcribe`) |
-| `DEEPGRAM_API_KEY` | - | Settings / env | API-ключ Deepgram для диктовки (`nova-3`) |
-| `GROQ_API_KEY` | - | Settings / env | API-ключ Groq для диктовки (`whisper-large-v3`) |
-| `TRANSCRIPTION_BASE_URL` | - | Settings / env | Базовый URL OpenAI-совместимой/локальной транскрипции |
-| `TRANSCRIPTION_MODEL` | - | Settings / env | Модель для OpenAI-совместимого эндпоинта транскрипции |
-| `TRANSCRIPTION_API_KEY` | - | Settings / env | Опциональный bearer-токен для этого эндпоинта |
-| `HAPI_TITLE_PROVIDER_BASE_URL` | - | - | Только для сервера: базовый URL OpenAI-совместимых Chat Completions для генерируемых заголовков сессий |
-| `HAPI_TITLE_PROVIDER_API_KEY` | - | - | Только для сервера: API-ключ для генерируемых заголовков сессий; никогда не отправляется в браузер |
-| `HAPI_TITLE_PROVIDER_MODEL` | - | - | Только для сервера: лёгкая модель для генерируемых заголовков сессий |
-| `HAPI_TITLE_SUGGESTION_RATE_LIMIT` | `5` | - | Максимум предложений заголовка на сессию в окне лимита |
-| `HAPI_TITLE_SUGGESTION_RATE_WINDOW_MS` | `600000` | - | Окно лимита предложений заголовка в миллисекундах |
-| `HAPI_TITLE_PROVIDER_MAX_TOKENS` | `64` | - | Максимальный бюджет токенов завершения на заголовок; увеличьте для reasoning-провайдеров |
-| `HAPI_TITLE_PROVIDER_TIMEOUT_MS` | `10000` | - | Таймаут запроса к провайдеру заголовков в миллисекундах |
+| `CLI_API_TOKEN` | Auto-generated | `cliApiToken` | Shared secret for authentication |
+| `HAPI_API_URL` | `http://localhost:3006` | `apiUrl` | Hub URL for CLI connections |
+| `HAPI_EXTRA_HEADERS_JSON` | - | `extraHeaders` | JSON object of extra outbound headers for CLI → hub HTTP/WebSocket requests |
+| `HAPI_LISTEN_HOST` | `127.0.0.1` | `listenHost` | Hub HTTP bind address |
+| `HAPI_LISTEN_PORT` | `3006` | `listenPort` | Hub HTTP port |
+| `HAPI_PUBLIC_URL` | - | `publicUrl` | Public URL for external access |
+| `CORS_ORIGINS` | - | `corsOrigins` | Allowed CORS origins (comma-separated) |
+| `TELEGRAM_BOT_TOKEN` | - | `telegramBotToken` | Telegram Bot API token |
+| `TELEGRAM_NOTIFICATION` | `true` | `telegramNotification` | Enable Telegram notifications |
+| `SERVERCHAN_SENDKEY` | - | `serverChanSendKey` | Server酱 (ServerChan) SendKey for push notifications |
+| `SERVERCHAN_NOTIFICATION` | `true` | `serverChanNotification` | Enable ServerChan notifications |
+| `SERVERCHAN_BACKGROUND_ONLY` | `false` | `serverChanBackgroundOnly` | Only send ServerChan notifications when no visible HAPI connection exists in the namespace |
+| `HAPI_RELAY_API` | `relay.hapi.run` | - | Relay API domain for the public relay |
+| `HAPI_RELAY_AUTH` | Per-hub key issued by the relay | `relayAuthKey` | Relay auth key override (set only when an operator provides a key) |
+| `HAPI_RELAY_FORCE_TCP` | `false` | - | Force TCP mode for relay |
+| `HAPI_OFFICIAL_WEB_URL` | `https://app.hapi.run` | - | Official web app origin, added to CORS when the relay is enabled |
+| `VAPID_SUBJECT` | `mailto:admin@hapi.run` | - | Web Push contact info |
+| `HAPI_ANDROID_PUSH` | `auto` | `androidPushMode` | Android push: official relay by default, direct FCM when private credentials are configured; also accepts `relay`, `fcm`, `off` |
+| `HAPI_IOS_PUSH` | `relay` | `iosPushMode` | iOS push: `relay`, direct `apns`, or `off` |
+| `HAPI_PUSH_RELAY_URL` | `https://push.hapi.run` | `iosPushRelayUrl` | Shared Android/iOS push relay, independent of the network tunnel |
+| `FCM_SERVICE_ACCOUNT_PATH` | - | `fcmServiceAccountPath` | Direct FCM credentials for private builds using the same Firebase project |
+| `HAPI_HOME` | `~/.hapi` | - | Config directory path |
+| `DB_PATH` | `~/.hapi/hapi.db` | - | Database file path |
+| `HAPI_EXPERIMENTAL` | - | - | CLI: enable experimental features (`true`/`1`/`yes`) |
+| `ELEVENLABS_API_KEY` | - | Settings / env | ElevenLabs API key for voice + dictation |
+| `ELEVENLABS_AGENT_ID` | Auto-created | - | Custom ElevenLabs agent ID |
+| `GEMINI_API_KEY` / `GOOGLE_API_KEY` | - | Settings / env | Gemini Live voice assistant |
+| `DASHSCOPE_API_KEY` / `QWEN_API_KEY` | - | Settings / env | Qwen Realtime voice assistant |
+| `VOICE_BACKEND` | Auto-detected | - | Default assistant backend: `elevenlabs`, `gemini-live`, or `qwen-realtime` |
+| `OPENAI_API_KEY` | - | Settings / env | OpenAI API key for dictation (`gpt-transcribe` / `gpt-live-transcribe`) |
+| `DEEPGRAM_API_KEY` | - | Settings / env | Deepgram API key for dictation (`nova-3`) |
+| `GROQ_API_KEY` | - | Settings / env | Groq API key for dictation (`whisper-large-v3`) |
+| `TRANSCRIPTION_BASE_URL` | - | Settings / env | OpenAI-compatible/local transcription base URL |
+| `TRANSCRIPTION_MODEL` | - | Settings / env | Model for the OpenAI-compatible transcription endpoint |
+| `TRANSCRIPTION_API_KEY` | - | Settings / env | Optional bearer token for that endpoint |
+| `HAPI_TITLE_PROVIDER_BASE_URL` | - | - | Server-only OpenAI-compatible Chat Completions base URL for generated session titles |
+| `HAPI_TITLE_PROVIDER_API_KEY` | - | - | Server-only API key for generated session titles; never sent to the browser |
+| `HAPI_TITLE_PROVIDER_MODEL` | - | - | Server-only lightweight model used for generated session titles |
+| `HAPI_TITLE_SUGGESTION_RATE_LIMIT` | `5` | - | Maximum title suggestions per session in the rate-limit window |
+| `HAPI_TITLE_SUGGESTION_RATE_WINDOW_MS` | `600000` | - | Title suggestion rate-limit window in milliseconds |
+| `HAPI_TITLE_PROVIDER_MAX_TOKENS` | `64` | - | Maximum completion-token budget per generated title; raise for reasoning-model providers |
+| `HAPI_TITLE_PROVIDER_TIMEOUT_MS` | `10000` | - | Title provider request timeout in milliseconds |
 </details>
 
-Действие **Generate** в диалоге переименования сессии недоступно, пока все три
-переменные `HAPI_TITLE_PROVIDER_*` не настроены на хабе. Провайдер
-вызывается только по запросу; существующий ручной поток переименования не требует этих
-переменных. Каждый запрос отправляет недавний видимый текст диалога пользователь/ассистент
-(до 200 сохранённых сообщений и ограниченный промпт) этому настроенному провайдеру.
+The session rename dialog's **Generate** action is unavailable until all three
+`HAPI_TITLE_PROVIDER_*` variables are configured on the Hub. The provider is
+called only on demand; the existing manual rename flow does not require these
+variables. Each request sends recent visible user/assistant conversation text
+(up to 200 stored messages and a bounded prompt) to that configured provider.
 
 <details>
-<summary>Пример settings.json</summary>
+<summary>settings.json example</summary>
 
-Приоритет конфигурации: **ENV > settings.json > default**
+Configuration priority: **ENV > settings.json > default**
 
-Когда значения ENV заданы и отсутствуют в settings.json, они автоматически сохраняются.
-`HAPI_EXTRA_HEADERS_JSON` не сохраняется автоматически, чтобы учётные данные доступа не персистились неожиданно.
+When ENV values are set and not present in settings.json, they are automatically saved.
+`HAPI_EXTRA_HEADERS_JSON` is not automatically saved, so access credentials are not persisted unexpectedly.
 
 ```json
 {
@@ -237,9 +237,9 @@ hapi hub --no-relay
 JSON Schema: [settings.schema.json](https://hapi.run/docs/schemas/settings.schema.json)
 </details>
 
-## Настройка CLI
+## CLI setup
 
-Если хаб не на localhost, задайте это перед запуском `hapi`:
+If the hub is not on localhost, set these before running `hapi`:
 
 ```bash
 export HAPI_API_URL="http://your-hub:3006"
@@ -247,13 +247,13 @@ export CLI_API_TOKEN="your-token-here"
 export HAPI_EXTRA_HEADERS_JSON='{"Cookie":"CF_Authorization=..."}'
 ```
 
-Или используйте интерактивный вход:
+Or use interactive login:
 
 ```bash
 hapi auth login
 ```
 
-Команды аутентификации:
+Authentication commands:
 
 ```bash
 hapi auth status
@@ -261,24 +261,24 @@ hapi auth login
 hapi auth logout
 ```
 
-Каждая машина получает уникальный ID, хранящийся в `~/.hapi/settings.json`. Это позволяет:
+Each machine gets a unique ID stored in `~/.hapi/settings.json`. This allows:
 
-- подключать несколько машин к одному хабу;
-- удалённо запускать сессии на конкретных машинах;
-- мониторить здоровье машин.
+- Multiple machines to connect to one hub
+- Remote session spawning on specific machines
+- Machine health monitoring
 
-### Диагностика
+### Diagnostics
 
-Выполните `hapi doctor` для полного отчёта диагностики: конфигурация, статус раннера, логи и релевантная информация об окружении.
+Run `hapi doctor` for a full diagnostics report: configuration, runner status, logs, and relevant environment info.
 
 ```bash
-hapi doctor          # Отчёт диагностики
-hapi doctor clean    # Убить разбежавшиеся процессы hapi
+hapi doctor          # Diagnostics report
+hapi doctor clean    # Kill runaway hapi processes
 ```
 
-## Настройка раннера
+## Runner setup
 
-Запустите фоновый сервис для удалённого запуска сессий:
+Run a background service for remote session spawning:
 
 ```bash
 hapi runner start
@@ -287,70 +287,70 @@ hapi runner logs
 hapi runner stop
 ```
 
-При работающем раннере:
+With the runner running:
 
-- ваша машина появляется в списке «Machines»;
-- вы можете удалённо запускать сессии из веб-приложения;
-- сессии сохраняются даже когда терминал закрыт.
+- Your machine appears in the "Machines" list
+- You can spawn sessions remotely from the web app
+- Sessions persist even when the terminal is closed
 
-#### Раздельный хаб + удалённый раннер (обнаружение пиров)
+#### Split hub + remote runner (peer discovery)
 
-Когда хаб работает на одном хосте, а раннер на другом, агенты внутри сессий, запущенных раннером, должны обнаруживать пиров через MCP **`list_peers`** (с теми же учётными данными хаба, что и CLI сессии). Предпочитайте это shell-вызову `hapi ping-peer --list`.
+When the hub runs on one host and the runner on another, agents inside runner-spawned sessions should discover peers via MCP **`list_peers`** (same hub credentials as the session CLI). Prefer that over shelling `hapi ping-peer --list`.
 
 ```
-[Хост хаба]  hapi hub          ← БД сессий + /api/sessions
+[Hub host]  hapi hub          ← sessions DB + /api/sessions
      ▲
      │ HAPI_API_URL + CLI_API_TOKEN
      │
-[Хост раннера]  hapi runner start  → запускает CLI сессий
-                      │
-                      ▼
-               сессия агента  → MCP list_peers / inspect_peer / ping_peer
+[Runner host]  hapi runner start  → spawns session CLIs
+                     │
+                     ▼
+              agent session  → MCP list_peers / inspect_peer / ping_peer
 ```
 
-На хосте раннера настройте **те же** URL хаба и токен, которые использует хаб:
+On the runner host, configure the **same** hub URL and token the hub uses:
 
 ```bash
-export HAPI_API_URL="http://your-hub:3006"   # или Tailscale / публичный URL
+export HAPI_API_URL="http://your-hub:3006"   # or Tailscale / public URL
 export CLI_API_TOKEN="your-token-here"
-# или: hapi auth login   # сохраняет токен; всё равно задайте HAPI_API_URL для удалённого хаба
+# or: hapi auth login   # saves the token; still set HAPI_API_URL for a remote hub
 hapi runner start
 ```
 
-CLI сессии может экспортировать **явный** нестандартный `HAPI_API_URL` (из env или настроек) в окружение дочерних процессов, чтобы shell-помощники обращались к тому же удалённому хабу. Он **не** зеркалирует `CLI_API_TOKEN` в обёрнутые агенты (секреты из настроек/промпта не попадают в окружение агента; свежий `hapi` заново читает `~/.hapi/settings.json`, а токены systemd/env уже наследуются). Внутри сессии предпочитайте MCP `list_peers`. PTY веб-терминала по-прежнему вычищают секреты хаба. Если `--list` падает с ошибкой auth/URL, сообщение указывает на `hapi auth login` и настроенный URL хаба.
+Session CLI may export an **explicit** non-default `HAPI_API_URL` (from env or settings) into child env so shell helpers hit the same remote hub. It does **not** mirror `CLI_API_TOKEN` into wrapped agents (settings/prompt-backed secrets stay out of agent env; a fresh `hapi` re-reads `~/.hapi/settings.json`, and systemd/env tokens already inherit). Prefer MCP `list_peers` inside a session. Web terminal PTYs still strip hub secrets. If `--list` fails with an auth/URL error, the message points at `hapi auth login` and the configured hub URL.
 
-Дополнительные команды раннера:
+Additional runner commands:
 
 ```bash
-hapi runner list                      # Список активных сессий
-hapi runner stop-session <sessionId>  # Остановить одну сессию, управляемую раннером
+hapi runner list                      # List active sessions
+hapi runner stop-session <sessionId>  # Stop a single session managed by the runner
 ```
 
-Используйте `--workspace-root <path>`, чтобы ограничить каталоги, которые раннер может просматривать и в которых может запускать сессии. Повторяйте флаг для нескольких каталогов; поддерживается раскрытие `~`:
+Use `--workspace-root <path>` to restrict which directories the runner can browse and spawn sessions in. Repeat the flag to allow multiple directories; supports `~` expansion:
 
 ```bash
 hapi runner start --workspace-root ~/projects --workspace-root ~/work
 ```
 
-Без `--workspace-root` просмотр каталогов и запуск принимают пути
-везде, куда имеет доступ учётная запись ОС раннера. Выбор каталога в iOS начинается
-с домашнего каталога и может подниматься выше. Настройка корней ограничивает
-и просмотр, и запуск этими корнями, включая цели символических ссылок.
+Without `--workspace-root`, directory browsing and spawning both accept paths
+anywhere the runner's OS account can access. The iOS directory picker starts
+at the home directory and can navigate above it. Configuring roots restricts
+both browsing and spawning to those roots, including symlink targets.
 
-О запуске хаба и раннера как постоянных фоновых служб (pm2, launchd, systemd) см. [Развёртывание](./deployment.md). Для установок под супервизором задавайте `HAPI_RUNNER_SUPERVISED=1` для процесса раннера (systemd `Environment=` / pm2 `--env`), чтобы веб-кнопка **Restart** могла безопасно остановить раннер, зная, что супервизор холодно перезапустит его.
+For running the hub and runner as persistent background services (pm2, launchd, systemd), see [Deployment](./deployment.md). Supervised installs should set `HAPI_RUNNER_SUPERVISED=1` on the runner process (systemd `Environment=` / pm2 `--env`) so the web **Restart** control can safely stop-runner knowing the supervisor will cold-start it.
 
-### Хабы с несколькими машинами
+### Multi-machine hubs
 
-Можно запустить **один хаб** и **раннеры на многих машинах** (каждая машина ставит свой CLI). При обновлении хаба обновите CLI HAPI на каждой машине, которая является родителем сессий. После изменения бинаря CLI на диске раннер этой машины обычно **сам перезапускается** через передачу версии (если не задан `HAPI_DISABLE_VERSION_HANDOFF=1`). Пока раннер не сообщит возможности, которые требует хаб, веб-UI показывает баннер **Runner out of date** (сворачиваемый / откладываемый) с именем хоста и шагами обновления. Кнопка **Restart** на хосте в баннере — только запасной выход, когда передача версии застряла или отключена — хаб никогда не скачивает и не устанавливает пакеты на удалённых машинах.
+You can run **one hub** and **runners on many machines** (each machine installs its own CLI). When you upgrade the hub, upgrade the HAPI CLI on every machine that parents sessions. After the CLI binary on disk changes, that machine’s runner normally **self-restarts** via version handoff (unless `HAPI_DISABLE_VERSION_HANDOFF=1`). Until a runner reports the capabilities the hub requires, the web UI shows a **Runner out of date** banner (minimizable / snoozeable) with the host name and upgrade steps. The banner’s per-host **Restart** is only an escape hatch when handoff is stuck or disabled — the hub never downloads or installs packages on remotes.
 
-## Заметки о безопасности
+## Security notes
 
-- Держите токены в секрете и ротируйте при необходимости
-- Используйте HTTPS для публичного доступа
-- Ограничивайте CORS-origin в проде
+- Keep tokens secret and rotate if needed
+- Use HTTPS for public access
+- Restrict CORS origins in production
 
 <details>
-<summary>Пример файрвола (ufw)</summary>
+<summary>Firewall example (ufw)</summary>
 
 ```bash
 ufw allow from 192.168.1.0/24 to any port 3006

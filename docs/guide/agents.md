@@ -1,168 +1,168 @@
-# Поддерживаемые агенты
+# Supported Agents
 
-HAPI — это обёртка вокруг ИИ-агентов. Одна команда (`hapi <agent>`) запускает любого поддерживаемого агента локально и предоставляет ту же сессию для удалённого управления из веб-приложения, PWA и Telegram — с запросами разрешений, очередью сообщений и бесшовной передачей между терминалом и телефоном.
+HAPI is a wrapper around AI coding agents. One CLI (`hapi <agent>`) starts any supported agent locally and exposes the same session for remote control from the web app, PWA, and Telegram — with permission prompts, message queueing, and seamless handoff between terminal and phone.
 
-Запустите `hapi` без аргументов, чтобы выбрать агента интерактивно. Меню показывает
-всех поддерживаемых агентов по алфавиту по имени команды; отсутствующие или неправильно
-настроенные агенты отключены с указанием причины. В скриптах нужно использовать `hapi <agent> [options]`.
-`hapi --help` показывает собственную справку HAPI. Опции после имени агента принадлежат
-интеграции этого агента; их поддерживаемый синтаксис различается.
+Run `hapi` without arguments to choose an agent interactively. The picker shows
+all supported agents alphabetically by command name; missing or misconfigured
+agents are disabled with a reason. Scripts must use `hapi <agent> [options]`.
+`hapi --help` shows HAPI's own help. Options after an agent name belong to that
+agent's integration; their supported syntax varies by agent.
 
-## Матрица поддержки
+## Support matrix
 
-| Агент | Команда | Интеграция | Локально | Удалённо | Режимы разрешений | Resume |
+| Agent | Command | Integration | Local | Remote | Permission modes | Resume |
 |-------|---------|-------------|:-----:|:------:|------------------|:------:|
-| Claude Code | `hapi claude` | Обёртка терминала (локально) + Claude Agent SDK (удалённо) | ✓ | ✓ | `default` `acceptEdits` `auto` `bypassPermissions` `plan` | ✓ |
-| Codex | `hapi codex` | Нативный терминал + `codex app-server` (Codex 0.154.0+) | ✓ | ✓ | `default` `read-only` `yolo` (+ режим коллаборации `plan`) | ✓ |
-| Cursor Agent | `hapi cursor` | ACP (`agent acp`); устаревший stream-json resume | ✓ | ✓ | `default` `plan` `ask` `debug` `autoReview` `yolo` | ✓ |
+| Claude Code | `hapi claude` | Terminal wrapper (local) + Claude Agent SDK (remote) | ✓ | ✓ | `default` `acceptEdits` `auto` `bypassPermissions` `plan` | ✓ |
+| Codex | `hapi codex` | Native terminal + `codex app-server` (Codex 0.154.0+) | ✓ | ✓ | `default` `read-only` `yolo` (+ `plan` collaboration mode) | ✓ |
+| Cursor Agent | `hapi cursor` | ACP (`agent acp`); legacy stream-json resume | ✓ | ✓ | `default` `plan` `ask` `debug` `autoReview` `yolo` | ✓ |
 | Grok Build | `hapi grok` | ACP (`grok agent stdio`) | ✓ | ✓ | `default` `auto` `plan` `bypassPermissions` | ✓ |
 | GitHub Copilot | `hapi copilot` | ACP (`copilot --acp --stdio`) | ✓ | ✓ | `default` `read-only` `safe-yolo` `yolo` | ✓ |
 | Kimi | `hapi kimi` | ACP (`kimi acp`) | ✓ | ✓ | `default` `read-only` `safe-yolo` `yolo` | ✓ |
 | OpenCode | `hapi opencode` | ACP (`opencode acp`) | ✓ | ✓ | `default` `plan` `yolo` | ✓ |
-| DeepSeek Harness | `hapi dsh` | ACP (`dsh-acp-demo` или настроенный сервер) | — | ✓ | Управляется композицией DSH ACP | — |
-| Antigravity (agy) | `hapi agy` | Headless print mode (`agy -p` за ход + NDJSON) | — | ✓ | `request-review` `always-proceed` | ✓ |
-| Pi | `hapi pi` | `pi --mode rpc` (JSON-line RPC через stdio) | — | ✓ | нет (всегда автоодобрение) | ✓ |
-| Gemini CLI | — | **Удалён** — Google закрыл потребительский Gemini CLI (2026-06-18) | — | — | — | — |
+| DeepSeek Harness | `hapi dsh` | ACP (`dsh-acp-demo` or configured server) | — | ✓ | Managed by DSH ACP composition | — |
+| Antigravity (agy) | `hapi agy` | Headless print mode (per-turn `agy -p` + NDJSON) | — | ✓ | `request-review` `always-proceed` | ✓ |
+| Pi | `hapi pi` | `pi --mode rpc` (JSON-line RPC over stdio) | — | ✓ | none (always auto-approve) | ✓ |
+| Gemini CLI | — | **Removed** — Google sunset the consumer Gemini CLI (2026-06-18) | — | — | — | — |
 
-Gemini больше нельзя запустить: `hapi gemini` оставлен как «надгробная» команда, которая печатает понятную ошибку, а существующие сессии Gemini остаются доступными для просмотра в веб-UI, но не могут быть возобновлены.
+Gemini is no longer launchable: `hapi gemini` is kept as a tombstone command that prints a clear error, and existing Gemini sessions remain viewable in the web UI but cannot be resumed.
 
-## Общие концепции
+## Common concepts
 
 ### ACP
 
-Большинство удалённых интеграций говорят на [Agent Client Protocol](https://agentclientprotocol.com) (ACP) через stdio через общий бэкенд HAPI. ACP даёт удалённым сессиям двустороннее одобрение разрешений, обновления плана/todo, UI вопросов, каталоги моделей и возобновление сессии через `session/load`. Удалённые сессии Cursor, Grok, Copilot, Kimi, OpenCode и DeepSeek Harness работают через ACP. Официальный ACP-сервер DSH намеренно предназначен только для автоматизации и сейчас поддерживает свежие сессии, зафиксированный вывод ассистента, отмену и одноразовые разрешения; он не предоставляет нативный resume, инъекцию MCP или живую телеметрию инструментов/рассуждений. Каталог моделей HAPI показывает для DSH, если ACP-сервер анонсирует его в `configOptions` — см. [DeepSeek Harness](#deepseek-harness).
+Most remote integrations speak the [Agent Client Protocol](https://agentclientprotocol.com) (ACP) over stdio through a shared HAPI backend. ACP gives remote sessions bidirectional permission approval, plan/todo updates, question UI, model catalogs, and session resume via `session/load`. Cursor, Grok, Copilot, Kimi, OpenCode, and DeepSeek Harness remote sessions all run over ACP. DSH's official ACP server is intentionally automation-only and currently supports fresh sessions, committed assistant output, cancellation, and one-shot permissions; it does not provide native resume, model switching, MCP injection, or live tool/reasoning telemetry.
 
-### Режимы разрешений
+### Permission modes
 
-Режимы разрешений индивидуальны для агента — каждый вид предоставляет свой набор (см. матрицу выше). Задайте режим при запуске через `--permission-mode <mode>` или флаг-сокращение (`--yolo`, `--plan`, `--auto-review`, в зависимости от агента) и переключайте его в середине сессии из веб-UI. Семантика различается; см. разделы по агентам ниже.
+Permission modes are per-agent — each flavor exposes its own set (see the matrix above). Set the mode at launch with `--permission-mode <mode>` or a shortcut flag (`--yolo`, `--plan`, `--auto-review`, depending on the agent), and switch it mid-session from the web UI. Semantics vary per agent; see the per-agent sections below.
 
-### Локальный и удалённый режим
+### Local and remote mode
 
-Работайте **локально** в терминале или **удалённо** из веба/телефона, сохраняя тот же диалог при передаче. Матрица поддержки показывает, какие интерфейсы предлагает каждый агент; DSH, Pi и Antigravity принимают ввод только через удалённый интерфейс HAPI.
+Work **locally** in the terminal or **remotely** from web/phone, keeping the same conversation when you hand off. The support matrix shows which interfaces each agent offers; DSH, Pi, and Antigravity accept input only through HAPI's remote interface.
 
-- **Удалённо → локально:** продолжайте в терминале. Если он показывает экран удалённого управления, нажмите двойной пробел, чтобы вернуться к локальному вводу.
-- **Локально → удалённо:** отправьте сообщение из веб-UI или телефона; HAPI обработает передачу.
+- **Remote → local:** continue in the terminal. If it shows the remote-control screen, press double-space to return to local input.
+- **Local → remote:** send a message from the web UI or phone; HAPI handles the handoff.
 
-Подробнее: [Бесшовная передача](./how-it-works.md).
+See [Seamless Handoff](./how-it-works.md#seamless-handoff) for details.
 
-### Возобновление сессий
+### Resuming sessions
 
 ```bash
-hapi resume                # Интерактивное меню возобновляемых сессий на этой машине
-hapi resume <session-id>   # Возобновить конкретную HAPI-сессию
+hapi resume                # Interactive picker of resumable sessions on this machine
+hapi resume <session-id>   # Resume a specific HAPI session
 ```
 
-`hapi resume` заново открывает диалог на этой машине, включая активные сессии, которые вы использовали с телефона. Gemini и работающий только со свежими сессиями DSH нельзя возобновить. Pi и Antigravity возобновляются с вводом, всё ещё управляемым из HAPI, а не из терминала.
+`hapi resume` reopens the conversation on this machine, including active sessions you were using from your phone. Gemini and fresh-session-only DSH cannot be resumed. Pi and Antigravity resume with input still controlled from HAPI rather than the terminal.
 
-### Математические формулы в Markdown HAPI
+### Mathematical formulas in HAPI Markdown
 
-HAPI отображает математику в стиле LaTeX через KaTeX. При генерации или правке Markdown, предназначенного для отображения в HAPI, следуйте этим правилам точно:
+HAPI renders LaTeX-style mathematics through KaTeX. When generating or revising Markdown intended for display in HAPI, follow these rules exactly:
 
-- Используйте `\( ... \)` для строчной математики.
-- Используйте `\[ ... \]` для отдельной блочной математики.
-- Не используйте одинарные доллары, такие как `$x^2$`. Математика с одинарным долларом отключена, чтобы валютные значения вида `$200` не интерпретировались как формулы.
-- `$$ ... $$` остаётся поддержанным для совместимости, но для блочной математики предпочтительнее `\[ ... \]`.
-- Не помещайте формулы внутрь инлайн-кода, огороженных блоков кода или другого кодового контента.
-- Используйте только команды LaTeX, поддерживаемые KaTeX. TikZ не поддерживается.
-- Не используйте голые `[ ... ]` как разделители математики.
+- Use `\( ... \)` for inline mathematics.
+- Use `\[ ... \]` for standalone display mathematics.
+- Do not use single-dollar delimiters such as `$x^2$`. Single-dollar math is disabled to prevent currency values such as `$200` from being misinterpreted as formulas.
+- `$$ ... $$` remains supported for compatibility, but `\[ ... \]` is preferred for display mathematics.
+- Do not put formulas inside inline code, fenced code blocks, or other code content.
+- Use only LaTeX commands supported by KaTeX. TikZ is not supported.
+- Do not use bare `[ ... ]` as math delimiters.
 
-Перед отправкой ответа проверяйте каждое математическое выражение на корректные разделители. Переписывайте любые математические `$...$` как `\(...\)` или `\[...\]`; сохраняйте обычный валютный текст вида `$200` как простой текст.
+Before sending a response, check every mathematical expression for the correct delimiters. Rewrite any mathematical `$...$` expression as `\(...\)` or `\[...\]`; preserve ordinary currency text such as `$200` as plain text.
 
 ## Cursor Agent
 
-HAPI поддерживает [Cursor Agent CLI](https://cursor.com/docs/cli/using) для запуска ИИ-агента Cursor с удалённым управлением из веба и телефона.
+HAPI supports [Cursor Agent CLI](https://cursor.com/docs/cli/using) for running Cursor's AI coding agent with remote control via web and phone.
 
-Когда Cursor возобновляется в середине простоя (например, после пробуждения Shell `notify_on_output`) и выдаёт активность ACP, HAPI повышает статус «думает» сессии над обычным keepalive `session-alive`, чтобы список не оставался застрявшим в idle. См. [FAQ](./faq.md).
+When Cursor resumes mid-idle (for example after a Shell `notify_on_output` wake) and emits ACP activity, HAPI bumps session thinking over the normal `session-alive` keepalive so the list does not stay stuck idle. See [FAQ](./faq.md#why-did-my-session-look-idle-when-the-agent-woke-itself).
 
-### Предварительные требования
+### Prerequisites
 
-Установите Cursor Agent CLI:
+Install Cursor Agent CLI:
 
 - **macOS/Linux:** `curl https://cursor.com/install -fsS | bash`
 - **Windows:** `irm 'https://cursor.com/install?win32=true' | iex`
 
-Проверьте установку:
+Verify installation:
 
 ```bash
 agent --version
 ```
 
-### Использование
+### Usage
 
 ```bash
-hapi cursor                    # Запустить сессию Cursor Agent
-hapi cursor resume <chatId>    # Возобновить конкретный чат
-hapi cursor --continue         # Возобновить последний чат
-hapi cursor --plan             # Запустить в режиме Plan (сокращение)
-hapi cursor --mode plan        # Запустить в режиме Plan
-hapi cursor --mode ask         # Запустить в режиме Ask
-hapi cursor --auto-review      # Запустить с Auto-review (Smart Auto)
-hapi cursor --yolo             # Обойти запросы одобрения (--force)
-hapi cursor --model <model>    # Указать модель
-hapi cursor --cursor-worktree              # Нативное worktree Cursor (авто-имя)
-hapi cursor --cursor-worktree feature-x    # Нативное worktree Cursor (с именем)
-hapi cursor --cursor-add-dir ../shared     # Дополнительный корень рабочего пространства (повторяемо)
+hapi cursor                    # Start Cursor Agent session
+hapi cursor resume <chatId>    # Resume a specific chat
+hapi cursor --continue         # Resume the most recent chat
+hapi cursor --plan             # Start in Plan mode (shortcut)
+hapi cursor --mode plan        # Start in Plan mode
+hapi cursor --mode ask         # Start in Ask mode
+hapi cursor --auto-review      # Start with Auto-review (Smart Auto)
+hapi cursor --yolo             # Bypass approval prompts (--force)
+hapi cursor --model <model>    # Specify model
+hapi cursor --cursor-worktree              # Cursor-native worktree (auto-named)
+hapi cursor --cursor-worktree feature-x    # Cursor-native worktree (named)
+hapi cursor --cursor-add-dir ../shared     # Extra workspace root (repeatable)
 ```
 
-### Режимы разрешений
+### Permission modes
 
-| Режим | Описание |
+| Mode | Description |
 |------|-------------|
-| `default` | Стандартное поведение агента |
-| `plan` | Режим плана — проектирование подхода до кодинга |
-| `ask` | Режим вопросов — изучение кода без правок |
-| `debug` | Режим отладки — гипотезы + инструментирование |
-| `autoReview` | Auto-review (Smart Auto) — allowlist/песочница/классификатор вместо полного YOLO |
-| `yolo` | Обойти запросы одобрения |
+| `default` | Standard agent behavior |
+| `plan` | Plan mode - design approach before coding |
+| `ask` | Ask mode - explore code without edits |
+| `debug` | Debug mode - hypotheses + instrumentation |
+| `autoReview` | Auto-review (Smart Auto) - allowlist/sandbox/classifier instead of full YOLO |
+| `yolo` | Bypass approval prompts |
 
-Задайте режим через `--plan` / `--mode` / `--permission-mode` / `--auto-review` или меняйте из веб-UI во время сессии.
+Set mode via `--plan` / `--mode` / `--permission-mode` / `--auto-review`, or change from the web UI during a session.
 
-### Нативное worktree Cursor и мультикорень
+### Cursor-native worktree & multi-root
 
-- **Worktree** новой сессии для Cursor использует `--worktree` Cursor (`~/.cursor/worktrees/<repo>/<name>`), а не worktree HAPI в соседней папке.
-- Исключение: если `directory` запуска **уже** является связанным git-worktree (worktree-функция HAPI, `driver/` и т.п.), раннер **не** передаёт `--cursor-worktree` — вложенность вешает инициализацию ACP ([#1085](https://github.com/tiann/hapi/issues/1085)). Используйте каталог как cwd вместо этого.
-- В середине сессии: отправьте `/worktree`, `/apply-worktree`, `/delete-worktree` или `/add-dir <path>` (изолированный pass-through).
+- New Session **Worktree** for Cursor uses Cursor's `--worktree` (`~/.cursor/worktrees/<repo>/<name>`), not HAPI's sibling-directory worktree.
+- Exception: if the spawn `directory` is **already** a linked git worktree (HAPI feature worktree, `driver/`, etc.), the runner does **not** pass `--cursor-worktree` — nesting hangs ACP initialize ([#1085](https://github.com/tiann/hapi/issues/1085)). Use the directory as cwd instead.
+- Mid-session: send `/worktree`, `/apply-worktree`, `/delete-worktree`, or `/add-dir <path>` (isolated pass-through).
 - CLI: `hapi cursor --cursor-worktree feature-x --cursor-add-dir ../shared`
-- ACP игнорирует простой текстовый stdout-баннер Cursor `Using worktree: …`, чтобы удалённый `sessionType: worktree` мог инициализироваться (исправлено в [#1085](https://github.com/tiann/hapi/issues/1085)). Прочий не-JSON stdout ACP остаётся фатальной ошибкой протокола.
+- ACP ignores Cursor's plain-text `Using worktree: …` stdout banner so remote `sessionType: worktree` can initialize (fixed in [#1085](https://github.com/tiann/hapi/issues/1085)). Other non-JSON ACP stdout remains a fatal protocol error.
 
-### Slash pass-through (удалённо)
+### Slash pass-through (remote)
 
-Эти команды изолируются в очереди и пересылаются агенту (ACP prompt или устаревший `-p`):
+These commands are isolated in the queue and forwarded to the agent (ACP prompt or legacy `-p`):
 
 `/compress` `/summarize` `/compact` `/model` `/multitask` `/best-of-n` `/worktree` `/apply-worktree` `/delete-worktree` `/add-dir` `/context` `/fork` `/auto-review`
 
-Интерактивные команды только для TUI (`/config`, `/mcp`, `/sandbox`, `/btw`, `/rewind`, …) не поддерживаются удалённо.
+Interactive TUI-only commands (`/config`, `/mcp`, `/sandbox`, `/btw`, `/rewind`, …) are not supported remotely.
 
-### Режимы
+### Modes
 
-- **Локальный режим** — запустите `hapi cursor` из терминала. Полный интерактивный опыт.
-- **Удалённый режим** — запуск из веба/телефона, когда нет терминала. Новые сессии Cursor используют `agent acp` с одобрением разрешений HAPI, UI плана/вопросов и более богатыми обновлениями инструментов. Устаревшие сессии, созданные до миграции ACP, могут временно возобновляться через старый путь `agent -p` stream-json.
+- **Local mode** - Run `hapi cursor` from terminal. Full interactive experience.
+- **Remote mode** - Spawn from web/phone when no terminal. New Cursor sessions use `agent acp` with HAPI permission approval, plan/question UI, and richer tool updates. Legacy sessions created before the ACP migration may still resume via the old `agent -p` stream-json path temporarily.
 
-### Ограничения
+### Limitations
 
-- **Multitask UI** — `/multitask` управляется слэшами; HAPI пока не предоставляет панель флота в стиле Agents Window. Уведомления подагентов `cursor/task` показываются как карточки CursorTask, когда агент их выдаёт.
-- **Устаревшие сессии** — сессии Cursor, созданные до миграции ACP, можно временно возобновить через stream-json. Начните новую сессию Cursor, чтобы получить разрешения ACP, планы, todo и поддержку вопросов.
-- **Возобновление сессий** — ACP-сессии возобновляются через `session/load`. Старые значения stream-json `session_id` не загружаются через ACP; эти сессии продолжают использовать устаревший путь, пока вы не начнёте заново.
+- **Multitask UI** - `/multitask` is slash-driven; HAPI does not yet provide an Agents Window-style fleet pane. Subagent `cursor/task` notifications show as CursorTask cards when the agent emits them.
+- **Legacy sessions** - Cursor sessions created before the ACP migration can still resume temporarily via stream-json. Start a new Cursor session to get ACP permissions, plans, todos, and question support.
+- **Session resume** - ACP sessions resume through `session/load`. Old stream-json `session_id` values are not loadable via ACP; those sessions keep using the legacy path until you start fresh.
 
-#### Безопасность устаревшего stream-json: поведение AskQuestion
+#### Legacy stream-json safety: AskQuestion behavior
 
-Новые удалённые сессии Cursor идут через ACP, который обрабатывает `AskQuestion` через двунаправленный метод расширения `cursor/ask_question` и не подвержен проблеме ниже. Описанный перехват существует только для устаревших сессий, которые возобновляются через старый лаунчер `agent -p` stream-json.
+New cursor remote sessions go through ACP, which handles `AskQuestion` via the bidirectional `cursor/ask_question` extension method and is immune to the issue below. The intercept described here exists only for legacy sessions that resume via the older `agent -p` stream-json launcher.
 
-При запуске cursor-agent с `--print --output-format stream-json` CLI cursor-agent возвращает синтетический ответ `Questions skipped by the user, continue with the information you already have` для инструмента `AskQuestion`, потому что нет поверхности IDE для отображения вопроса. Лежащая в основе модель агента может интерпретировать это как легитимное согласие пользователя и действовать на его основе.
+When running cursor-agent under `--print --output-format stream-json`, the cursor-agent CLI returns a synthetic `Questions skipped by the user, continue with the information you already have` response for the `AskQuestion` tool because there is no IDE surface to render the question. The agent's underlying model can interpret this as legitimate user consent and act on it.
 
-Устаревший конвертер событий HAPI перехватывает этот синтетический ответ и переписывает его в явную ошибку `no_input_surface` (`status: failed`), чтобы нижестоящие потребители (веб-UI, Telegram, читатели логов) показывали фабрикацию как ошибку, а не молча пропускали сфабрикованное согласие. Перехват сканирует сырой payload `tool_call` на литеральный маркерный текст и ограничен вызовами в форме `AskQuestion` (и fallback-вызовами конвертера `name=unknown`); легитимные инструменты чтения/записи/функций не затрагиваются.
+HAPI's legacy event converter intercepts this synthetic response and rewrites it to an explicit `no_input_surface` error (`status: failed`), so downstream consumers (web UI, Telegram, log readers) surface the fabrication as an error instead of silently passing through fabricated consent. The intercept scans the raw `tool_call` payload for the literal marker text and is scoped to `AskQuestion`-shaped (and converter-fallback `name=unknown`) calls; legitimate read/write/function tools are not affected.
 
-Перехват естественно исчезает вместе с популяцией устаревших сессий — возобновлённые до-ACP сессии — единственный путь, который всё ещё попадает в этот код.
+The intercept drains naturally with the legacy session population - resumed pre-ACP sessions are the only path that still hits this code.
 
-Отслеживающая задача: [tiann/hapi#784](https://github.com/tiann/hapi/issues/784).
+Tracking issue: [tiann/hapi#784](https://github.com/tiann/hapi/issues/784).
 
 ## Grok Build
 
-HAPI может запускать официальный Grok Build CLI локально и управлять той же сессией кодинга удалённо из Web/PWA.
+HAPI can run the official Grok Build CLI locally and control the same coding session remotely from the Web/PWA.
 
-### Установка
+### Install
 
-Установите Grok Build официальным установщиком:
+Install Grok Build using the official installer:
 
 ::: code-group
 
@@ -176,99 +176,99 @@ irm https://x.ai/cli/install.ps1 | iex
 
 :::
 
-Проверьте установку:
+Verify the installation:
 
 ```bash
 grok version
 ```
 
-### Аутентификация
+### Authenticate
 
-HAPI переиспользует локальную аутентификацию Grok CLI. На headless-машине раннера аутентифицируйтесь один раз через device-code:
+HAPI reuses the Grok CLI's local authentication. On a headless runner machine, authenticate once with device-code login:
 
 ```bash
 grok login --device-auth
 ```
 
-Либо настройте API-ключ xAI в окружении раннера:
+Alternatively, configure an xAI API key in the runner environment:
 
 ```bash
 export XAI_API_KEY="xai-..."
 ```
 
-Не помещайте API-ключи в конфигурационные файлы HAPI, логи или репозиторий.
+Do not place API keys in HAPI configuration files, logs, or a repository.
 
-### Запуск сессии
+### Start a session
 
-Запустите нативный TUI Grok Build:
+Start the native Grok Build TUI:
 
 ```bash
 hapi grok
 ```
 
-Запустите с явными настройками:
+Start with explicit launch settings:
 
 ```bash
 hapi grok --model grok-4.5 --effort low --permission-mode default
-hapi grok --yolo    # Сокращение для --permission-mode bypassPermissions
+hapi grok --yolo    # Shortcut for --permission-mode bypassPermissions
 ```
 
-Сессии, созданные из раннера HAPI, автоматически запускаются в удалённом режиме. Сессии, созданные из терминала, запускаются в нативном TUI Grok и могут переключиться на удалённое управление без разбора вывода терминала.
+Sessions created from a HAPI runner start in remote mode automatically. Terminal-created sessions start in the native Grok TUI and can switch to remote control without parsing terminal output.
 
-### Режимы разрешений
+### Permission modes
 
-Grok предоставляет четыре режима разрешений:
+Grok exposes four permission modes:
 
-- `default` — запросы инструментов показываются в HAPI для одобрения или отклонения.
-- `auto` — собственный Auto-режим Grok: HAPI пересылает команду `/auto` Grok в сессию. Auto зависит от доступности аккаунта и сборки CLI — если Grok не анонсирует команду `/auto`, HAPI откатывается на `default` и публикует уведомление в сессии.
-- `plan` — HAPI просит Grok только планировать и отклоняет запросы выполнения инструментов.
-- `bypassPermissions` — запросы инструментов автоматически одобряются для сессии (сокращение `--yolo`).
+- `default` — tool requests are shown in HAPI for approval or denial.
+- `auto` — Grok's own Auto mode: HAPI forwards Grok's `/auto` command to the session. Auto depends on account and CLI-build availability — if Grok does not advertise the `/auto` command, HAPI falls back to `default` and posts a notice in the session.
+- `plan` — HAPI asks Grok to plan only and rejects tool execution requests.
+- `bypassPermissions` — tool requests are automatically approved for the session (`--yolo` shortcut).
 
-Используйте `bypassPermissions` только в доверенном рабочем пространстве.
+Use `bypassPermissions` only in a trusted workspace.
 
-### Resume и передача
+### Resume and handoff
 
-Удалённый режим использует ACP stdio-агента Grok (`grok agent stdio`). HAPI хранит нативный ID сессии Grok и использует его для:
+Remote mode uses Grok's ACP stdio agent (`grok agent stdio`). HAPI stores the native Grok session ID and uses it for:
 
-- ACP `session/load` после перезапуска.
-- `grok --resume <session-id>` при переключении обратно на нативный TUI.
-- `hapi resume <hapi-session-id>` из терминала.
+- ACP `session/load` after a restart.
+- `grok --resume <session-id>` when switching back to the native TUI.
+- `hapi resume <hapi-session-id>` from a terminal.
 
-Для новой локальной сессии HAPI передаёт UUID с `grok --session-id`, чтобы сессию можно было возобновить без скрейпинга полноэкранного TUI.
+For a new local session, HAPI supplies a UUID with `grok --session-id`, so the session can be resumed without scraping the fullscreen TUI.
 
-### Fork и rewind
+### Fork and rewind
 
-Когда сборка Grok CLI анонсирует их, HAPI использует методы расширения ACP Grok для форка диалога (текущая точка или с более раннего сообщения, через `_x.ai/session/fork`) и для отката диалога к более раннему запросу (через `_x.ai/rewind/*`). Возможности проверяются на сессию, поэтому старые сборки просто скрывают эти элементы управления.
+When the Grok CLI build advertises them, HAPI uses Grok's ACP extension methods to fork the conversation (current point or from an earlier message, via `_x.ai/session/fork`) and to rewind the conversation to an earlier prompt (via `_x.ai/rewind/*`). Capabilities are probed per session, so older builds simply hide these controls.
 
-### Управление моделью и усилиями
+### Model and effort controls
 
-Страница Create обнаруживает каталог моделей ACP Grok и варианты reasoning-effort, анонсированные для каждой модели. Удалённые сессии могут переключать и модель, и усилия между ходами; HAPI применяет их через ACP `session/set_model` и `session/set_mode`. Из терминала выбирайте их при запуске через `--model <model>` и `--effort <level>`.
+The Create page discovers Grok's ACP model catalog and the reasoning-effort choices advertised for each model. Remote sessions can switch both model and effort between turns; HAPI applies them through ACP `session/set_model` and `session/set_mode`. From the terminal, pick them at launch with `--model <model>` and `--effort <level>`.
 
-HAPI также предоставляет общие слэш-команды Grok, обнаруживает навыки из `.grok/skills`, `~/.grok/skills` и общих `.agents/skills`, и просит Grok задать краткий заголовок сессии HAPI после первого обычного запроса.
+HAPI also exposes Grok's common slash commands, discovers skills from `.grok/skills`, `~/.grok/skills`, and shared `.agents/skills`, and asks Grok to set a concise HAPI session title after the first normal prompt.
 
-### Текущие ограничения
+### Current limitations
 
-- OAuth/device-code вход нужно выполнять вне веб-UI HAPI.
-- Подписка, кредиты и доступность моделей Grok управляются xAI.
+- OAuth/device-code login must be completed outside the HAPI Web UI.
+- Grok subscription, credit, and model availability are controlled by xAI.
 
-Если удалённая сессия сообщает об ошибке аутентификации, выполните `grok login --device-auth` на машине раннера и повторите.
+If a remote session reports authentication failure, run `grok login --device-auth` on the runner machine and retry.
 
 ## DeepSeek Harness
 
-`hapi dsh` использует общий ACP-транспорт и держит рантайм DSH вне HAPI.
-Исполняемый файл по умолчанию — `dsh-acp-demo`; настройте другой ACP-сервер или
-исходный checkout через `HAPI_DSH_ACP_COMMAND`, `HAPI_DSH_ACP_CONFIG` или JSON-массив
-аргументов `HAPI_DSH_ACP_ARGS_JSON`.
+`hapi dsh` uses the shared ACP transport and keeps DSH's runtime outside HAPI. The
+default executable is `dsh-acp-demo`; configure a different ACP server or a
+source checkout with `HAPI_DSH_ACP_COMMAND`, `HAPI_DSH_ACP_CONFIG`, or the JSON
+argument array `HAPI_DSH_ACP_ARGS_JSON`.
 
-Официальное демо публикуется как `@deepseek-ai/dsh-acp-demo`; используйте точную
-версию, например `0.1.0-rc.7`, а не устаревший тег npm `latest`:
+The official demo is published as `@deepseek-ai/dsh-acp-demo`; use an exact
+version such as `0.1.0-rc.7` rather than npm's stale `latest` tag:
 
 ```bash
 npm install -g @deepseek-ai/dsh-acp-demo@0.1.0-rc.7
 ```
 
-Опубликованному пакету всё равно нужна DSH Cordis-композиция/конфиг. Исходный
-checkout можно запустить напрямую:
+A published package still needs a DSH Cordis composition/config. A source
+checkout can be launched directly:
 
 ```bash
 export HAPI_DSH_ACP_COMMAND=pnpm
@@ -276,41 +276,32 @@ export HAPI_DSH_ACP_ARGS_JSON='["--dir", "/path/to/deepseek-harness", "run", "de
 hapi dsh
 ```
 
-Сессии DSH только удалённые и только со свежими сессиями. HAPI не инжектирует MCP-
-серверы: эта поверхность остаётся за композицией DSH.
+DSH sessions are remote-only and fresh-session-only. HAPI does not inject MCP
+servers or expose model/effort pickers because the official ACP contract leaves
+those surfaces to the DSH composition. Pending one-shot permission requests
+remain answerable in the standard HAPI UI, but the ACP composition owns the
+overall permission policy.
 
-Выбор модели доступен, если настроенный ACP-сервер анонсирует её в блоке
-`configOptions` ответа `session/new` (категория или id `model`). HAPI показывает
-такой каталог в композере сессии и применяет переключение через
-`session/set_config_option` на границе хода. Пакет `deepseek-harness-acp`
-(бинарник `dsh-acp`) анонсирует модели так; официальное демо может их не
-анонсировать, и тогда список останется пустым. Reasoning effort для DSH в UI
-пока не выносится.
+## Other agents
 
-Ожидающие одноразовые запросы разрешений
-остаются доступными для ответа в стандартном UI HAPI, но общую политику разрешений
-владеет композиция ACP.
+- **Claude Code** (`hapi claude`) — local sessions wrap the native TUI, remote sessions drive the Claude Agent SDK. [Claude Code docs](https://docs.anthropic.com/en/docs/claude-code)
+- **Codex** (`hapi codex`) — OpenAI's Codex CLI, with terminal/Web control and a dedicated `plan` mode. See [Codex usage and limits](./codex-shared-sessions.md) for resume, terminal-exit behavior, and launch options. [openai/codex](https://github.com/openai/codex)
+- **GitHub Copilot** (`hapi copilot`) — Copilot CLI over ACP (`copilot --acp --stdio`). [GitHub Copilot](https://github.com/features/copilot)
+- **Kimi** (`hapi kimi`) — Moonshot AI's Kimi CLI over ACP (`kimi acp`). [MoonshotAI/kimi-cli](https://github.com/MoonshotAI/kimi-cli)
+- **OpenCode** (`hapi opencode`) — the open-source OpenCode agent over ACP (`opencode acp`). [opencode.ai](https://opencode.ai)
+- **Antigravity** (`hapi agy`) — Google's Antigravity CLI (`agy`), driven headlessly via print mode: every turn spawns `agy -p <msg> --conversation <uuid> --output-format stream-json`, and NDJSON events (init / step_update / result) are streamed into the chat. There is no PTY/TUI wrapper and no hook-based permission bridge: permission handling uses agy's own `settings.json` allow/deny rules (`request-review`) or `--dangerously-skip-permissions` (`always-proceed`). Tool calls that lack an allow-rule are auto-denied by agy and surfaced as a chat hint. MCP servers are configured the standard agy way — in the user's global `~/.gemini/config/mcp_config.json` or a workspace `.agents/mcp_config.json` — and are loaded natively by agy in headless mode (no HAPI injection). Remote-only — there is no local terminal input path. [Google Antigravity](https://antigravity.google)
+- **Pi** (`hapi pi`) — the Pi coding agent running as `pi --mode rpc` (JSON-line RPC over piped stdio); remote-control only, no local TUI input path. [badlogic/pi-mono](https://github.com/badlogic/pi-mono)
 
-## Другие агенты
+  HAPI translates a subset of Pi's TUI slash commands to native Pi RPC calls, so they work from the web chat as well:
 
-- **Claude Code** (`hapi claude`) — локальные сессии оборачивают нативный TUI, удалённые сессии управляют Claude Agent SDK. [Документация Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-- **Codex** (`hapi codex`) — Codex CLI от OpenAI, с управлением из терминала/веба и отдельным режимом `plan`. О resume, поведении при выходе из терминала и опциях запуска см. [Использование и ограничения Codex](./codex-shared-sessions.md). [openai/codex](https://github.com/openai/codex)
-- **GitHub Copilot** (`hapi copilot`) — Copilot CLI через ACP (`copilot --acp --stdio`). [GitHub Copilot](https://github.com/features/copilot)
-- **Kimi** (`hapi kimi`) — Kimi CLI от Moonshot AI через ACP (`kimi acp`). [MoonshotAI/kimi-cli](https://github.com/MoonshotAI/kimi-cli)
-- **OpenCode** (`hapi opencode`) — open-source агент OpenCode через ACP (`opencode acp`). [opencode.ai](https://opencode.ai)
-- **Antigravity** (`hapi agy`) — Antigravity CLI от Google (`agy`), управляемый headless через print mode: каждый ход запускает `agy -p <msg> --conversation <uuid> --output-format stream-json`, а события NDJSON (init / step_update / result) стримятся в чат. Нет обёртки PTY/TUI и нет моста разрешений на хуках: обработка разрешений использует собственные allow/deny-правила `settings.json` agy (`request-review`) или `--dangerously-skip-permissions` (`always-proceed`). Вызовы инструментов без allow-правила автоотклоняются agy и показываются как подсказка в чате. MCP-серверы настраиваются стандартным для agy способом — в глобальном `~/.gemini/config/mcp_config.json` пользователя или рабочем `.agents/mcp_config.json` — и загружаются нативно agy в headless-режиме (без инъекции HAPI). Только удалённо — локального пути ввода из терминала нет. [Google Antigravity](https://antigravity.google)
-- **Pi** (`hapi pi`) — агент Pi, работающий как `pi --mode rpc` (JSON-line RPC через piped stdio); только удалённое управление, без локального пути ввода TUI. [badlogic/pi-mono](https://github.com/badlogic/pi-mono)
+  - `/compact [instructions]` — manually compact context with optional custom summary instructions (runs Pi's `compact` RPC; the summary is rendered as a dedicated block in the chat with the token delta in its header).
+  - `/session` — show session stats (messages, tokens, cost, context usage).
+  - `/model [modelId]` — show the current model and available models, or switch with `/model <modelId>`.
+  - `/help` — list the commands supported from HAPI.
 
-  HAPI транслирует подмножество слэш-команд TUI Pi в нативные RPC-вызовы Pi, поэтому они работают и из веб-чата:
+  Pi's extension commands and prompt templates (discovered via `get_commands`) keep working from the `/` menu, and skills are available through `$skill-name` like other ACP flavors. Other Pi TUI builtins (e.g. `/tree`, `/export`, `/reload`) cannot run over RPC; typing them in web shows an explicit "terminal-only" notice instead of silently forwarding the text to the model.
 
-  - `/compact [instructions]` — вручную сжать контекст с опциональными пользовательскими инструкциями сводки (выполняет RPC `compact` Pi; сводка отображается отдельным блоком в чате с дельтой токенов в заголовке).
-  - `/session` — показать статистику сессии (сообщения, токены, стоимость, использование контекста).
-  - `/model [modelId]` — показать текущую модель и доступные модели, или переключиться через `/model <modelId>`.
-  - `/help` — список команд, поддерживаемых из HAPI.
+## Related
 
-  Команды расширения и шаблоны промптов Pi (обнаруживаются через `get_commands`) продолжают работать из меню `/`, а навыки доступны через `$skill-name`, как в других видах ACP. Другие встроенные команды TUI Pi (например, `/tree`, `/export`, `/reload`) не могут работать через RPC; их ввод в вебе показывает явное уведомление «terminal-only» вместо молчаливой пересылки текста модели.
-
-## Связанное
-
-- [Как это работает](./how-it-works.md) — архитектура и поток данных
-- [Быстрый старт](./quick-start.md) — установите HAPI и начните первую сессию
+- [How it Works](./how-it-works.md) - Architecture and data flow
+- [Quick Start](./quick-start.md) - Install HAPI and start your first session

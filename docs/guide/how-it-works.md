@@ -1,188 +1,188 @@
-# Как это работает
+# How it Works
 
-HAPI связывает ИИ-агентов, self-hosted хаб и веб/нативные клиенты для удалённого управления.
+HAPI connects coding agents, a self-hosted hub, and web/native clients for remote control.
 
-## Обзор архитектуры
+## Architecture Overview
 
 ```text
 CLI + Agent  <---- Socket.IO /cli ---->  Hub + SQLite
 Runner       <---- Socket.IO /cli ---->       |
   |                                          | REST + SSE
   +-- spawns CLI sessions                    |
-                                      Web / PWA / Mini App
-                                      Native iOS / Android
+                                     Web / PWA / Mini App
+                                     Native iOS / Android
 ```
 
-Хаб может работать на вашем локальном компьютере или на удалённом хосте (VPS, облако и т.д.).
-Клиенты обращаются к нему напрямую или через опциональный туннель/обратный прокси. Для сопряжения
-нативных приложений используйте HTTPS-адрес хаба; см. [Развёртывание](./deployment.md).
+The hub can run on your local desktop or a remote host (VPS, cloud, etc.).
+Clients reach it directly or through an optional tunnel/reverse proxy. Use an
+HTTPS hub origin for native pairing; see [Deployment](./deployment.md).
 
-## Компоненты
+## Components
 
 ### HAPI CLI
 
-CLI — это обёртка вокруг ИИ-агентов. Он из коробки поддерживает несколько видов агентов — полный список см. в [Поддерживаемых агентах](./agents.md). Он:
+The CLI is a wrapper around AI coding agents. It supports multiple agent flavors out of the box — see [Supported agents](./agents.md) for the full list. It:
 
-- запускает и управляет сессиями кодинга;
-- регистрирует сессии в хабе HAPI;
-- передаёт сообщения и запросы разрешений;
-- предоставляет инструменты MCP (Model Context Protocol).
+- Starts and manages coding sessions
+- Registers sessions with the HAPI hub
+- Relays messages and permission requests
+- Provides MCP (Model Context Protocol) tools
 
-**Ключевые команды:**
+**Key Commands:**
 ```bash
-hapi              # Выбрать агента интерактивно и начать сессию
-hapi <agent>      # Запустить поддерживаемого агента напрямую (обязательно в скриптах)
-hapi runner start # Запустить фоновый сервис для удалённого создания сессий
-hapi ping-peer --list  # Краткий список пиров из оболочки (в сессии предпочтительнее MCP list_peers)
+hapi              # Choose an agent interactively and start a session
+hapi <agent>      # Start a supported agent directly (required in scripts)
+hapi runner start # Run background service for remote session spawning
+hapi ping-peer --list  # Shell peer shortlist (prefer MCP list_peers in-session)
 ```
 
-MCP-инструменты пиров (тот же хаб/пространство имён, что и сессия): `list_peers` (обнаружение), `inspect_peer` (чтение), `ping_peer` (сообщение). Они работают из сессий, запущенных раннером, даже когда хаб на другом хосте — см. [Установка → Раздельный хаб + удалённый раннер](./installation.md).
+MCP peer tools (same hub/namespace as the session): `list_peers` (discover), `inspect_peer` (read), `ping_peer` (message). These work from runner-spawned sessions even when the hub is on another host - see [Installation → Split hub + remote runner](./installation.md#split-hub-remote-runner-peer-discovery).
 
 ### HAPI Hub
 
-Хаб — центральный сервис, который всё связывает:
+The hub is the central service that connects everything:
 
-- **HTTP API** — REST-эндпоинты для сессий, сообщений, разрешений
-- **Socket.IO** — двусторонняя связь с CLI в реальном времени
-- **SSE (Server-Sent Events)** — живые обновления, отправляемые веб- и нативным клиентам
-- **База данных SQLite** — постоянное хранилище сессий и сообщений
-- **Telegram-бот** — уведомления и интеграция Mini App
+- **HTTP API** - RESTful endpoints for sessions, messages, permissions
+- **Socket.IO** - Real-time bidirectional communication with CLI
+- **SSE (Server-Sent Events)** - Live updates pushed to web and native clients
+- **SQLite Database** - Persistent storage for sessions and messages
+- **Telegram Bot** - Notifications and Mini App integration
 
-### Веб-приложение
+### Web App
 
-PWA на React, работающее в браузере, как установленная PWA или как Telegram Mini App:
+A React-based PWA usable in a browser, as an installed PWA, or as a Telegram Mini App:
 
-- **Список сессий** — просмотр всех активных и прошлых сессий
-- **Интерфейс чата** — отправка сообщений и просмотр ответов агента
-- **Управление разрешениями** — одобрение или отклонение доступа инструментов
-- **Файловый браузер** — просмотр файлов проекта и git-диффов
-- **Терминал** — выполнение команд на рабочей машине из браузера
-- **Голосовой ассистент** — общение с агентом и одобрение разрешений голосом (см. [Голосовой ввод и ассистент](./voice-assistant.md))
-- **Ссылки на сессии** — копирование ссылки на сессию или упоминание другого диалога для контекста
-- **Удалённый запуск** — создание новых сессий на любой подключённой машине
+- **Session List** - View all active and past sessions
+- **Chat Interface** - Send messages and view agent responses
+- **Permission Management** - Approve or deny tool access
+- **File Browser** - Browse project files and view git diffs
+- **Terminal View** - Run commands on the working machine from your browser
+- **Voice Assistant** - Talk to your agent and approve permissions by voice (see [Voice input and assistant](./voice-assistant.md))
+- **Session References** - Copy a session reference or mention another conversation for context
+- **Remote Spawn** - Start new sessions on any connected machine
 
-### Нативные приложения
+### Native apps
 
-Приложения iOS (SwiftUI/UIKit) и Android (Kotlin Compose) — независимые клиенты
-хаба. Оба поддерживают сессии/чат, одобрения и вопросы, новые сессии,
-вложения, файлы/Git, Scratchlist, диктовку и нативные push. Их интерактивный
-трафик использует тот же клиентский API REST + SSE; фоновые уведомления используют
-FCM/APNs с [нативным push-контрактом](../api/native-companion-contract.md).
+The iOS SwiftUI/UIKit and Android Kotlin Compose apps are independent clients
+of the hub. Both support sessions/chat, approvals and questions, new sessions,
+attachments, files/Git, Scratchlist, dictation and native push. Their interactive
+traffic uses the same REST + SSE client API; background notifications use
+FCM/APNs with the [native push contract](../api/native-companion-contract.md).
 
-У приложений своя навигация и отрисовка. Соответствие фикстурам протокола
-не означает паритета с веб-UI: терминал, Work Graph и управление голосом в реальном
-времени остаются веб-функциями. Актуальные возможности, отличия платформ и инструкции
-по сборке/сопряжению: [Нативные приложения](./native-apps.md).
+The apps have their own navigation and rendering. Protocol fixture conformance
+does not imply web UI parity: the terminal, Work Graph and realtime voice
+controls remain web features. See [Native apps](./native-apps.md) for current
+capabilities, platform differences and build/pairing instructions.
 
-## Поток данных
+## Data Flow
 
-### Запуск сессии
-
-```
-1. Пользователь запускает `hapi` и выбирает агента
-         │
-         ▼
-2. CLI запускает выбранного агента
-         │
-         ▼
-3. CLI подключается к хабу через Socket.IO
-         │
-         ▼
-4. Хаб создаёт сессию в базе данных
-         │
-         ▼
-5. Веб/нативные клиенты получают SSE-обновление
-         │
-         ▼
-6. Сессия появляется в мобильном приложении
-```
-
-### Поток запроса разрешения
+### Starting a Session
 
 ```
-1. ИИ-агент запрашивает разрешение инструмента (например, правку файла)
+1. User runs `hapi` and chooses an agent
          │
          ▼
-2. CLI отправляет запрос разрешения в хаб
+2. CLI starts the selected agent
          │
          ▼
-3. Хаб сохраняет запрос и отправляет SSE + настроенные уведомления
+3. CLI connects to hub via Socket.IO
          │
          ▼
-4. Пользователь получает уведомление на телефоне
+4. Hub creates session in database
          │
          ▼
-5. Пользователь одобряет/отклоняет в нативном или веб-клиенте
+5. Web/native clients receive SSE update
          │
          ▼
-6. Хаб передаёт решение CLI через Socket.IO
-         │
-         ▼
-7. CLI сообщает ИИ-агенту, выполнение продолжается
+6. Session appears in mobile app
 ```
 
-### Поток сообщений
+### Permission Request Flow
 
 ```
-Пользователь (Телефон)        Хаб                     CLI
-     │                          │                       │
-     │──── Отправить сообщение ─►│                       │
-     │                          │─── Socket.IO emit ───►│
-     │                          │                       │
-     │                          │                       ├── ИИ обрабатывает
-     │                          │                       │
-     │                          │◄── Поток ответа ──────│
-     │◄─────── SSE ─────────────│                       │
-     │                          │                       │
+1. AI agent requests tool permission (e.g., file edit)
+         │
+         ▼
+2. CLI sends permission request to hub
+         │
+         ▼
+3. Hub stores request and sends SSE + configured notifications
+         │
+         ▼
+4. User receives notification on phone
+         │
+         ▼
+5. User approves/denies in a native or web client
+         │
+         ▼
+6. Hub relays decision to CLI via Socket.IO
+         │
+         ▼
+7. CLI informs AI agent, execution continues
 ```
 
-## Протоколы связи
+### Message Flow
+
+```
+User (Phone)                 Hub                     CLI
+     │                         │                       │
+     │──── Send message ──────►│                       │
+     │                         │─── Socket.IO emit ───►│
+     │                         │                       │
+     │                         │                       ├── AI processes
+     │                         │                       │
+     │                         │◄── Stream response ───│
+     │◄─────── SSE ────────────│                       │
+     │                         │                       │
+```
+
+## Communication Protocols
 
 ### CLI ↔ Hub: Socket.IO
 
-Двусторонняя связь в реальном времени для:
-- регистрации сессии и heartbeat;
-- передачи сообщений (ввод пользователя → агент);
-- запросов и ответов на разрешения;
-- обновлений метаданных и состояния;
-- вызова RPC-методов.
+Real-time bidirectional communication for:
+- Session registration and heartbeat
+- Message relay (user input → agent)
+- Permission requests and responses
+- Metadata and state updates
+- RPC method invocation
 
-### Hub ↔ Веб/нативные клиенты: REST + SSE
+### Hub ↔ Web/native clients: REST + SSE
 
-- **REST API** для действий (отправить сообщение, одобрить разрешение)
-- **SSE-поток** для обновлений в реальном времени (новые сообщения, изменения статуса)
+- **REST API** for actions (send message, approve permission)
+- **SSE stream** for real-time updates (new messages, status changes)
 
-### Внешний доступ: туннель
+### External Access: Tunnel
 
-Для удалённого доступа вне вашей локальной сети:
-- **Встроенное реле** (`hapi hub --relay`) — управляемый туннель tunwg (WireGuard + TLS), без сторонних аккаунтов
-- **Cloudflare Tunnel** (рекомендуется) — бесплатно, безопасно, надёжно
-- **Tailscale** — mesh-VPN для приватных сетей
-- **ngrok** — быстрая настройка для тестирования
+For remote access outside your local network:
+- **Built-in relay** (`hapi hub --relay`) - Managed tunwg tunnel (WireGuard + TLS), no third-party account required
+- **Cloudflare Tunnel** (recommended) - Free, secure, reliable
+- **Tailscale** - Mesh VPN for private networks
+- **ngrok** - Quick setup for testing
 
-## Бесшовная передача
+## Seamless Handoff
 
-Ключевая особенность HAPI — бесшовная передача управления между локальным терминалом и удалёнными устройствами без потери состояния сессии.
+HAPI's defining feature is the ability to seamlessly hand off control between local terminal and remote devices without losing session state.
 
-### Локальный режим
+### Local Mode
 
-В локальном режиме у вас полный опыт терминала — это нативный CLI агента (Claude Code, Codex, OpenCode и другие):
+When working in local mode, you have the full terminal experience — it is the native agent CLI (Claude Code, Codex, OpenCode, and more):
 
-- прямой ввод с клавиатуры и мгновенный ответ;
-- полный терминальный UI с подсветкой синтаксиса;
-- лучше всего для сосредоточенных, непрерывных сессий кодинга;
-- инструменты агента работают на вашей машине; запросы модели используют провайдера, настроенного в агенте.
+- Direct keyboard input with instant response
+- Full terminal UI with syntax highlighting
+- Best for focused, uninterrupted coding sessions
+- Agent tools run on your machine; model requests use the provider configured in the agent
 
-### Удалённый режим
+### Remote Mode
 
-Переключайтесь в удалённый режим, когда нужно отойти:
+Switch to remote mode when you need to step away:
 
-- управление через Web/PWA/Telegram с любого устройства;
-- одобрение разрешений на ходу;
-- наблюдение за прогрессом вдали от рабочего места;
-- сессия продолжает работать на вашей локальной машине.
+- Control via Web/PWA/Telegram from any device
+- Approve permissions on the go
+- Monitor progress while away from your desk
+- Session continues running on your local machine
 
-### Как работает переключение
+### How Switching Works
 
 ```
 ┌─────────────────┐                    ┌─────────────────┐
@@ -195,21 +195,21 @@ FCM/APNs с [нативным push-контрактом](../api/native-companion
            └────────────────────────────┘
 ```
 
-**Локально → удалённо:**
-- Откройте сессию на телефоне/в вебе и отправьте сообщение
-- HAPI продолжает диалог на той же рабочей машине
+**Local → Remote:**
+- Open the session on your phone/web and send a message
+- HAPI keeps the conversation going on the same working machine
 
-**Удалённо → локально:**
-- Продолжайте печатать в терминале
-- Если терминал показывает экран удалённого управления, нажмите двойной пробел, чтобы вернуться к локальному вводу
+**Remote → Local:**
+- Continue typing in the terminal
+- If the terminal shows the remote-control screen, press double-space to return to local input
 
-Некоторые агенты держат оба интерфейса доступными одновременно, поэтому переключение не нужно.
-О поведении Codex при выходе из терминала и resume см. [Использование и ограничения](./codex-shared-sessions.md).
+Some agents keep both interfaces available at once, so no switch is needed.
+For Codex terminal-exit and resume behavior, see [Usage and limits](./codex-shared-sessions.md).
 
-### Сценарии использования
+### Use Cases
 
-1. **Удалённое управление вдали от дома** — начните сессию за рабочим столом, продолжите с телефона в дороге или на кофе-брейке
+1. **Remote Control While Away** - Start a session at your desk, continue from your phone during commute or coffee break
 
-2. **Одобрение разрешений** — ИИ запрашивает доступ к файлу, вы получаете уведомление на телефон, одобряете одним касанием, сессия продолжается
+2. **Permission Approval** - AI requests file access, you get notified on phone, approve with one tap, session continues
 
-3. **Многопользовательская коллаборация** — наблюдайте за прогрессом сессии на телефоне, пока ваш компьютер делает основную работу
+3. **Multi-Device Collaboration** - View session progress on your phone while your desktop does the heavy lifting

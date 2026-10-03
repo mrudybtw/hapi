@@ -1,172 +1,172 @@
-# Нативные приложения (iOS / Android)
+# Native apps (iOS / Android)
 
-HAPI включает нативные клиенты iOS и Android для управления сессиями на хабе,
-который вы запускаете. Агенты выполняются на ваших машинах с CLI/Runner'ом; хаб хранит историю
-сессий. Приложения подключаются напрямую к этому хабу и показывают те же диалоги,
-что и [Web/PWA](./pwa.md).
+HAPI includes native iOS and Android clients for controlling sessions on a hub
+you run. Agents execute on your CLI/Runner machines; the hub stores the session
+history. The apps connect directly to that hub and share the same conversations
+as the [Web/PWA](./pwa.md).
 
-## Сборка и установка
+## Build and install
 
-Репозиторий предоставляет такие пути сборки:
+The repository provides these build paths:
 
-| Платформа | Требование к устройству | Инструкция по сборке |
+| Platform | Device requirement | Build instructions |
 |---|---|---|
-| iOS | iOS 17 или новее | [iOS README](https://github.com/mrudybtw/hapi/blob/main/ios/README.md): Xcode 16 или новее, общая схема `Hapi`; сборки на устройство требуют подписи. |
-| Android | Android 8.0 (API 26) или новее | [Android README](https://github.com/mrudybtw/hapi/blob/main/android/README.md): JDK 17+, Android SDK, обёртка Gradle; соберите/установите debug-APK или настройте release-подпись. |
+| iOS | iOS 17 or newer | [iOS README](https://github.com/tiann/hapi/blob/main/ios/README.md): Xcode 16 or newer, shared `Hapi` scheme; device builds require signing. |
+| Android | Android 8.0 (API 26) or newer | [Android README](https://github.com/tiann/hapi/blob/main/android/README.md): JDK 17+, Android SDK, Gradle wrapper; build/install a debug APK or configure release signing. |
 
-Мейнтейнеры могут использовать [воркфлоу Android Official Build](https://github.com/mrudybtw/hapi/blob/main/.github/workflows/android-release.yml)
-для получения подписанных APK/AAB-артефактов с официальной конфигурацией Firebase.
-Этот воркфлоу не публикует в Google Play. Настройка push зависит от устанавливаемой
-сборки; см. [Уведомления](#уведомления).
+Maintainers can use the [Android Official Build workflow](https://github.com/tiann/hapi/blob/main/.github/workflows/android-release.yml)
+to produce signed APK/AAB artifacts with the official Firebase configuration.
+That workflow does not publish to Google Play. Push setup depends on the build
+you install; see [Notifications](#notifications).
 
-## Сопряжение с хабом
+## Pair with your hub
 
-1. Запустите свой хаб или используйте существующий HTTPS-эндпоинт хаба:
+1. Start your hub, or use an existing HTTPS hub endpoint:
 
    ```bash
    hapi hub --relay
    ```
 
-2. Откройте нативное приложение и выберите способ сопряжения:
+2. Open the native app and choose a pairing method:
 
-   - **Сканировать QR:** используйте встроенный сканер с любым из QR-кодов, которые печатает
-     хаб. Веб-пункт **Settings → Companion pairing** тоже показывает QR компаньона.
-   - **Открыть ссылку сопряжения:** `hapicompanion://bind` открывает поток
-     сопряжения приложения. Подтвердите хаб перед сопряжением.
-   - **Ввести вручную:** укажите URL хаба и токен доступа, которые печатает
-     хаб. На iOS введите только домен/IP и опциональный порт; отдельное
-     меню протокола по умолчанию — HTTPS. Можно также вставить полный адрес или
-     вставить ссылку сопряжения в любое из полей, чтобы заполнить оба значения перед нажатием
-     **Pair**. Используйте адрес хаба, а не адрес веб-фронтенда `app.hapi.run`.
-3. Приложение проверяет доступность и совместимость протокола, затем аутентифицируется
-   и сохраняет учётные данные для этого хаба. Токен с пространством имён, например
-   `your-token:team`, открывает сессии этого пространства имён.
+   - **Scan QR:** use the in-app scanner with either QR code printed by the
+     hub. Web **Settings → Companion pairing** also shows the companion QR.
+   - **Open a pairing link:** `hapicompanion://bind` opens the app's pairing
+     flow. Confirm the hub before pairing.
+   - **Enter manually:** supply the hub URL and access token printed by the
+     hub. On iOS, enter just the domain/IP and optional port; the separate
+     protocol menu defaults to HTTPS. You can also paste a full address, or
+     paste a pairing link into either field to fill both values before tapping
+     **Pair**. Use the hub address, not the web frontend address `app.hapi.run`.
+3. The app checks reachability and protocol compatibility, then authenticates
+   and stores credentials for that hub. A namespaced token such as
+   `your-token:team` opens that namespace's sessions.
 
-Используйте **HTTPS-адрес хаба**, например `https://hub.example.com`. Оба приложения
-идентифицируют хабы по origin; префиксы пути не сохраняются. Ваш телефон должен
-иметь доступ к хабу. `localhost` на физическом телефоне указывает на сам телефон.
-Сетевое реле, HTTPS-обратный прокси или Tailscale Serve могут дать
-эндпоинт; см. [Развёртывание](./deployment.md).
+Use an **HTTPS hub origin**, for example `https://hub.example.com`. Both apps
+identify hubs by origin; path prefixes are not retained. Your phone must be
+able to reach the hub. `localhost` on a physical phone refers to the phone.
+The network relay, an HTTPS reverse proxy, or Tailscale Serve can provide an
+endpoint; see [Deployment](./deployment.md).
 
-Android отклоняет HTTP-URL при ручном вводе, в QR-кодах, deep-ссылках и сохранённом состоянии
-хаба, включая debug-сборки. Ручной ввод на iOS по умолчанию — HTTPS, а HTTP принимается
-только при явном выборе или в полном URL/ссылке сопряжения. Приложение
-предупреждает о незашифрованном HTTP и никогда автоматически не понижает HTTPS. Успех
-HTTP-подключения всё равно зависит от сетевой политики системы. Проект iOS
-не объявляет исключений ATS, поэтому принятие HTTP-ввода не гарантирует
-рабочее подключение. Предпочитайте HTTPS на обеих платформах.
+Android rejects HTTP URLs in manual entry, QR codes, deep links and saved hub
+state, including debug builds. iOS manual entry defaults to HTTPS and accepts
+HTTP only when explicitly selected or supplied in a full URL/pairing link. It
+warns about unencrypted HTTP and never automatically downgrades HTTPS. HTTP
+connection success still depends on system network policy. The iOS project
+declares no ATS exceptions, so HTTP input acceptance does not guarantee a
+working connection. Prefer HTTPS on both platforms.
 
-Сопряжение через камеру опционально. Используйте ручной ввод на iOS Simulator или любом устройстве
-без рабочего сканера.
+Camera pairing is optional. Use manual entry on an iOS Simulator or any device
+without a usable scanner.
 
-## Сессии и повседневное использование
+## Sessions and everyday use
 
-Запустите агента на компьютере командой `hapi` и выберите установленного агента, или
-выполните [команду конкретного агента](./agents.md). Сессия появится в приложении.
+Start an agent on your computer with `hapi` and choose an installed agent, or
+run a [specific agent command](./agents.md). The session appears in the app.
 
-Чтобы создавать сессии с телефона, запустите [Runner](./installation.md)
-на машине, которая будет выполнять агента:
+To create sessions from your phone, start a [Runner](./installation.md#runner-setup)
+on the machine that will execute the agent:
 
 ```bash
 hapi runner start
 ```
 
-В приложении выберите **New Session**, укажите онлайн-машину, каталог и
-доступного агента, затем создайте сессию. Управление моделью и разрешениями зависит
-от агента и возможностей сессии. Настроенные корни рабочего пространства ограничивают
-просмотр каталогов и создание сессий.
+In the app, select **New Session**, choose an online machine, directory and
+available agent, then create the session. Model and permission controls depend
+on the agent and session capabilities. Configured workspace roots constrain
+directory browsing and session creation.
 
-| Возможность | Текущее поведение нативных приложений |
+| Capability | Current native behavior |
 |---|---|
-| Чат и разрешения | Потоковые сообщения, история, просмотр инструментов, одобрения и ответы на вопросы на обеих платформах. |
-| Редактор (Composer) | Текст, фото/камера/файлы, черновики, действия с отложенными сообщениями и steering, когда поддерживается сессией. |
-| Управление сессией | Обе платформы поддерживают закрепление/архивирование, остановку хода и отправку для возобновления неактивной сессии. Android также имеет Rename, Delete и явный Reopen; на iOS для этих трёх действий пока нет соответствующего UI. |
-| Файлы и Git | Откройте **Session files** из меню чата для просмотра/поиска файлов, проверки статуса Git и чтения диффов. |
-| Scratchlist | На iOS нажмите лоток рядом с кнопкой вложения редактора, чтобы войти в режим **Save draft**; на Android — через меню чата. Текст и вложения синхронизируются в рамках сессии. |
-| Диктовка | Запишите аудио, транскрибируйте через настроенного провайдера хаба, затем отредактируйте вставленный текст перед отправкой. |
-| Использование и хранилище | Доступно только владельцу хаба (пространство имён `default`). |
-| Отображение | Английский/упрощённый китайский, предпочтения темы, системное масштабирование текста и фильтрация машин в списке сессий. |
+| Chat and permissions | Streaming messages, history, tool inspection, approvals and question answering on both platforms. |
+| Composer | Text, photos/camera/files, drafts, queued-message actions and steering when supported by the session. |
+| Session controls | Both support pin/archive, stopping a turn and sending to resume an inactive session. Android also exposes Rename, Delete and explicit Reopen actions; iOS currently has no corresponding UI for those three actions. |
+| Files and Git | Open **Session files** from the chat menu to browse/search files, inspect Git status and read diffs. |
+| Scratchlist | On iOS, tap the tray beside the composer attachment button to enter **Save draft** mode; Android uses the chat menu. Text and attachments sync within the session. |
+| Dictation | Record audio, transcribe through a configured hub provider, then edit the inserted text before sending. |
+| Usage and storage | Available only to the hub owner (`default` namespace). |
+| Display | English/Simplified Chinese, theme preferences, system text scaling and machine filtering on the session list. |
 
-Выбор вложения запускает его загрузку после подготовки, до отправки
-сообщения или сохранения записи Scratchlist. Удаление запрашивает очистку
-неиспользуемых загрузок по принципу best-effort. О хранении и потоках данных провайдеров см.
-[Политику конфиденциальности](../privacy.md).
+Selecting an attachment starts its upload after preparation, before you send
+the message or save the Scratchlist entry. Removing it requests cleanup of
+unused uploads on a best-effort basis. See the [Privacy Policy](../privacy.md)
+for storage and provider data flows.
 
-На iOS Scratchlist открывается как компактный лоток над тем же полем ввода.
-**Save draft** сохраняет содержимое без отправки; закрытие лотка через
-× оставляет несохранённый ввод нетронутым. Лоток показывает один недавний черновик или только
-его заголовок во время ввода. **Take draft** сохраняет запись и восстанавливает её
-текст и вложения. Если ввод не пуст, выберите **Append to input** или
-**Save input, then take draft**. **Add to send queue** в меню черновика — это
-явная отправка; черновик удаляется только после принятия. Неудачное удаление
-можно повторить без повторной отправки. Нажмите заголовок лотка для полного списка
-и потяните вниз для поиска по тексту или именам файлов. То же меню предлагает редактирование, копирование и
-удаление; редактирование исходного черновика фиксирует текст и вложения вместе по кнопке **Save**.
-Отмена редактирования оставляет оригинал без изменений.
+On iOS, Scratchlist opens as a compact drawer above the same input field.
+**Save draft** keeps the content without sending it; closing the drawer with
+× leaves unsaved input intact. The drawer shows one recent draft, or just its
+header while typing. **Take draft** keeps the saved entry and restores its
+text and attachments. If the input is nonempty, choose **Append to input** or
+**Save input, then take draft**. **Add to send queue** in the draft's menu is an
+explicit send and removes the draft only after acceptance. A failed removal
+can be retried without sending again. Tap the drawer header for the full list
+and pull down to search text or filenames. The same menu offers edit, copy and
+delete; editing an original draft commits text and attachments together on **Save**.
+Cancelling an edit leaves the original unchanged.
 
-Диктовка использует первого настроенного провайдера, поддерживающего стандартную
-транскрипцию. Микрофон остаётся скрытым, пока не завершится обнаружение провайдера;
-выдайте разрешение микрофона при первом использовании. Настройте провайдеров на хабе
-или через **Web Settings → Voice**. Нативная диктовка вставляет текст и не
-отправляет его автоматически. См. [Голосовой ввод и ассистент](./voice-assistant.md).
+Dictation uses the first configured provider that supports standard
+transcription. The microphone stays hidden until provider discovery succeeds;
+grant microphone permission when first using it. Configure providers on the hub
+or through **Web Settings → Voice**. Native dictation inserts text and does not
+send it automatically. See [Voice input and assistant](./voice-assistant.md).
 
-### Возможности, доступные через веб
+### Features available through the web
 
-Используйте веб-приложение для удалённого терминала, Work Graph, диктовки в реальном времени и
-голосового ассистента, fork/rewind/export сессий и выбора навыков. Для них нет
-нативного UI. Действия с историей сессии также зависят от возможностей агента.
-Нативные приложения отображают существующие отложенные сообщения, но не дают форму для
-создания отложенной отправки. Полнотекстовый экспорт файлов на Android — это действие чтения,
-отдельное от экспорта всей сессии.
+Use the web app for the remote terminal, Work Graph, realtime dictation and
+voice assistant, session fork/rewind/export, and the skills picker. These have
+no native UI. Session history actions also depend on the agent's capabilities.
+Native apps display existing scheduled messages but do not provide a form to
+create scheduled sends. Android's full-text file export is a reader action,
+separate from exporting an entire session.
 
-## Несколько хабов и выход
+## Multiple hubs and sign-out
 
-Меню хабов на главном экране позволяет добавлять и переключать хабы, открывать настройки и
-выходить. Можно держать несколько сопряжённых хабов, активен один за раз; списки
-сессий и черновики принадлежат своему хабу. Выход удаляет сохранённые учётные данные
-этого хаба и пытается отменить регистрацию его push-токена.
+The home screen's hub menu lets you add or switch hubs, open Settings, and
+sign out. You can keep several hubs paired, with one active at a time; session
+lists and drafts belong to their hub. Signing out removes that hub's stored
+credentials and attempts to unregister its push token.
 
-Оба приложения обновляют аутентификацию автоматически. Временные сетевые или серверные
-сбои сохраняют сопряжённые учётные данные. Отклонённый токен доступа или свежевыданный
-токен, который снова отклоняется, требуют повторного сопряжения с корректными учётными данными.
+Both apps refresh authentication automatically. Temporary network or server
+failures retain paired credentials. A rejected access token or a freshly
+issued token that is rejected again requires re-pairing with valid credentials.
 
-## Уведомления
+## Notifications
 
-Разрешите системные уведомления после сопряжения. Нативные уведомления поддерживают
-одобрение/отклонение разрешений и ответы; уведомление для открытого чата
-подавляется локально, потому что диалог уже виден.
+Allow system notifications after pairing. Native notifications support
+permission approval/denial and replies; a notification for the foreground chat
+is suppressed locally because the conversation is already visible.
 
-| Сборка приложения | Требования push |
+| App build | Push requirements |
 |---|---|
-| Официальная конфигурация Firebase Android | Актуальный хаб по умолчанию использует зашифрованное push-реле, когда не настроены приватные учётные данные FCM. Требуются Google Play services и доступность FCM. |
-| Официальная подпись iOS | Актуальный хаб по умолчанию использует зашифрованное push-реле. Учётные данные разработчика Apple на хабе пользователя не нужны. |
-| Приватный проект Firebase Android | Встройте клиентскую конфигурацию этого проекта и настройте соответствующие учётные данные сервисного аккаунта Firebase на хабе для прямого FCM. |
-| Android без конфигурации Firebase | Функции сессий работают; FCM-push недоступен. |
-| Самоподписанная iOS-сборка | Настройте прямой APNs или self-hosted push-реле с учётными данными, совпадающими с аккаунтом разработчика, bundle ID и окружением APNs приложения. Следуйте инструкциям по подписи в iOS README. |
+| Official Android Firebase configuration | A current hub uses the encrypted push relay by default when no private FCM credentials are configured. Google Play services and FCM connectivity are required. |
+| Official iOS signing | A current hub uses the encrypted push relay by default. No Apple developer credentials are needed on the user's hub. |
+| Private Android Firebase project | Bundle that project's client configuration and configure matching Firebase service-account credentials on the hub for direct FCM. |
+| Android without Firebase configuration | Session features work; FCM push is unavailable. |
+| Self-signed iOS build | Configure direct APNs or a self-hosted push relay with credentials matching the app's developer account, bundle ID and APNs environment. Follow the iOS README's signing instructions. |
 
-Официальное push-реле переносит зашифрованное содержимое уведомлений и метаданные
-маршрутизации. Оно отделено от сетевого туннеля, включаемого `hapi hub --relay`,
-поэтому работает и с хабами, доступными через другой HTTPS. Приватная прямая
-доставка FCM использует незашифрованный payload данных уведомления; прямой APNs остаётся
-зашифрованным. См. [Уведомления](./notifications.md)
-и [push-контракт](../api/native-companion-contract.md) — настройка.
+The official push relay carries encrypted notification content and routing
+metadata. It is separate from the network tunnel enabled by `hapi hub --relay`,
+so it also works with hubs reached through another HTTPS setup. Private direct
+FCM delivery uses an unencrypted notification data payload; direct APNs remains
+encrypted. See [Notifications](./notifications.md#native-app-notifications)
+and the [push contract](../api/native-companion-contract.md) for configuration.
 
-Push-регистрация охватывает каждый сопряжённый хаб. Тапы по уведомлениям сейчас открывают
-сессию на активном хабе; если сессия не найдена, переключитесь на
-её хаб-владелец. Фоновые действия уведомлений пробуют сопряжённые хабы, чтобы разрешить
-сессию.
+Push registration covers every paired hub. Notification taps currently open
+the session against the active hub; if the session cannot be found, switch to
+its owning hub. Background notification actions try paired hubs to resolve
+the session.
 
-## Решение проблем
+## Troubleshooting
 
-| Симптом | Проверьте |
+| Symptom | Check |
 |---|---|
-| Сопряжение не может достучаться до хаба | Используйте HTTPS-адрес хаба, проверьте сетевой доступ телефона и доверие сертификату, а также адрес прослушивания хаба или обратный прокси. |
-| Несовпадение протокола | Обновите приложение/хаб до совместимых сборок; оба приложения требуют, чтобы версия протокола хаба совпадала с их поддерживаемой версией. |
-| Запрошено повторное сопряжение | Используйте текущий токен доступа, включая нужный суффикс пространства имён. |
-| Нет машин для New Session | Запустите Runner, проверьте его подключение и пространство имён, а также доступность агента на этой машине. |
-| Микрофон отсутствует | Настройте стандартного провайдера транскрипции и убедитесь, что хаб доступен. |
-| Уведомления отсутствуют | Проверьте разрешение ОС, конфигурацию Firebase/APNs сборки, доступность провайдера и настройки push хаба. |
+| Pairing cannot reach the hub | Use the HTTPS hub origin, verify phone network access and certificate trust, and check the hub's listening address or reverse proxy. |
+| Protocol mismatch | Update the app/hub to compatible builds; both apps require the hub protocol version to equal their supported version. |
+| Re-pairing requested | Use the current access token, including the intended namespace suffix. |
+| No machines for New Session | Start the Runner, verify its connection and namespace, and check agent availability on that machine. |
+| Microphone missing | Configure a standard transcription provider and ensure the hub is reachable. |
+| Notifications missing | Check OS permission, the build's Firebase/APNs configuration, provider connectivity and hub push settings. |
 
-Для разработки и проверок соответствия используйте README платформ и
-[клиентский контракт](../api/client-contract/index.md). Соответствие фикстурам протокола
-не означает идентичности возможностей нативного и веб-UI.
+For development and conformance checks, use the platform READMEs and the
+[client contract](../api/client-contract/index.md). Protocol fixture conformance
+does not imply identical native and web UI features.

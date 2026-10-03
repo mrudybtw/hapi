@@ -1,172 +1,172 @@
 # FAQ
 
-## Общее
+## General
 
-### Что такое HAPI?
+### What is HAPI?
 
-HAPI — это local-first, self-hosted платформа для запуска и удалённого управления ИИ-агентами (Claude Code, Codex, Cursor Agent, Grok Build, OpenCode и другие — см. [Поддерживаемые агенты](./agents.md)). Она позволяет запускать сессии кодинга на компьютере и следить за ними/управлять ими с телефона.
+HAPI is a local-first, self-hosted platform for running and controlling AI coding agents remotely (Claude Code, Codex, Cursor Agent, Grok Build, OpenCode, and more — see [Supported Agents](./agents.md)). It lets you start coding sessions on your computer and monitor/control them from your phone.
 
-### Что означает название HAPI?
+### What does HAPI stand for?
 
-HAPI (哈皮) — китайская транслитерация «Happy», отражающая цель проекта сделать помощь ИИ в кодинге более приятным опытом, освободив вас от терминала.
+HAPI (哈皮) is a Chinese transliteration of "Happy", reflecting the project's goal of making AI coding assistance a happier experience by freeing you from the terminal.
 
-### HAPI бесплатен?
+### Is HAPI free?
 
-Да, HAPI с открытым исходным кодом и бесплатен по лицензии AGPL-3.0-only.
+Yes, HAPI is open source and free to use under the AGPL-3.0-only license.
 
-### Каких ИИ-агентов поддерживает HAPI?
+### What AI agents does HAPI support?
 
-HAPI поддерживает несколько агентов, рекомендуемый вариант — Claude Code. Полный список и заметки по настройке каждого агента: [Поддерживаемые агенты](./agents.md).
+HAPI supports several coding agents, with Claude Code as the recommended option. See [Supported Agents](./agents.md) for the full list and per-agent setup notes.
 
-## Установка и настройка
+## Setup & Installation
 
-### Нужен ли хаб?
+### Do I need a hub?
 
-HAPI включает встроенный хаб. Просто выполните `hapi hub` на своей машине — внешний хаб не нужен.
+HAPI includes an embedded hub. Just run `hapi hub` on your machine - no external hub required.
 
-`hapi server` остаётся поддерживаемым псевдонимом.
+`hapi server` remains supported as an alias.
 
-### Как получить доступ к HAPI с телефона?
+### How do I access HAPI from my phone?
 
-Используйте [нативные приложения iOS / Android](./native-apps.md) или откройте веб-приложение
-в браузере/PWA. Нативные приложения сопрягаются с URL хаба и токеном доступа; в
-гайде описаны сборка приложения и сканирование QR компаньона.
+Use the [native iOS / Android apps](./native-apps.md) or open the web app in
+your browser/PWA. Native apps pair with the hub's URL and access token; the
+guide covers building an app and scanning the companion QR.
 
-Для доступа по локальной сети:
+For local network access:
 ```
-http://<ip-вашего-компьютера>:3006
+http://<your-computer-ip>:3006
 ```
 
-Этот незашифрованный URL — для браузера/PWA в вашей доверенной LAN. Для сопряжения
-нативных приложений используйте HTTPS: Android отклоняет HTTP, а HTTP-ввод на iOS остаётся подчинённым
-сетевой политике системы. Запустите `hapi hub --relay` или поставьте перед хабом HTTPS-обратный
-прокси/туннель.
+That cleartext URL is for a browser/PWA on your trusted LAN. Use HTTPS for
+native pairing: Android rejects HTTP, and iOS HTTP input remains subject to
+system network policy. Run `hapi hub --relay` or place an HTTPS reverse
+proxy/tunnel in front of the hub.
 
-Если телефон не может подключиться, убедитесь, что хаб слушает не только `127.0.0.1`. Для доступа по LAN задайте `listenHost` равным `0.0.0.0` в `~/.hapi/settings.json` или задайте `HAPI_LISTEN_HOST=0.0.0.0`, затем перезапустите `hapi hub`.
+If your phone cannot connect, make sure the hub is not only listening on `127.0.0.1`. For LAN access, set `listenHost` to `0.0.0.0` in `~/.hapi/settings.json` or set `HAPI_LISTEN_HOST=0.0.0.0`, then restart `hapi hub`.
 
-Для доступа из интернета:
-- Используйте встроенный релейный туннель: запустите хаб с `hapi hub --relay`, чтобы получить публичный URL через реле tunwg (по умолчанию — официальный `relay.hapi.run`)
-- Если у хаба есть публичный IP, обращайтесь к нему напрямую (в проде используйте HTTPS через обратный прокси)
-- Если вы за NAT, настройте собственный туннель (Cloudflare Tunnel, Tailscale или ngrok)
+For internet access:
+- Use the built-in relay tunnel: start the hub with `hapi hub --relay` to get a public URL via the tunwg relay (defaults to the official `relay.hapi.run`)
+- If the hub has a public IP, access it directly (use HTTPS via reverse proxy for production)
+- If behind NAT, set up your own tunnel (Cloudflare Tunnel, Tailscale, or ngrok)
 
-### Зачем нужен токен доступа?
+### What's the access token for?
 
-`CLI_API_TOKEN` — это общий секрет, который аутентифицирует:
-- подключения CLI к хабу;
-- входы в веб-приложение;
-- сопряжение и аутентификацию нативных приложений;
-- привязку аккаунта Telegram.
+The `CLI_API_TOKEN` is a shared secret that authenticates:
+- CLI connections to the hub
+- Web app logins
+- Native app pairing and authentication
+- Telegram account binding
 
-Он автоматически генерируется при первом запуске хаба и сохраняется в `~/.hapi/settings.json`.
+It's auto-generated on first hub start and saved to `~/.hapi/settings.json`.
 
-### Поддерживаете ли вы несколько аккаунтов?
+### Do you support multiple accounts?
 
-Да. Мы поддерживаем лёгкий мультиаккаунтный доступ через пространства имён для общих командных хабов. См. [Пространства имён (продвинуто)](./namespace.md).
+Yes. We support lightweight multi-account access via namespaces for shared team hubs. See [Namespace (Advanced)](./namespace.md).
 
-### Можно ли использовать HAPI без Telegram?
+### Can I use HAPI without Telegram?
 
-Да. Telegram опционален. Можно использовать нативное приложение iOS/Android, открыть веб-приложение в браузере или установить PWA.
+Yes. Telegram is optional. You can use a native iOS/Android app, open the web app in a browser, or install the PWA.
 
-## Использование
+## Usage
 
-### Как одобрять разрешения удалённо?
+### How do I approve permissions remotely?
 
-1. Когда ваш ИИ-агент запрашивает разрешение (например, на правку файла), вы увидите уведомление
-2. Откройте HAPI на телефоне
-3. Перейдите к активной сессии
-4. Одобрите или отклоните ожидающее разрешение
+1. When your AI agent requests permission (e.g., to edit a file), you'll see a notification
+2. Open HAPI on your phone
+3. Navigate to the active session
+4. Approve or deny the pending permission
 
-### Как получать уведомления?
+### How do I receive notifications?
 
-HAPI поддерживает такие каналы уведомлений:
+HAPI supports these notification channels:
 
-1. **Push-уведомления PWA** — включайте по запросу, работают даже когда приложение закрыто
-2. **Telegram-бот** — см. [Настройка Telegram](./notifications.md)
-3. **Уведомления нативных приложений** — официальные приложения Android и iOS используют зашифрованную доставку push; свяжите хаб и разрешите уведомления, настройка push-провайдера не требуется
-4. **ServerChan (Server酱)** — отправка уведомлений в WeChat и другие каналы; см. [Настройка ServerChan](./notifications.md)
+1. **PWA Push Notifications** - Enable when prompted, works even when app is closed
+2. **Telegram Bot** - See [Telegram Setup](./notifications.md#telegram-setup)
+3. **Native app notifications** - Official Android and iOS apps use encrypted push delivery; pair your hub and allow notifications, with no push-provider setup required
+4. **ServerChan (Server酱)** - Send notifications to WeChat and other channels; see [ServerChan Setup](./notifications.md#serverchan-server酱-setup)
 
-### Можно ли запускать сессии удалённо?
+### Can I start sessions remotely?
 
-Да, в режиме раннера:
+Yes, with runner mode:
 
-1. Выполните `hapi runner start` на компьютере
-2. Откройте New Session в нативном или веб-приложении
-3. Выберите онлайн-машину, каталог и доступного агента, затем создайте сессию
+1. Run `hapi runner start` on your computer
+2. Open New Session in a native app or the web app
+3. Select the online machine, directory and available agent, then create the session
 
-### Как посмотреть, какие файлы изменились?
+### How do I see what files were changed?
 
-В веб-представлении сессии откройте **Files**. В нативных приложениях откройте **Session files**
-из меню чата, чтобы:
+In the web session view, open **Files**. In native apps, open **Session files**
+from the chat menu to:
 
-- просматривать файлы проекта;
-- смотреть статус git;
-- видеть диффы изменённых файлов.
+- Browse project files
+- View git status
+- See diffs of changed files
 
-### Можно ли отправлять сообщения ИИ с телефона?
+### Can I send messages to the AI from my phone?
 
-Да. Откройте любую сессию и используйте интерфейс чата, чтобы отправлять сообщения напрямую ИИ-агенту.
+Yes. Open any session and use the chat interface to send messages directly to the AI agent.
 
-### Почему моя сессия выглядела неактивной, когда агент сам проснулся?
+### Why did my session look idle when the agent woke itself?
 
-Некоторые агенты (особенно Cursor) могут возобновляться после простоя по сигналам обвязки, таким как фоновый Shell `notify_on_output` или `/loop`, без вашего нового сообщения в HAPI. HAPI обновляет индикатор «думает» сессии, когда агент возобновляет работу или запрашивает разрешение, так что список отражает эту активность.
+Some agents (especially Cursor) can resume after idle from harness signals such as background Shell `notify_on_output` or `/loop`, without you sending a new HAPI message. HAPI updates the session's thinking indicator when the agent resumes work or requests permission, so the list reflects that activity.
 
-### Можно ли получить удалённый доступ к терминалу?
+### Can I access a terminal remotely?
 
-Да. Откройте сессию в веб-приложении и нажмите вкладку Terminal для удалённой оболочки.
+Yes. Open a session in the web app and tap the Terminal tab for a remote shell.
 
-Хосты Linux и macOS используют POSIX PTY из Bun. Хосты Windows используют ConPTY из Bun, что требует Bun 1.3.14 или новее.
+Linux and macOS hosts use Bun's POSIX PTY support. Windows hosts use Bun's ConPTY support, which requires Bun 1.3.14 or newer.
 
-### Как использовать голосовое управление?
+### How do I use voice control?
 
-Веб-голосовой ассистент поддерживает ElevenLabs, Gemini Live и Qwen Realtime.
-Нативные приложения поддерживают стандартную диктовку: настройте провайдера транскрипции на
-хабе, запишите в редакторе, затем проверьте и отправьте вставленный текст.
-Детали настройки: [Голосовой ввод и ассистент](./voice-assistant.md).
+The web voice assistant supports ElevenLabs, Gemini Live, and Qwen Realtime.
+Native apps support standard dictation: configure a transcription provider on
+the hub, record in the composer, then review and send the inserted text.
+See [Voice input and assistant](./voice-assistant.md) for setup details.
 
-## Безопасность
+## Security
 
-### Мои данные в безопасности?
+### Is my data safe?
 
-HAPI хранит историю сессий на хабе, которым вы управляете, по умолчанию в `~/.hapi/`,
-а не на центральном сервере аккаунтов HAPI. Ваши устройства подключаются к этому хабу.
-ИИ-агенты по-прежнему используют своих настроенных провайдеров моделей; опциональные голос,
-генерация заголовков и уведомления также обращаются к внешним сервисам.
-Об обработке данных и зашифрованном нативном push см. [Политику конфиденциальности](../privacy.md).
+HAPI keeps session history on the hub you operate, in `~/.hapi/` by default,
+rather than on a central HAPI account server. Your devices connect to that hub.
+Coding agents still use their configured model providers; optional voice,
+title generation, and notification features also contact external services.
+See the [Privacy Policy](../privacy.md) for data handling and encrypted native push.
 
-### Насколько безопасна токенная аутентификация?
+### How secure is the token authentication?
 
-Автоматически сгенерированный токен — 256-битный (криптографически стойкий). Для внешнего доступа всегда используйте HTTPS через туннель.
+The auto-generated token is 256-bit (cryptographically secure). For external access, always use HTTPS via a tunnel.
 
-### Могут ли другие получить доступ к моему экземпляру HAPI?
+### Can others access my HAPI instance?
 
-Только если у них есть ваш токен доступа. Для дополнительной безопасности:
-- используйте сильный уникальный токен;
-- всегда используйте HTTPS для внешнего доступа;
-- рассмотрите Tailscale для приватной сети.
+Only if they have your access token. For additional security:
+- Use a strong, unique token
+- Always use HTTPS for external access
+- Consider Tailscale for private networking
 
-## Решение проблем
+## Troubleshooting
 
-### Почему сессия останавливается, когда засыпает ноутбук-хост?
+### Why does a session stop when its laptop host sleeps?
 
-Удалённый режим меняет, откуда вы управляете агентом, а не где он выполняется. Машина с CLI или раннером должна оставаться бодрствующей. Если хаб работает в другом месте, веб-приложение может всё ещё загружаться, пока эта машина выполнения недоступна. Запуск хаба на сервере не переносит существующую сессию ноутбука на этот сервер.
+Remote mode changes where you control the agent, not where it executes. The machine running the CLI or runner must remain awake. If the hub runs elsewhere, the web app may still load while that execution machine is unavailable. Running the hub on a server does not move an existing laptop session to that server.
 
-Сначала проверьте небольшой запрос при открытом ноутбуке. Если он тоже не работает, проверьте ожидающие разрешения агента, подключение CLI и сеть, прежде чем менять настройки питания. Отключение терминала и сон операционной системы — разные проблемы: сохранение процесса после отключения SSH не позволяет ему выполняться, пока его хост спит.
+First verify a small request with the laptop open. If that fails too, check the agent's pending permissions, CLI connection, and network before changing power settings. Terminal disconnection and operating-system sleep are separate problems: preserving a process after an SSH disconnect does not let it execute while its host is asleep.
 
-Для MacBook, который должен работать с закрытой крышкой, используйте поддерживаемую настройку с внешним дисплеем или совместимое решение для закрытой крышки. Оставить крышку открытой с управляемым сном простоя — другой вариант. Держите активный ноутбук под питанием и с вентиляцией. После закрытия крышки подтвердите новый вывод команд с телефона, прежде чем полагаться на долгий прогон.
+For a MacBook that must work with the lid closed, use a supported external-display setup or a compatible closed-lid solution. Leaving the lid open with idle sleep managed is another option. Keep an active laptop powered and ventilated. After closing the lid, confirm new command output from the phone before relying on a long run.
 
-Это [руководство по настройке MacBook на Apple Silicon](https://clamshell.dev/guides/keep-claude-code-running-lid-closed#phone-check) включает двухминутную проверку таймстампа и опциональную настройку Clamshell. Clamshell — отдельное платное приложение с пробным периодом; HAPI его не требует.
+This [Apple Silicon MacBook setup guide](https://clamshell.dev/guides/keep-claude-code-running-lid-closed#phone-check) includes a two-minute timestamp check and an optional Clamshell setup. Clamshell is a separate paid app with a trial; HAPI does not require it.
 
-### Ошибка «Connection refused»
+### "Connection refused" error
 
-- Убедитесь, что хаб запущен: `hapi hub`
-- Проверьте, что файрвол разрешает порт 3006
-- Проверьте, что `HAPI_API_URL` корректен
+- Ensure hub is running: `hapi hub`
+- Check firewall allows port 3006
+- Verify `HAPI_API_URL` is correct
 
-### Телефон не может получить доступ к HAPI в локальной сети
+### My phone cannot access HAPI on the local network
 
-Если HAPI работает на компьютере, но не с другого устройства в той же LAN, сначала проверьте адрес привязки хаба. По умолчанию HAPI слушает `127.0.0.1`, который принимает только localhost-подключения.
+If HAPI works on your computer but not from another device on the same LAN, check the hub bind address first. By default, HAPI listens on `127.0.0.1`, which only accepts localhost connections.
 
-Используйте один из вариантов:
+Use one of these:
 
 ```json
 {
@@ -178,61 +178,61 @@ HAPI хранит историю сессий на хабе, которым вы
 export HAPI_LISTEN_HOST=0.0.0.0
 ```
 
-Затем перезапустите `hapi hub` и откройте:
+Then restart `hapi hub` and open:
 
 ```bash
-http://<ip-вашего-компьютера>:3006
+http://<your-computer-ip>:3006
 ```
 
-Этот прямой LAN-URL — для доступа браузера/PWA. Нативный Android-компаньон
-требует HTTPS (`hapi hub --relay` или ваш собственный HTTPS-обратный прокси/туннель).
+This direct LAN URL is for browser/PWA access. The native Android companion
+requires HTTPS (`hapi hub --relay`, or your own HTTPS reverse proxy/tunnel).
 
-Также проверьте, что файрвол ОС разрешает входящие подключения на порт `3006`.
+Also verify your OS firewall allows inbound connections on port `3006`.
 
-### Ошибка «Invalid token»
+### "Invalid token" error
 
-Сначала выполните `hapi doctor` — он покажет, задан ли `CLI_API_TOKEN` и откуда он берётся (переменная окружения или файл настроек).
+Run `hapi doctor` first - it shows whether `CLI_API_TOKEN` is set and where it comes from (environment variable or settings file).
 
-- Повторно выполните `hapi auth login`
-- Проверьте, что токен совпадает в CLI и хабе
-- Проверьте, что в `~/.hapi/settings.json` корректный `cliApiToken`
+- Re-run `hapi auth login`
+- Check token matches in CLI and hub
+- Verify `~/.hapi/settings.json` has correct `cliApiToken`
 
-### Раннер не запускается
+### Runner won't start
 
-Сначала выполните `hapi doctor` — он показывает статус раннера (включая устаревшее состояние), все процессы hapi и недавние файлы логов.
+Run `hapi doctor` first - it shows runner status (including stale state), all hapi processes, and recent log files.
 
 ```bash
-# Проверить статус
+# Check status
 hapi runner status
 
-# Список сессий, о которых знает раннер
+# List sessions the runner is aware of
 hapi runner list
 
-# Остановить конкретную сессию, запущенную раннером
+# Stop a specific runner-spawned session
 hapi runner stop-session <session-id>
 
-# Очистить устаревший файл блокировки
+# Clear stale lock file
 rm ~/.hapi/runner.state.json.lock
 
-# Посмотреть логи
+# Check logs
 hapi runner logs
 
-# Убить разбежавшиеся процессы hapi
+# Kill runaway hapi processes
 hapi doctor clean
 ```
 
-### Claude Code не найден
+### Claude Code not found
 
-Установите Claude Code или задайте свой путь:
+Install Claude Code or set custom path:
 ```bash
 npm install -g @anthropic-ai/claude-code
-# или
+# or
 export HAPI_CLAUDE_PATH=/path/to/claude
 ```
 
-### Cursor Agent не найден
+### Cursor Agent not found
 
-Установите Cursor Agent CLI:
+Install Cursor Agent CLI:
 ```bash
 # macOS/Linux
 curl https://cursor.com/install -fsS | bash
@@ -241,62 +241,62 @@ curl https://cursor.com/install -fsS | bash
 irm 'https://cursor.com/install?win32=true' | iex
 ```
 
-Убедитесь, что `agent` находится в вашем PATH.
+Ensure `agent` is on your PATH.
 
-### Как запустить диагностику?
+### How do I run diagnostics?
 
 ```bash
 hapi doctor
 ```
 
-Это первый шаг диагностики для большинства проблем. Он печатает:
+This is the first diagnostic step for most issues. It prints:
 
-- версию CLI, платформу и диагностику запуска;
-- конфигурацию и релевантные переменные окружения;
-- содержимое `settings.json` (токен замаскирован);
-- задан ли `CLI_API_TOKEN` и его источник (он не обращается к хабу и не валидирует токен);
-- статус раннера и его состояние (включая устаревшее состояние);
-- все запущенные процессы hapi;
-- недавние файлы логов (включая логи раннера).
+- CLI version, platform, and spawn diagnostics
+- Configuration and relevant environment variables
+- Contents of `settings.json` (token redacted)
+- Whether `CLI_API_TOKEN` is set, and its source (it does not contact the hub or validate the token)
+- Runner status and runner state (including stale state)
+- All running hapi processes
+- Recent log files (including runner logs)
 
-Чтобы очистить разбежавшиеся процессы:
+To clean up runaway processes:
 
 ```bash
 hapi doctor clean
 ```
 
-## Сравнение
+## Comparison
 
-### HAPI против Happy
+### HAPI vs Happy
 
-| Аспект | Happy | HAPI |
+| Aspect | Happy | HAPI |
 |--------|-------|------|
-| Дизайн | Cloud-first | Local-first |
-| Пользователи | Многопользовательский | Один пользователь по умолчанию; лёгкая мультиаккаунтная изоляция через [пространства имён](./namespace.md) |
-| Развёртывание | Несколько сервисов | Один бинарь |
-| История сессий | Зашифрована на сервере | Хранится на вашем хабе |
+| Design | Cloud-first | Local-first |
+| Users | Multi-user | Single user by default; lightweight multi-account isolation via [namespaces](./namespace.md) |
+| Deployment | Multiple services | Single binary |
+| Session history | Encrypted on server | Stored on your own hub |
 
-Подробное сравнение: [Почему HAPI](./why-hapi.md).
+See [Why HAPI](./why-hapi.md) for detailed comparison.
 
-### HAPI против прямого запуска Claude Code
+### HAPI vs running Claude Code directly
 
-| Возможность | Claude Code | HAPI + Claude Code |
+| Feature | Claude Code | HAPI + Claude Code |
 |---------|-------------|-------------------|
-| Удалённый доступ | Нет | Да |
-| Управление с мобильного | Нет | Да |
-| Одобрение разрешений | Только терминал | Телефон/веб |
-| Постоянство сессий | Нет | Да |
-| Несколько машин | Вручную | Встроено |
+| Remote access | No | Yes |
+| Mobile control | No | Yes |
+| Permission approval | Terminal only | Phone/web |
+| Session persistence | No | Yes |
+| Multi-machine | Manual | Built-in |
 
-## Участие в разработке
+## Contributing
 
-### Как я могу помочь?
+### How can I contribute?
 
-Посетите наш [GitHub-репозиторий](https://github.com/tiann/hapi), чтобы:
-- сообщать о проблемах;
-- отправлять pull request'ы;
-- предлагать функции.
+Visit our [GitHub repository](https://github.com/tiann/hapi) to:
+- Report issues
+- Submit pull requests
+- Suggest features
 
-### Где сообщать об ошибках?
+### Where do I report bugs?
 
-Откройте issue в [GitHub Issues](https://github.com/tiann/hapi/issues).
+Open an issue on [GitHub Issues](https://github.com/tiann/hapi/issues).

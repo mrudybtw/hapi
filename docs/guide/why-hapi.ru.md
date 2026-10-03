@@ -1,33 +1,33 @@
-# Why HAPI?
+# Почему HAPI?
 
-[Happy](https://github.com/slopus/happy) is an excellent project. So why build HAPI?
+[Happy](https://github.com/slopus/happy) — отличный проект. Так зачем нужен HAPI?
 
-**The short answer**: Happy uses a centralized server that stores your encrypted data. HAPI is decentralized — each user runs their own hub, and the optional network relay forwards encrypted traffic rather than hosting your conversation history. These different goals lead to fundamentally different architectures.
+**Короткий ответ**: Happy использует централизованный сервер, который хранит ваши зашифрованные данные. HAPI децентрализован — каждый пользователь запускает собственный хаб, а опциональное сетевое реле лишь пересылает зашифрованный трафик, а не хранит историю ваших диалогов. Разные цели приводят к принципиально разной архитектуре.
 
 ## TL;DR
 
-| Aspect | Happy | HAPI |
+| Аспект | Happy | HAPI |
 |--------|-------|------|
-| **Architecture** | Centralized (cloud server stores encrypted data) | Decentralized (each user runs own hub) |
-| **Users** | Multi-user on shared server | Any number (each runs own hub) |
-| **Session history** | Encrypted on server (server cannot read) | Stored on your own hub |
-| **Encryption** | Application-layer E2EE (client encrypts before sending) | WireGuard + TLS via relay; HTTPS for self-hosted remote access |
-| **Deployment** | Multiple services (PostgreSQL, Redis, app server) | Single binary |
-| **Complexity** | High (E2EE, key management, scaling) | Low (one command) |
+| **Архитектура** | Централизованная (облачный сервер хранит зашифрованные данные) | Децентрализованная (каждый запускает свой хаб) |
+| **Пользователи** | Многопользовательский общий сервер | Любое количество (каждый запускает свой хаб) |
+| **История сессий** | Зашифрована на сервере (сервер не может читать) | Хранится на вашем хабе |
+| **Шифрование** | E2EE на уровне приложения (клиент шифрует до отправки) | WireGuard + TLS через реле; HTTPS для self-hosted удалённого доступа |
+| **Развёртывание** | Несколько сервисов (PostgreSQL, Redis, сервер приложения) | Один бинарь |
+| **Сложность** | Высокая (E2EE, управление ключами, масштабирование) | Низкая (одна команда) |
 
-**Choose HAPI if**: You want data sovereignty, self-hosting, and minimal setup.
+**Выбирайте HAPI, если** хотите суверенитет над данными, self-hosting и минимальную настройку.
 
-**Choose Happy if**: You need a managed cloud service with multi-user collaboration.
+**Выбирайте Happy, если** нужен управляемый облачный сервис с многопользовательской коллаборацией.
 
-## Architecture Comparison
+## Сравнение архитектур
 
-### Happy: Centralized Cloud
+### Happy: централизованное облако
 
-Happy's centralized design requires:
+Централизованная модель Happy требует:
 
-- **Application-layer E2EE** — Clients encrypt before sending; the server stores encrypted blobs it cannot read
-- **Distributed database + cache** — PostgreSQL + Redis for multi-user scaling
-- **Complex deployment** — Docker, multiple services, config files
+- **E2EE на уровне приложения** — клиенты шифруют до отправки; сервер хранит зашифрованные блобы, которые не может прочитать
+- **Распределённые БД + кэш** — PostgreSQL + Redis для многопользовательского масштабирования
+- **Сложное развёртывание** — Docker, несколько сервисов, конфигурационные файлы
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -50,20 +50,20 @@ Happy's centralized design requires:
                                              └───────────────────┘
 ```
 
-The server stores encrypted data — it never sees plaintext, but it does hold your data.
+Сервер хранит зашифрованные данные — он никогда не видит открытый текст, но данные находятся у него.
 
-### HAPI: Decentralized
+### HAPI: децентрализованный
 
-Each user runs their own hub. HAPI offers two modes of remote access:
+Каждый пользователь запускает собственный хаб. HAPI предлагает два режима удалённого доступа:
 
-- **Self-hosted** (own server / Cloudflare Tunnel / Tailscale) — You choose the host and HTTPS endpoint
-- **Public relay** (`hapi hub --relay`) — E2E encrypted via tunwg (WireGuard + TLS); the relay only forwards opaque packets
-- **Single embedded database** — SQLite, no external services
-- **One-command deployment** — Single binary, zero config
+- **Self-hosted** (собственный сервер / Cloudflare Tunnel / Tailscale) — вы сами выбираете хост и HTTPS-эндпоинт
+- **Публичное реле** (`hapi hub --relay`) — сквозное шифрование через tunwg (WireGuard + TLS); реле только пересылает непрозрачные пакеты
+- **Одна встроенная БД** — SQLite, без внешних сервисов
+- **Развёртывание одной командой** — один бинарь, ноль конфигурации
 
-#### Mode 1: Self-Hosted (own server or tunnel)
+#### Режим 1: Self-Hosted (свой сервер или туннель)
 
-You operate the hub and choose how to expose it. Use HTTPS for remote access; a third-party proxy that terminates TLS is part of that trust boundary.
+Вы управляете хабом и сами выбираете, как его публиковать. Для удалённого доступа используйте HTTPS; сторонний прокси, завершающий TLS, входит в эту границу доверия.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -91,9 +91,9 @@ You operate the hub and choose how to expose it. Use HTTPS for remote access; a 
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-#### Mode 2: Public Relay (E2E encrypted)
+#### Режим 2: Публичное реле (сквозное шифрование)
 
-The relay server only forwards encrypted packets — it cannot read your data.
+Сервер-реле только пересылает зашифрованные пакеты — он не может прочитать ваши данные.
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
@@ -128,20 +128,20 @@ The relay server only forwards encrypted packets — it cannot read your data.
                     └─────────────────┘
 ```
 
-## Key Differences
+## Ключевые различия
 
-### Data Location
+### Расположение данных
 
-| Aspect | Happy | HAPI |
+| Аспект | Happy | HAPI |
 |--------|-------|------|
-| **Where session history lives** | Cloud server (encrypted blobs) | Your own hub |
-| **Who stores it** | Central server holds encrypted data | Your hub; clients may cache data |
-| **Data at rest** | Encrypted (server cannot read) | Plaintext (protected by OS) |
-| **Server's role** | Stores encrypted data + syncs devices | Your hub stores history; optional relay forwards traffic |
+| **Где живёт история сессий** | Облачный сервер (зашифрованные блобы) | Ваш собственный хаб |
+| **Кто хранит** | Центральный сервер хранит зашифрованные данные | Ваш хаб; клиенты могут кэшировать данные |
+| **Данные в покое** | Зашифрованы (сервер не может читать) | Открытый текст (защищён ОС) |
+| **Роль сервера** | Хранит зашифрованные данные + синхронизирует устройства | Ваш хаб хранит историю; опциональное реле пересылает трафик |
 
-### Deployment Model
+### Модель развёртывания
 
-**Happy** requires orchestrating multiple components:
+**Happy** требует оркестрации нескольких компонентов:
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
@@ -156,7 +156,7 @@ The relay server only forwards encrypted packets — it cannot read your data.
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-**HAPI** bundles everything:
+**HAPI** объединяет всё:
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
@@ -170,18 +170,18 @@ The relay server only forwards encrypted packets — it cannot read your data.
 └───────────────────────────────────────────────────────────────────┘
 ```
 
-### Security Approach
+### Подход к безопасности
 
-| Aspect | Happy | HAPI (self-hosted) | HAPI (relay) |
+| Аспект | Happy | HAPI (self-hosted) | HAPI (relay) |
 |--------|-------|-------------------|--------------|
-| **Problem** | Data on untrusted server | Remote access to local hub | Remote access via third-party relay |
-| **Solution** | Application-layer E2EE | HTTPS (you control the path) | WireGuard + TLS (tunwg) |
-| **Key management** | Client holds keys; server never sees plaintext | Not needed | Handled by tunwg automatically |
-| **Data at rest** | Encrypted on server | Plaintext on your machine | Plaintext on your machine |
+| **Проблема** | Данные на недоверенном сервере | Удалённый доступ к локальному хабу | Удалённый доступ через стороннее реле |
+| **Решение** | E2EE на уровне приложения | HTTPS (вы контролируете путь) | WireGuard + TLS (tunwg) |
+| **Управление ключами** | Клиент хранит ключи; сервер не видит открытый текст | Не требуется | Автоматически через tunwg |
+| **Данные в покое** | Зашифрованы на сервере | Открытый текст на вашей машине | Открытый текст на вашей машине |
 
-## Why Different Architectures?
+## Почему разная архитектура?
 
-### Happy: Centralized
+### Happy: централизованный
 
 ```
 Goal: Multi-user cloud platform
@@ -196,9 +196,9 @@ Goal: Multi-user cloud platform
                    └──► Must sync encrypted state across devices
 ```
 
-**Result**: Sophisticated infrastructure with zero-knowledge server
+**Итог**: сложная инфраструктура с сервером нулевого знания (zero-knowledge).
 
-### HAPI: Decentralized
+### HAPI: децентрализованный
 
 ```
 Goal: Self-hosted tool — each user runs their own hub
@@ -216,26 +216,26 @@ Goal: Self-hosted tool — each user runs their own hub
                    └──► WireGuard + TLS (tunwg) — relay forwards only
 ```
 
-**Result**: Simple, portable, one-command deployment
+**Итог**: простое, портативное развёртывание одной командой.
 
-## Summary
+## Сводка
 
-| Dimension | Happy | HAPI |
+| Измерение | Happy | HAPI |
 |-----------|-------|------|
-| **Architecture** | Centralized cloud server | Decentralized (each user runs own hub) |
-| **Server's role** | Stores encrypted data | Your hub stores history; optional relay forwards traffic |
-| **Data location** | Server (encrypted, zero-knowledge) | Local (plaintext, your machine) |
-| **Deployment** | Multiple services (PostgreSQL, Redis, Node.js) | Single binary (embedded SQLite) |
-| **Encryption** | Application-layer E2EE (client-side) | WireGuard + TLS (relay) or HTTPS (self-hosted) |
-| **Scaling** | Horizontal (multi-user on shared server) | Per-user (each runs own hub) |
-| **Target user** | Managed cloud service users | Self-hosters who want data sovereignty |
+| **Архитектура** | Централизованный облачный сервер | Децентрализованная (каждый запускает свой хаб) |
+| **Роль сервера** | Хранит зашифрованные данные | Ваш хаб хранит историю; опциональное реле пересылает трафик |
+| **Расположение данных** | Сервер (зашифровано, zero-knowledge) | Локально (открытый текст, ваша машина) |
+| **Развёртывание** | Несколько сервисов (PostgreSQL, Redis, Node.js) | Один бинарь (встроенный SQLite) |
+| **Шифрование** | E2EE на уровне приложения (на клиенте) | WireGuard + TLS (реле) или HTTPS (self-hosted) |
+| **Масштабирование** | Горизонтальное (многопользовательский общий сервер) | На пользователя (каждый запускает свой хаб) |
+| **Целевой пользователь** | Пользователи управляемого облачного сервиса | Self-hoster'ы, ценящие суверенитет данных |
 
-## Conclusion
+## Заключение
 
-The architectural differences stem from a centralized vs decentralized design:
+Различия в архитектуре проистекают из выбора «централизованно vs децентрализованно»:
 
-- **Happy**: Centralized cloud server that stores your encrypted data. The server never sees plaintext (zero-knowledge), but it does hold your data. This requires application-layer E2EE, key management, and distributed infrastructure (PostgreSQL, Redis, scaling).
+- **Happy**: централизованный облачный сервер, который хранит ваши зашифрованные данные. Сервер никогда не видит открытый текст (zero-knowledge), но данные находятся у него. Это требует E2EE на уровне приложения, управления ключами и распределённой инфраструктуры (PostgreSQL, Redis, масштабирование).
 
-- **HAPI**: Decentralized — you run the hub that stores your session history, on your workstation or another host you control. Remote access uses your own HTTPS endpoint or the built-in encrypted network relay. The CLI, hub, web app, and SQLite database ship in one binary.
+- **HAPI**: децентрализованный — вы запускаете хаб, который хранит историю ваших сессий, на своей рабочей станции или другом контролируемом вами хосте. Удалённый доступ — через собственный HTTPS-эндпоинт или встроенное зашифрованное сетевое реле. CLI, хаб, веб-приложение и база SQLite поставляются в одном бинаре.
 
-The core tradeoff: Happy encrypts data for storage on its server; HAPI puts the history store under your control. Coding agents and optional voice, title-generation, and notification features still use their configured providers. See the [Privacy Policy](../privacy.md) for those data flows and native push relay metadata.
+Ключевой компромисс: Happy шифрует данные для хранения на своём сервере; HAPI оставляет хранилище истории под вашим контролем. ИИ-агенты и опциональные голос, генерация заголовков и уведомления по-прежнему используют своих настроенных провайдеров. О потоках этих данных и метаданных нативного push-реле см. [Политику конфиденциальности](../privacy.md).
