@@ -152,7 +152,7 @@
     <string name="settings_usage_cache_hit_rate">Доля попаданий в кеш</string>
     <string name="settings_usage_requests">Запросы</string>
     <string name="settings_usage_daily_title">Токены по дням</string>
-    <string name="settings_usage_tooltip">%1$s токенов · %2$d запр. · вход %3$s / выход %4$s</string>
+    <string name="settings_usage_tooltip">Токены: %1$s · запросов: %2$d · вход %3$s / выход %4$s</string>
     <string name="settings_usage_tooltip_empty">0 токенов</string>
     <string name="settings_usage_by_agent">По агентам</string>
     <string name="settings_usage_by_model">По моделям</string>
