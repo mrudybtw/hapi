@@ -7,7 +7,7 @@
     <string name="code_copied">Скопировано</string>
     <string name="code_plain_fallback">текст</string>
     <string name="diff_binary_file">Двоичный файл не показан</string>
-    <string name="diff_show_more">Показать ещё %1$d строк</string>
+    <string name="diff_show_more">Показать ещё строк: %1$d</string>
     <string name="diff_collapse">Свернуть</string>
 
     <!-- Pairing (B-M1d) -->
@@ -156,7 +156,7 @@
     <string name="settings_usage_tooltip_empty">0 токенов</string>
     <string name="settings_usage_by_agent">По агентам</string>
     <string name="settings_usage_by_model">По моделям</string>
-    <string name="settings_usage_bucket_details">%1$d запросов · вход %2$s · выход %3$s</string>
+    <string name="settings_usage_bucket_details">Запросы: %1$d · вход %2$s · выход %3$s</string>
     <string name="settings_usage_sessions">Сессий с использованием: %1$d</string>
     <string name="settings_usage_empty">За этот период использование не зафиксировано.</string>
 
@@ -253,7 +253,7 @@
     <string name="chat_empty_title">Сообщений пока нет</string>
     <string name="chat_empty_hint">Сообщения появятся здесь по мере работы агента.</string>
     <string name="chat_new_messages_one">1 новое сообщение ↓</string>
-    <string name="chat_new_messages_many">%1$d новых сообщений ↓</string>
+    <string name="chat_new_messages_many">Новых сообщений: %1$d ↓</string>
 
     <!-- Chat snackbar notices (semantic ChatNotice resolution) -->
     <string name="chat_notice_no_transcription">На хабе не настроен провайдер транскрипции</string>
@@ -292,7 +292,7 @@
     <string name="chat_composer_abort">Остановить текущий ход</string>
     <string name="chat_send_steer">Отправить и вклиниться в текущий ход</string>
     <string name="chat_queued_one">1 сообщение в очереди</string>
-    <string name="chat_queued_many">%1$d сообщений в очереди</string>
+    <string name="chat_queued_many">Сообщений в очереди: %1$d</string>
     <string name="chat_queued_scheduled">По расписанию · %1$s</string>
     <string name="chat_queued_steer">Направить</string>
     <string name="chat_queued_edit">Изменить</string>
@@ -327,9 +327,9 @@
     <string name="chat_tool_status_pending">ожидает</string>
     <string name="chat_tool_status_error">ошибка</string>
     <string name="chat_agent_steps_one">1 шаг агента</string>
-    <string name="chat_agent_steps_many">%1$d шагов агента</string>
+    <string name="chat_agent_steps_many">Шаги агента: %1$d</string>
     <string name="chat_group_tools_one">1 инструмент</string>
-    <string name="chat_group_tools_many">%1$d инструментов</string>
+    <string name="chat_group_tools_many">Инструменты: %1$d</string>
     <string name="chat_before">До</string>
     <string name="chat_after">После</string>
     <string name="chat_edit_n_of_m">Правка %1$d/%2$d</string>
@@ -342,7 +342,7 @@
     <string name="chat_not_delivered">Не доставлено</string>
     <string name="chat_review_title">Ревью кода</string>
     <string name="chat_review_findings_one">1 замечание</string>
-    <string name="chat_review_findings_many">%1$d замечаний</string>
+    <string name="chat_review_findings_many">Замечания: %1$d</string>
 
     <!-- Permission footers (B-M3b) -->
     <string name="chat_perm_allow">Разрешить</string>
@@ -419,11 +419,11 @@
     <string name="tool_open_url">Открыть URL</string>
     <string name="tool_query">Запрос</string>
     <string name="tool_question">Вопрос</string>
-    <string name="tool_questions">%1$d вопросов</string>
+    <string name="tool_questions">Вопросы: %1$d</string>
     <string name="tool_questions_more">%1$s (+ещё %2$d)</string>
-    <string name="tool_write_lines">%1$d строк</string>
-    <string name="tool_write_chars">%1$d символов</string>
-    <string name="tool_edits_count">%1$s (%2$d правок)</string>
+    <string name="tool_write_lines">Строки: %1$d</string>
+    <string name="tool_write_chars">Символы: %1$d</string>
+    <string name="tool_edits_count">%1$s (правки: %2$d)</string>
 
     <!-- Files browser + viewer (B-M4c) -->
     <string name="files_back">Назад</string>
@@ -472,7 +472,7 @@
     <string name="scratchlist_title">Заметки</string>
     <string name="scratchlist_count_none">Нет заметок</string>
     <string name="scratchlist_count_one">1 заметка</string>
-    <string name="scratchlist_count_many">%1$d заметок</string>
+    <string name="scratchlist_count_many">Заметки: %1$d</string>
     <string name="scratchlist_new_note">Новая заметка</string>
     <string name="scratchlist_edit_note">Редактировать заметку</string>
     <string name="scratchlist_to_composer">В поле ввода</string>
@@ -498,7 +498,7 @@
     <string name="scratchlist_notice_upload_failed">Ошибка загрузки — проверьте подключение к хабу</string>
     <string name="scratchlist_reject_unreadable">Не удалось прочитать выбранный файл</string>
     <string name="scratchlist_reject_image_too_large">Изображение слишком большое даже после сжатия</string>
-    <string name="scratchlist_reject_max_attachments">Заметка может содержать не более %1$d вложений</string>
+    <string name="scratchlist_reject_max_attachments">Максимум вложений в заметке: %1$d</string>
     <string name="scratchlist_reject_type">Этот тип файла не разрешён для вложений в заметки</string>
     <string name="scratchlist_reject_file_too_large">Этот файл превышает лимит %1$d МБ</string>
     <string name="scratchlist_reject_budget">Бюджет вложений этой заметки исчерпан</string>
