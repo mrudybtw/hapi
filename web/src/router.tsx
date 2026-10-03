@@ -755,7 +755,7 @@ function SessionPage() {
         if (sessionError) {
             return (
                 <div className="flex h-full flex-col items-center justify-center gap-3 p-4 text-center">
-                    <div className="text-sm font-medium text-[var(--app-fg)]">Session unavailable</div>
+                    <div className="text-sm font-medium text-[var(--app-fg)]">{t('app.sessionUnavailable')}</div>
                     <div className="max-w-md text-xs text-[var(--app-hint)]">{sessionError}</div>
                     <div className="flex gap-2">
                         <button

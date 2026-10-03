@@ -339,6 +339,7 @@ function HappyNestedBlockList(props: {
 }
 
 export function HappyToolMessage(props: ToolCallMessagePartProps) {
+    const { t } = useTranslation()
     const ctx = useHappyChatContext()
     const artifact = props.artifact
 
@@ -390,7 +391,7 @@ export function HappyToolMessage(props: ToolCallMessagePartProps) {
 
                     {hasResult ? (
                         <div className="mt-2">
-                            <CodeBlock code={resultText} language={typeof props.result === 'string' ? 'text' : 'json'} title="Output" />
+                            <CodeBlock code={resultText} language={typeof props.result === 'string' ? 'text' : 'json'} title={t('tool.output')} />
                         </div>
                     ) : null}
                 </div>

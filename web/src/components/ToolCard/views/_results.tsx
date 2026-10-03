@@ -6,6 +6,7 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer'
 import { ChecklistList, extractTodoChecklist } from '@/components/ToolCard/checklist'
 import { basename, resolveDisplayPath } from '@/utils/path'
 import { getInputStringAny } from '@/lib/toolInputUtils'
+import { useTranslation } from '@/lib/use-translation'
 import {
     getCodexAgentActivity,
     getCodexAgentTargets,
@@ -316,16 +317,17 @@ function placeholderForState(state: ToolViewProps['block']['tool']['state']): st
 }
 
 function RawJsonDevOnly(props: { value: unknown; surface?: ToolViewProps['surface'] }) {
+    const { t } = useTranslation()
     if (!import.meta.env.DEV) return null
     if (props.value === null || props.value === undefined) return null
 
     return (
         <details className="mt-3">
             <summary className="cursor-pointer text-xs font-medium text-[var(--app-hint)]">
-                Raw JSON
+                {t('tool.rawJson')}
             </summary>
             <div className="mt-2">
-                <CodeBlock code={safeStringify(props.value)} language="json" title="Raw JSON" {...resultCodeBlockProps(props.surface, false)} />
+                <CodeBlock code={safeStringify(props.value)} language="json" title={t('tool.rawJson')} {...resultCodeBlockProps(props.surface, false)} />
             </div>
         </details>
     )
@@ -426,7 +428,7 @@ export function parseNumberedFileLines(text: string): { startLine: number; body:
     return startLine === null ? null : { startLine, body: body.join('\n') }
 }
 
-function renderReadTextResult(text: string, path: string | null, surface: ToolViewProps['surface'], parseNumberedLines: boolean) {
+function renderReadTextResult(text: string, path: string | null, surface: ToolViewProps['surface'], parseNumberedLines: boolean, title: string) {
     // A file read is line-oriented content: render it in a code block (monospace
     // + line-number gutter) even when the extension is unknown (.txt, .log, agy
     // step output …), so it reads as clean numbered lines instead of a
@@ -438,7 +440,7 @@ function renderReadTextResult(text: string, path: string | null, surface: ToolVi
         <CodeBlock
             code={body}
             language={language}
-            title="File content"
+            title={title}
             startLineNumber={numbered?.startLine}
             {...resultCodeBlockProps(surface, surface === 'inline')}
         />
@@ -641,6 +643,7 @@ const LineListResultView: ToolViewComponent = (props: ToolViewProps) => {
 }
 
 const ReadResultView: ToolViewComponent = (props: ToolViewProps) => {
+    const { t } = useTranslation()
     const result = props.block.tool.result
 
     if (result === undefined || result === null) {
@@ -657,7 +660,7 @@ const ReadResultView: ToolViewComponent = (props: ToolViewProps) => {
                         {basename(path)}
                     </div>
                 ) : null}
-                {renderReadTextResult(file.content, path, props.surface, props.block.tool.nativeKind === 'agy-numbered-read')}
+                {renderReadTextResult(file.content, path, props.surface, props.block.tool.nativeKind === 'agy-numbered-read', t('tool.fileContent'))}
                 <RawJsonDevOnly value={result} surface={props.surface} />
             </>
         )
@@ -669,7 +672,7 @@ const ReadResultView: ToolViewComponent = (props: ToolViewProps) => {
         const displayPath = path ? resolveDisplayPath(path, props.metadata) : null
         return (
             <>
-                {renderReadTextResult(text, displayPath, props.surface, props.block.tool.nativeKind === 'agy-numbered-read')}
+                {renderReadTextResult(text, displayPath, props.surface, props.block.tool.nativeKind === 'agy-numbered-read', t('tool.fileContent'))}
                 <RawJsonDevOnly value={result} surface={props.surface} />
             </>
         )
@@ -981,6 +984,7 @@ const SkillResultView: ToolViewComponent = (props: ToolViewProps) => {
 }
 
 const GenericResultView: ToolViewComponent = (props: ToolViewProps) => {
+    const { t } = useTranslation()
     const result = props.block.tool.result
 
     if (result === undefined || result === null) {
@@ -1006,7 +1010,8 @@ const GenericResultView: ToolViewComponent = (props: ToolViewProps) => {
                             parsed.output.trim(),
                             extractReadPathFromInput(props.block.tool.input),
                             props.surface,
-                            props.block.tool.nativeKind === 'agy-numbered-read'
+                            props.block.tool.nativeKind === 'agy-numbered-read',
+                            t('tool.fileContent')
                         )
                         : renderText(parsed.output.trim(), { mode: 'code', language: 'text', collapseLongContent: props.surface === 'inline', surface: props.surface })}
                     <RawJsonDevOnly value={result} surface={props.surface} />
@@ -1020,7 +1025,7 @@ const GenericResultView: ToolViewComponent = (props: ToolViewProps) => {
         return (
             <>
                 {isReadFileToolCall(props.block.tool.name, props.block.tool.input)
-                    ? renderReadTextResult(text, extractReadPathFromInput(props.block.tool.input), props.surface, props.block.tool.nativeKind === 'agy-numbered-read')
+                    ? renderReadTextResult(text, extractReadPathFromInput(props.block.tool.input), props.surface, props.block.tool.nativeKind === 'agy-numbered-read', t('tool.fileContent'))
                     : renderText(text, { mode: 'auto', collapseLongContent: props.surface === 'inline', surface: props.surface })}
                 {typeof result === 'object' ? <RawJsonDevOnly value={result} surface={props.surface} /> : null}
             </>
