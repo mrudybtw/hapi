@@ -90,6 +90,19 @@ export async function resolveLateTelegramLocale(
   return null
 }
 
+/**
+ * Apply a late-detected Telegram locale unless the user has stored an explicit
+ * choice in the meantime. Returns true when the locale was applied.
+ */
+export function applyLateTelegramLocale(
+  detected: Locale | null,
+  apply: (locale: Locale) => void
+): boolean {
+  if (!detected || readStoredLocale()) return false
+  apply(detected)
+  return true
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => detectInitialLocale())
 
@@ -120,7 +133,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
     let cancelled = false
     void resolveLateTelegramLocale().then((detected) => {
-      if (!cancelled && detected) setLocaleState(detected)
+      if (cancelled) return
+      applyLateTelegramLocale(detected, setLocaleState)
     })
     return () => {
       cancelled = true

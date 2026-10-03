@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { detectInitialLocale, normalizeLocaleTag, resolveLateTelegramLocale } from './i18n-context'
+import {
+    applyLateTelegramLocale,
+    detectInitialLocale,
+    normalizeLocaleTag,
+    resolveLateTelegramLocale
+} from './i18n-context'
 
 function setTelegramLanguage(code: string | undefined) {
     if (code === undefined) {
@@ -107,5 +112,29 @@ describe('resolveLateTelegramLocale', () => {
 
         await expect(pending).resolves.toBeNull()
         vi.useRealTimers()
+    })
+})
+
+describe('applyLateTelegramLocale', () => {
+    it('applies the detected locale when nothing is stored', () => {
+        const apply = vi.fn()
+
+        expect(applyLateTelegramLocale('ru', apply)).toBe(true)
+        expect(apply).toHaveBeenCalledWith('ru')
+    })
+
+    it('does not override a manual choice made while the SDK loaded', () => {
+        localStorage.setItem('hapi-lang', 'en')
+        const apply = vi.fn()
+
+        expect(applyLateTelegramLocale('ru', apply)).toBe(false)
+        expect(apply).not.toHaveBeenCalled()
+    })
+
+    it('ignores a null detection', () => {
+        const apply = vi.fn()
+
+        expect(applyLateTelegramLocale(null, apply)).toBe(false)
+        expect(apply).not.toHaveBeenCalled()
     })
 })
