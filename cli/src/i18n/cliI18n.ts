@@ -29,16 +29,19 @@ export function normalizeCliLocale(tag: string | null | undefined): CliLocale | 
 
 /**
  * Pick the CLI locale. An explicit `HAPI_LANG` wins, then the settings file,
- * then the POSIX locale variables, then English.
+ * then the POSIX locale variables, then English. Following POSIX, the first
+ * locale variable that is set decides: `LC_ALL=C` with `LANG=ru_RU.UTF-8` is
+ * English, not Russian.
  */
 export function resolveCliLocale(
     env: NodeJS.ProcessEnv = process.env,
     settingsLanguage: string | null = null
 ): CliLocale {
-    const candidates = [env.HAPI_LANG, settingsLanguage, env.LC_ALL, env.LC_MESSAGES, env.LANG]
-    for (const candidate of candidates) {
-        const locale = normalizeCliLocale(candidate)
-        if (locale) return locale
+    const explicit = normalizeCliLocale(env.HAPI_LANG) ?? normalizeCliLocale(settingsLanguage)
+    if (explicit) return explicit
+
+    for (const candidate of [env.LC_ALL, env.LC_MESSAGES, env.LANG]) {
+        if (candidate?.trim()) return normalizeCliLocale(candidate) ?? 'en'
     }
     return 'en'
 }

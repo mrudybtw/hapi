@@ -64,6 +64,15 @@ describe('resolveCliLocale', () => {
         expect(resolveCliLocale({ LANG: 'ru_RU.UTF-8' })).toBe('ru')
     })
 
+    it('lets a set LC_ALL win over LANG even when it is C', () => {
+        expect(resolveCliLocale({ LC_ALL: 'C', LANG: 'ru_RU.UTF-8' })).toBe('en')
+        expect(resolveCliLocale({ LC_MESSAGES: 'C.UTF-8', LANG: 'ru_RU.UTF-8' })).toBe('en')
+    })
+
+    it('ignores an unsupported HAPI_LANG and still uses the POSIX locale', () => {
+        expect(resolveCliLocale({ HAPI_LANG: 'de', LANG: 'ru_RU.UTF-8' })).toBe('ru')
+    })
+
     it('falls back to English for C or unsupported locales', () => {
         expect(resolveCliLocale({ LC_ALL: 'C.UTF-8', LANG: 'de_DE.UTF-8' })).toBe('en')
         expect(resolveCliLocale({}, 'de')).toBe('en')
