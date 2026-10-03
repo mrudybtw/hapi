@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { detectInitialLocale, normalizeLocaleTag } from './i18n-context'
+import { detectInitialLocale, normalizeLocaleTag, resolveLateTelegramLocale } from './i18n-context'
 
 function setTelegramLanguage(code: string | undefined) {
     if (code === undefined) {
@@ -81,5 +81,31 @@ describe('detectInitialLocale', () => {
         vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
 
         expect(detectInitialLocale()).toBe('en')
+    })
+})
+
+describe('resolveLateTelegramLocale', () => {
+    it('picks up the language when the SDK appears after the timeout', async () => {
+        vi.useFakeTimers()
+        setTelegramLanguage(undefined)
+
+        const pending = resolveLateTelegramLocale(500, 5)
+        await vi.advanceTimersByTimeAsync(1500)
+        setTelegramLanguage('ru')
+        await vi.advanceTimersByTimeAsync(500)
+
+        await expect(pending).resolves.toBe('ru')
+        vi.useRealTimers()
+    })
+
+    it('resolves null when the SDK never loads', async () => {
+        vi.useFakeTimers()
+        setTelegramLanguage(undefined)
+
+        const pending = resolveLateTelegramLocale(500, 2)
+        await vi.advanceTimersByTimeAsync(1500)
+
+        await expect(pending).resolves.toBeNull()
+        vi.useRealTimers()
     })
 })
