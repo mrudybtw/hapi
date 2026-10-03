@@ -124,8 +124,6 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
             return false
         }
 
-        subscriptionGeneration.current += 1
-
         try {
             const registration = await navigator.serviceWorker.ready
             const existing = await registration.pushManager.getSubscription()
@@ -157,6 +155,9 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
                     userVisibleOnly: true,
                     applicationServerKey
                 })
+                // The endpoint changed, so an in-flight language write for the
+                // previous one must not be trusted.
+                subscriptionGeneration.current += 1
             }
 
             const json = subscription.toJSON()
@@ -196,7 +197,7 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
      * Browsers keep one subscription per SW registration, so a language change
      * only needs to refresh the hub's copy instead of re-subscribing.
      */
-    const refreshSubscriptionLanguage = useCallback(async (nextLanguage: string): Promise<boolean> => {
+    const postSubscriptionLanguage = useCallback(async (nextLanguage: string): Promise<boolean> => {
         if (!api || !isPushSupported()) return false
         if (Notification.permission !== 'granted') return false
 
@@ -231,6 +232,23 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
         }
     }, [api])
 
+    const languageQueue = useRef<Promise<void>>(Promise.resolve())
+    const latestRequestedLanguage = useRef<string | undefined>(undefined)
+
+    /**
+     * Serializes language writes and drops superseded ones, so an overlapping
+     * `en → ru` switch cannot land `en` after `ru`.
+     */
+    const refreshSubscriptionLanguage = useCallback((nextLanguage: string): Promise<boolean> => {
+        latestRequestedLanguage.current = nextLanguage
+        const task = languageQueue.current.then(() => {
+            if (latestRequestedLanguage.current !== nextLanguage) return false
+            return postSubscriptionLanguage(nextLanguage)
+        })
+        languageQueue.current = task.then(() => undefined, () => undefined)
+        return task
+    }, [postSubscriptionLanguage])
+
     const lastSentLanguage = useRef<string | undefined>(undefined)
 
     useEffect(() => {
@@ -253,8 +271,6 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
             return false
         }
 
-        subscriptionGeneration.current += 1
-
         try {
             const registration = await navigator.serviceWorker.ready
             const subscription = await registration.pushManager.getSubscription()
@@ -266,6 +282,9 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
             const endpoint = subscription.endpoint
             const success = await subscription.unsubscribe()
             if (!success) return false
+            // Only once the browser dropped it; a failed unsubscribe must not
+            // invalidate an in-flight language write for the live endpoint.
+            subscriptionGeneration.current += 1
             await api.unsubscribePushNotifications({ endpoint })
             setIsSubscribed(false)
             return true
