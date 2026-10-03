@@ -1209,4 +1209,55 @@ export default {
   'session.summary.status.needsDecision': 'Требует решения',
   'session.summary.status.failed': 'Не удалась',
   'session.summary.status.stalled': 'Застопорилась',
+
+  // Install prompt (iOS add-to-home-screen guide)
+  'install.close': 'Закрыть',
+  'install.ios.step1.before': 'Нажмите',
+  'install.ios.step1.after': '«Поделиться» на панели',
+  'install.ios.step2.before': 'Прокрутите вниз и нажмите',
+  'install.ios.step2.after': 'На экран «Домой»',
+  'install.ios.step3.before': 'Нажмите',
+  'install.ios.step3.emphasis': 'Добавить',
+  'install.ios.step3.after': 'в правом верхнем углу',
+
+  // Queued messages bar
+  'queuedMessages.title': 'Сообщения в очереди',
+  'queuedMessages.status': 'В очереди',
+  'queuedMessages.editLabel': 'Изменить сообщение в очереди',
+  'queuedMessages.cancelLabel': 'Отменить сообщение в очереди',
+  'queuedMessages.pendingInvocation.one': '{n} сообщение в очереди ожидает вызова',
+  'queuedMessages.pendingInvocation.other': '{n} сообщений в очереди ожидают вызова',
+
+  // Image viewer / zoomable lightbox
+  'image.clickToZoom': 'Нажмите, чтобы увеличить',
+  'image.previous': 'Предыдущее изображение',
+  'image.next': 'Следующее изображение',
+  'image.zoomIn': 'Увеличить',
+  'image.zoomOut': 'Уменьшить',
+  'image.resetZoom': 'Сбросить масштаб',
+  'image.fitToScreen': 'По размеру экрана',
+
+  // Chat chrome and status
+  'chat.contextCompacted': 'Контекст сжат',
+  'chat.reasoning': 'Рассуждения',
+  'chat.queuedStatus': 'В очереди',
+  'chat.sendingStatus': 'Отправка',
+  'chat.terminalOutput': 'Вывод терминала',
+  'chat.removeAttachment': 'Убрать вложение',
+  'chat.uploadFailed': 'Ошибка загрузки',
+
+  // Tool cards
+  'tool.output': 'Вывод',
+  'tool.prompt': 'Промпт',
+  'tool.draft': 'Черновик',
+  'tool.rawJson': 'Исходный JSON',
+  'tool.fileContent': 'Содержимое файла',
+
+  // Team panel
+  'team.members': 'Участники',
+  'team.recentMessages': 'Недавние сообщения',
+
+  // Terminal / app shell
+  'terminal.inactiveSession': 'Сессия неактивна. Терминал недоступен.',
+  'app.sessionUnavailable': 'Сессия недоступна',
 } as const
