@@ -124,6 +124,8 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
             return false
         }
 
+        subscriptionGeneration.current += 1
+
         try {
             const registration = await navigator.serviceWorker.ready
             const existing = await registration.pushManager.getSubscription()
@@ -185,29 +187,47 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
     }, [api, language])
 
     /**
+     * Bumped whenever the browser-side subscription is replaced or removed, so
+     * an in-flight language refresh can detect that its write is stale.
+     */
+    const subscriptionGeneration = useRef(0)
+
+    /**
      * Browsers keep one subscription per SW registration, so a language change
      * only needs to refresh the hub's copy instead of re-subscribing.
      */
-    const refreshSubscriptionLanguage = useCallback(async (nextLanguage: string): Promise<void> => {
-        if (!api || !isPushSupported()) return
-        if (Notification.permission !== 'granted') return
+    const refreshSubscriptionLanguage = useCallback(async (nextLanguage: string): Promise<boolean> => {
+        if (!api || !isPushSupported()) return false
+        if (Notification.permission !== 'granted') return false
 
+        const generation = subscriptionGeneration.current
         try {
             const registration = await navigator.serviceWorker.ready
             const subscription = await registration.pushManager.getSubscription()
-            if (!subscription) return
+            if (!subscription) return false
 
             const json = subscription.toJSON()
             const keys = json.keys
-            if (!json.endpoint || !keys?.p256dh || !keys.auth) return
+            if (!json.endpoint || !keys?.p256dh || !keys.auth) return false
 
+            const endpoint = json.endpoint
             await api.subscribePushNotifications({
-                endpoint: json.endpoint,
+                endpoint,
                 keys: { p256dh: keys.p256dh, auth: keys.auth },
                 language: nextLanguage
             })
+
+            if (subscriptionGeneration.current !== generation) {
+                // The subscription was replaced or removed while this request
+                // was in flight — undo the write so the hub does not keep an
+                // endpoint the browser no longer owns.
+                await api.unsubscribePushNotifications({ endpoint })
+                return false
+            }
+            return true
         } catch (error) {
             console.error('[PushNotifications] Failed to refresh subscription language:', error)
+            return false
         }
     }, [api])
 
@@ -221,14 +241,19 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
 
         const next = notificationLanguage(language)
         if (!next || next === lastSentLanguage.current) return
-        lastSentLanguage.current = next
-        void refreshSubscriptionLanguage(next)
+        // Recorded only after the hub accepted the write, so a failure retries
+        // on the next change instead of being suppressed.
+        void refreshSubscriptionLanguage(next).then((sent) => {
+            if (sent) lastSentLanguage.current = next
+        })
     }, [isSubscribed, language, refreshSubscriptionLanguage])
 
     const unsubscribe = useCallback(async (): Promise<boolean> => {
         if (!api || !isPushSupported()) {
             return false
         }
+
+        subscriptionGeneration.current += 1
 
         try {
             const registration = await navigator.serviceWorker.ready

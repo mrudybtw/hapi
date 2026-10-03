@@ -160,6 +160,59 @@ describe('usePushNotifications VAPID rotation', () => {
         }))
     })
 
+    it('retries a failed language refresh on the next change', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
+        const existing = createSubscription('https://push.test/current', true)
+        setupPushEnvironment(existing, existing)
+        const api = createApi()
+        api.subscribePushNotifications
+            .mockRejectedValueOnce(new Error('offline'))
+            .mockResolvedValue(undefined)
+        const { rerender } = renderHook(
+            ({ language }: { language: string }) => usePushNotifications(api as unknown as ApiClient, language),
+            { initialProps: { language: 'en' } }
+        )
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledTimes(1))
+
+        localStorage.setItem('hapi-lang', 'ru')
+        rerender({ language: 'ru' })
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenLastCalledWith({
+            endpoint: existing.endpoint,
+            keys: { p256dh: 'p256dh', auth: 'auth' },
+            language: 'ru'
+        }))
+    })
+
+    it('undoes an in-flight language refresh when the browser subscription goes away', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
+        // `unsubscribe()` returning false means the browser kept the
+        // subscription, so the hub call asserted below can only come from the
+        // refresh cleanup.
+        const existing = createSubscription('https://push.test/current', false)
+        setupPushEnvironment(existing, existing)
+        const api = createApi()
+        let releaseRefresh: () => void = () => {}
+        api.subscribePushNotifications = vi.fn(() => new Promise<void>((resolve) => {
+            releaseRefresh = () => resolve()
+        }))
+        const { result } = renderHook(() => usePushNotifications(api as unknown as ApiClient, 'en'))
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledTimes(1))
+
+        await act(async () => {
+            await result.current.unsubscribe()
+        })
+        releaseRefresh()
+
+        await waitFor(() => expect(api.unsubscribePushNotifications).toHaveBeenCalledWith({
+            endpoint: existing.endpoint
+        }))
+    })
+
     it('registers the browser language when the web UI ships no matching locale', async () => {
         localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
         const existing = createSubscription('https://push.test/current', true)
