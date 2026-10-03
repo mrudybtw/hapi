@@ -220,9 +220,14 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
 
             if (subscriptionGeneration.current !== generation) {
                 // The subscription was replaced or removed while this request
-                // was in flight — undo the write so the hub does not keep an
-                // endpoint the browser no longer owns.
-                await api.unsubscribePushNotifications({ endpoint })
+                // was in flight. Only prune the endpoint we wrote when the
+                // browser no longer holds it — a replacement may have reused
+                // the same endpoint, and deleting that would drop the live
+                // registration.
+                const current = await registration.pushManager.getSubscription()
+                if (!current || current.endpoint !== endpoint) {
+                    await api.unsubscribePushNotifications({ endpoint })
+                }
                 return false
             }
             return true
