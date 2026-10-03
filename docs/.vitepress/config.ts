@@ -68,6 +68,15 @@ export default defineConfig({
             ]
           }
         ]
+      },
+      {
+        text: 'Русский · API',
+        items: [
+          { text: 'Обзор контракта клиента', link: '/api/client-contract/index.ru' },
+          { text: 'Auth и сопряжение', link: '/api/client-contract/auth.ru' },
+          { text: 'Ошибки', link: '/api/client-contract/errors.ru' },
+          { text: 'Политика конфиденциальности', link: '/privacy.ru' }
+        ]
       }
     ],
 
