@@ -38,7 +38,7 @@ npx @twsxtd/hapi                 # выбрать агента и начать �
 
 ## Русская локаль
 
-В этот форк добавлен полный перевод интерфейса веб-приложения на русский язык — `web/src/lib/locales/ru.ts` (1212 строк). Переключить язык можно через переключатель в шапке или в **Настройки → Язык**.
+В этот форк добавлен полный перевод интерфейса веб-приложения на русский язык — `web/src/lib/locales/ru.ts` (все ключи `en.ts`). Переключить язык можно через переключатель в шапке или в **Настройки → Язык**.
 
 Локали лежат в `web/src/lib/locales/`:
 
@@ -75,12 +75,14 @@ bun run build:single-exe
 - [Уведомления](docs/guide/notifications.ru.md)
 - [Почему HAPI](docs/guide/why-hapi.ru.md)
 - [FAQ](docs/guide/faq.ru.md)
+- [API-контракты](docs/api/client-contract/index.ru.md)
+- [Политика конфиденциальности](docs/privacy.ru.md)
 
-На английском пока остаются API-контракты ([`docs/api/`](docs/api/client-contract/index.md)), [политика конфиденциальности](docs/privacy.md) и README подпроектов ([cli](cli/README.md), [hub](hub/README.md), [relay](relay/README.md), [web](web/README.md), [iOS](ios/README.md), [Android](android/README.md)).
+На русский переведены также [API-контракты](docs/api/client-contract/index.ru.md), [политика конфиденциальности](docs/privacy.ru.md) и README подпроектов: [cli](cli/README.ru.md), [runner](cli/src/runner/README.ru.md), [hub](hub/README.ru.md), [relay](relay/README.ru.md), [web](web/README.ru.md), [iOS](ios/README.ru.md), [Android](android/README.ru.md), [shared/fixtures](shared/fixtures/README.ru.md), а также [AGENTS](AGENTS.ru.md), [CONTRIBUTING](CONTRIBUTING.ru.md) и [SECURITY](SECURITY.ru.md).
 
 ## Нативные приложения (iOS / Android)
 
-Репозиторий включает клиенты на SwiftUI/UIKit и Kotlin Compose: чат, подтверждения, создание сессий, файлы, диктовка и push-уведомления. Возможности, отличия платформ и сопряжение — в [гайде по нативным приложениям](docs/guide/native-apps.ru.md). Инструкции по сборке: [iOS](ios/README.md) (англ.) и [Android](android/README.md) (англ.). Протокол разработчика: [client contract](docs/api/client-contract/index.md) (англ.).
+Репозиторий включает клиенты на SwiftUI/UIKit и Kotlin Compose: чат, подтверждения, создание сессий, файлы, диктовка и push-уведомления. Возможности, отличия платформ и сопряжение — в [гайде по нативным приложениям](docs/guide/native-apps.ru.md). Инструкции по сборке: [iOS](ios/README.ru.md) и [Android](android/README.ru.md). Протокол разработчика: [client contract](docs/api/client-contract/index.ru.md).
 
 ## Благодарности
 
