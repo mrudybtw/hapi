@@ -42,7 +42,7 @@ export {
     WorkGraphValidationError
 } from './workGraph'
 
-const SCHEMA_VERSION: number = 26
+const SCHEMA_VERSION: number = 27
 const REQUIRED_TABLES = [
     'sessions',
     'machines',
@@ -348,6 +348,7 @@ export class Store {
             23: () => this.migrateFromV23ToV24(),
             24: () => this.migrateFromV24ToV25(),
             25: () => this.migrateFromV25ToV26(),
+            26: () => this.migrateFromV26ToV27(),
         })
 
         if (currentVersion === 0) {
@@ -475,6 +476,7 @@ export class Store {
                 platform TEXT NOT NULL,
                 platform_user_id TEXT NOT NULL,
                 namespace TEXT NOT NULL DEFAULT 'default',
+                language TEXT,
                 created_at INTEGER NOT NULL,
                 UNIQUE(platform, platform_user_id)
             );
@@ -994,6 +996,14 @@ export class Store {
                   AND scheduled_at IS NULL
                   AND delivery_state = 'queued';
         `)
+    }
+
+    /** v26→v27: remember the platform-reported language for localized messages. */
+    private migrateFromV26ToV27(): void {
+        const columns = this.db.prepare('PRAGMA table_info(users)').all() as Array<{ name: string }>
+        if (!columns.some((column) => column.name === 'language')) {
+            this.db.exec('ALTER TABLE users ADD COLUMN language TEXT')
+        }
     }
 
     /**

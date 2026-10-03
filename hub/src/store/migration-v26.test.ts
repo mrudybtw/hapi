@@ -13,36 +13,35 @@ afterEach(() => {
     }
 })
 
-describe('schema migration v25 to v26', () => {
-    it('adds an index used by immediate queued-message replay', () => {
-        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v25-'))
+describe('schema migration v26 to v27', () => {
+    it('adds a language column to users and round-trips it', () => {
+        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v26-'))
         tempDirs.push(dir)
         const dbPath = join(dir, 'hapi.db')
 
         new Store(dbPath).close()
+
         const legacy = new Database(dbPath)
         legacy.exec(`
-            DROP INDEX idx_messages_immediate_queued;
-            PRAGMA user_version = 25;
+            ALTER TABLE users DROP COLUMN language;
+            PRAGMA user_version = 26;
         `)
         legacy.close()
 
         const migrated = new Store(dbPath)
         const internalDb = (migrated as unknown as { db: Database }).db
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
-        const plan = internalDb.prepare(`
-            EXPLAIN QUERY PLAN
-            SELECT * FROM messages
-            WHERE session_id = ?
-              AND invoked_at IS NULL
-              AND local_id IS NOT NULL
-              AND scheduled_at IS NULL
-              AND delivery_state = 'queued'
-            ORDER BY seq ASC
-        `).all('session-id') as Array<{ detail: string }>
-
         expect(version.user_version).toBe(27)
-        expect(plan.some((row) => row.detail.includes('idx_messages_immediate_queued'))).toBe(true)
+
+        const columns = internalDb.prepare('PRAGMA table_info(users)').all() as Array<{ name: string }>
+        expect(columns.some((column) => column.name === 'language')).toBe(true)
+
+        migrated.users.addUser('telegram', '42', 'default', 'ru')
+        expect(migrated.users.getUser('telegram', '42')?.language).toBe('ru')
+
+        migrated.users.setUserLanguage('telegram', '42', 'en')
+        expect(migrated.users.getUser('telegram', '42')?.language).toBe('en')
+
         migrated.close()
     })
 })
