@@ -13,9 +13,9 @@ afterEach(() => {
     }
 })
 
-describe('schema migration v26 to v27', () => {
-    it('adds a language column to users and round-trips it', () => {
-        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v26-'))
+describe('schema migration v28 to v29', () => {
+    it('adds a language column to fcm_devices and round-trips it', () => {
+        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v28-'))
         tempDirs.push(dir)
         const dbPath = join(dir, 'hapi.db')
 
@@ -23,8 +23,8 @@ describe('schema migration v26 to v27', () => {
 
         const legacy = new Database(dbPath)
         legacy.exec(`
-            ALTER TABLE users DROP COLUMN language;
-            PRAGMA user_version = 26;
+            ALTER TABLE fcm_devices DROP COLUMN language;
+            PRAGMA user_version = 28;
         `)
         legacy.close()
 
@@ -33,20 +33,30 @@ describe('schema migration v26 to v27', () => {
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
         expect(version.user_version).toBe(29)
 
-        const columns = internalDb.prepare('PRAGMA table_info(users)').all() as Array<{ name: string }>
-        expect(columns.some((column) => column.name === 'language')).toBe(true)
+        migrated.fcm.upsertDevice('default', {
+            token: 'fcm-token',
+            platform: 'phone',
+            deviceId: 'device-1',
+            language: 'ru'
+        })
+        const stored = migrated.fcm.getDevicesByNamespace('default', ['phone'])
+        expect(stored).toHaveLength(1)
+        expect(stored[0]?.language).toBe('ru')
 
-        migrated.users.addUser('telegram', '42', 'default', 'ru')
-        expect(migrated.users.getUser('telegram', '42')?.language).toBe('ru')
-
-        migrated.users.setUserLanguage('telegram', '42', 'en')
-        expect(migrated.users.getUser('telegram', '42')?.language).toBe('en')
+        // Re-registering the same install refreshes the language.
+        migrated.fcm.upsertDevice('default', {
+            token: 'fcm-token',
+            platform: 'phone',
+            deviceId: 'device-1',
+            language: 'en'
+        })
+        expect(migrated.fcm.getDevicesByNamespace('default', ['phone'])[0]?.language).toBe('en')
 
         migrated.close()
     })
 
-    it('finishes migration when a legacy database has no users table', () => {
-        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v26-legacy-'))
+    it('finishes migration when a legacy database has no fcm_devices table', () => {
+        const dir = mkdtempSync(join(tmpdir(), 'hapi-migration-v28-legacy-'))
         tempDirs.push(dir)
         const dbPath = join(dir, 'hapi.db')
 
@@ -54,9 +64,8 @@ describe('schema migration v26 to v27', () => {
 
         const legacy = new Database(dbPath)
         legacy.exec(`
-            PRAGMA foreign_keys = OFF;
-            DROP TABLE users;
-            PRAGMA user_version = 26;
+            DROP TABLE fcm_devices;
+            PRAGMA user_version = 28;
         `)
         legacy.close()
 
@@ -65,10 +74,10 @@ describe('schema migration v26 to v27', () => {
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
         expect(version.user_version).toBe(29)
 
-        const usersTable = internalDb
-            .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'")
+        const table = internalDb
+            .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'fcm_devices'")
             .get()
-        expect(usersTable).toBeNull()
+        expect(table).toBeNull()
 
         migrated.close()
     })

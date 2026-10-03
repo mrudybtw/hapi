@@ -89,6 +89,8 @@ export type StoredFcmDevice = {
      * null for legacy phone/Wear registrations.
      */
     pushKey: string | null
+    /** BCP-47 tag reported by the native app at registration time, if any. */
+    language: string | null
     createdAt: number
     updatedAt: number
 }
