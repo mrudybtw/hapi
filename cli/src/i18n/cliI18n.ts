@@ -14,16 +14,16 @@ export type CliLocale = 'en' | 'ru'
 
 /**
  * Map a BCP-47-ish or POSIX language tag (`ru`, `ru-RU`, `ru_RU.UTF-8`,
- * `en_US`) onto a supported locale. Returns null for `C`/`POSIX` and anything
- * we do not ship.
+ * `ru.UTF-8`, `en_US@euro`) onto a supported locale. Returns null for
+ * `C`/`POSIX` and anything we do not ship.
  */
 export function normalizeCliLocale(tag: string | null | undefined): CliLocale | null {
     if (!tag) return null
-    const lower = tag.trim().toLowerCase().replace(/_/g, '-')
-    if (!lower || lower === 'c' || lower === 'posix') return null
-    if (lower.startsWith('c.') || lower.startsWith('posix.')) return null
-    if (lower === 'ru' || lower.startsWith('ru-')) return 'ru'
-    if (lower === 'en' || lower.startsWith('en-')) return 'en'
+    // Drop the POSIX codeset (`.UTF-8`) and modifier (`@euro`) parts.
+    const language = tag.trim().toLowerCase().replace(/_/g, '-').split('.')[0].split('@')[0]
+    if (!language || language === 'c' || language === 'posix') return null
+    if (language === 'ru' || language.startsWith('ru-')) return 'ru'
+    if (language === 'en' || language.startsWith('en-')) return 'en'
     return null
 }
 

@@ -26,11 +26,13 @@ describe('normalizeCliLocale', () => {
         expect(normalizeCliLocale('ru-RU')).toBe('ru')
         expect(normalizeCliLocale('RU')).toBe('ru')
         expect(normalizeCliLocale('ru_RU.UTF-8')).toBe('ru')
+        expect(normalizeCliLocale('ru.UTF-8')).toBe('ru')
     })
 
     it('maps English tags', () => {
         expect(normalizeCliLocale('en')).toBe('en')
         expect(normalizeCliLocale('en_US.UTF-8')).toBe('en')
+        expect(normalizeCliLocale('en_US@euro')).toBe('en')
     })
 
     it('ignores C/POSIX and unsupported locales', () => {
@@ -38,6 +40,7 @@ describe('normalizeCliLocale', () => {
         expect(normalizeCliLocale('C.UTF-8')).toBeNull()
         expect(normalizeCliLocale('POSIX')).toBeNull()
         expect(normalizeCliLocale('de_DE.UTF-8')).toBeNull()
+        expect(normalizeCliLocale('de.UTF-8')).toBeNull()
         expect(normalizeCliLocale('')).toBeNull()
         expect(normalizeCliLocale(null)).toBeNull()
         expect(normalizeCliLocale(undefined)).toBeNull()
