@@ -211,14 +211,14 @@ describe('PushNotificationChannel', () => {
     })
 
     it('renders the web-push payload in the subscription language', async () => {
-        let resolved: PushPayload | null = null
+        const resolved: PushPayload[] = []
         const channel = new PushNotificationChannel(
             {
                 sendToNamespace: async (
                     _namespace: string,
                     payload: PushPayload | ((language: string | null) => PushPayload)
                 ) => {
-                    resolved = typeof payload === 'function' ? payload('ru') : payload
+                    resolved.push(typeof payload === 'function' ? payload('ru') : payload)
                 }
             } as never,
             {
@@ -232,8 +232,8 @@ describe('PushNotificationChannel', () => {
 
         await channel.sendReady(createSession())
 
-        expect(resolved?.title).toBe('Готов к вводу')
-        expect(resolved?.body).toContain('Codex ждёт в сессии')
+        expect(resolved[0]?.title).toBe('Готов к вводу')
+        expect(resolved[0]?.body).toContain('Codex ждёт в сессии')
     })
 
     it('falls back to English for an unknown or missing subscription language', async () => {
