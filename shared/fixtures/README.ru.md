@@ -75,18 +75,18 @@ shared/fixtures/
 ```jsonc
 {
     "fixtureVersion": 1,
-    "name": "claude-assistant-text",        // equals the file name
+    "name": "claude-assistant-text",        // совпадает с именем файла
     "description": "…",
     "input": {
-        "messages": [ /* DecryptedMessage[] exactly as GET /sessions/:id/messages returns them */ ],
-        "agentState": null,                 // session.agentState (permission requests) or null
-        "options": { "hasMoreMessages": false }  // older history exists beyond `messages`
+        "messages": [ /* DecryptedMessage[] ровно так, как их возвращает GET /sessions/:id/messages */ ],
+        "agentState": null,                 // session.agentState (запросы разрешений) или null
+        "options": { "hasMoreMessages": false }  // за `messages` есть более старая история
     },
     "expected": {
-        "blocks": [ /* projected ChatBlock[] (pre tool-grouping) */ ],
+        "blocks": [ /* спроецированные ChatBlock[] (до группировки инструментов) */ ],
         "hasReadyEvent": false,
-        "latestUsage": null,                // or { inputTokens, outputTokens, contextSize, contextWindow }
-        "visibleBlocks": [ /* projected blocks after tool-grouping */ ]
+        "latestUsage": null,                // или { inputTokens, outputTokens, contextSize, contextWindow }
+        "visibleBlocks": [ /* спроецированные блоки после группировки инструментов */ ]
     }
 }
 ```
@@ -167,12 +167,12 @@ shared/fixtures/
 ```jsonc
 {
     "fixtureVersion": 1,
-    "name": "metadata-newer-version-applied",   // equals the file name
+    "name": "metadata-newer-version-applied",   // совпадает с именем файла
     "description": "…",
-    "initialSession": { /* full Session as cached before the first patch */ },
-    "patches": [ /* SessionPatch payloads in arrival order */ ],
-    "expectedPatchResults": [ "applied" | "unchanged", … ],  // aligned with patches
-    "expectedSession": { /* Session after folding all patches */ }
+    "initialSession": { /* полный Session, кешированный до первого патча */ },
+    "patches": [ /* payload SessionPatch в порядке прихода */ ],
+    "expectedPatchResults": [ "applied" | "unchanged", … ],  // выровнено с patches
+    "expectedSession": { /* Session после свёртки всех патчей */ }
 }
 ```
 
@@ -181,7 +181,7 @@ shared/fixtures/
 Сверните по `patches` по порядку:
 
 ```
-next = applySessionDetailPatch(session, patch)   // your port
+next = applySessionDetailPatch(session, patch)   // ваш порт
 results[i] = next == null ? "unchanged" : "applied"
 session = next ?? session
 ```
@@ -235,10 +235,10 @@ keep-alive изменением, падает на вердикте, даже к
 ```jsonc
 {
     "fixtureVersion": 1,
-    "name": "older-page-epoch-mismatch-resets",   // equals the file name
+    "name": "older-page-epoch-mismatch-resets",   // совпадает с именем файла
     "description": "…",
-    "ops": [ /* operation script, in order; see below */ ],
-    "expectedState": { /* final window projection, see below */ }
+    "ops": [ /* скрипт операций, по порядку; см. ниже */ ],
+    "expectedState": { /* итоговая проекция окна, см. ниже */ }
 }
 ```
 
@@ -271,16 +271,16 @@ keep-alive изменением, падает на вердикте, даже к
 ```jsonc
 {
     "messages": [ { "id", "localId", "seq", "createdAt",
-                    "invokedAt"?,     // wire tri-state: absent / null / number
-                    "scheduledAt"?,   // wire tri-state
-                    "status"?,        // client send state when present
-                    "queued": bool,   // user row ∧ invokedAt === null ∧ status ≠ 'failed'
+                    "invokedAt"?,     // трёхсостояние провода: отсутствует / null / число
+                    "scheduledAt"?,   // трёхсостояние провода
+                    "status"?,        // состояние отправки клиента, когда присутствует
+                    "queued": bool,   // строка пользователя ∧ invokedAt === null ∧ status ≠ 'failed'
                     "optimistic": bool } ],   // localId ∧ id === localId
-    "hasMore": bool,                  // older history exists (server flag ∨ trim)
+    "hasMore": bool,                  // есть более старая история (флаг сервера ∨ обрезка)
     "epoch": number | null,
     "viewMode": "tail" | "history",
-    "olderCursor": { "at", "seq" } | null,   // next before-request position
-    "newestCursor": { "at", "seq" } | null   // next after-request position
+    "olderCursor": { "at", "seq" } | null,   // позиция следующего before-запроса
+    "newestCursor": { "at", "seq" } | null   // позиция следующего after-запроса
 }
 ```
 
