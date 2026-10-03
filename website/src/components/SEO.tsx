@@ -11,6 +11,7 @@ interface SEOProps {
 export function SEO({ title, description, image, url }: SEOProps) {
   const { i18n } = useTranslation();
   const currentLang = i18n.language;
+  const baseLang = currentLang.toLowerCase().split(/[-_]/)[0];
   
   const siteTitle = "HAPI - Vibe Coding Anytime, Anywhere";
   const defaultDescription = "The local-first AI agent platform for developers who love freedom. Go for a hike, grab a coffee, or just relax. Your AI agents work in the background.";
@@ -58,7 +59,7 @@ export function SEO({ title, description, image, url }: SEOProps) {
       <meta property="og:title" content={metaTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:image" content={metaImage} />
-      <meta property="og:locale" content={currentLang === 'zh' ? 'zh_CN' : currentLang === 'ru' ? 'ru_RU' : 'en_US'} />
+      <meta property="og:locale" content={baseLang === 'zh' ? 'zh_CN' : baseLang === 'ru' ? 'ru_RU' : 'en_US'} />
       <meta property="og:site_name" content="HAPI" />
 
       {/* Twitter */}
