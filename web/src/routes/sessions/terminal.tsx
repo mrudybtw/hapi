@@ -550,7 +550,7 @@ export default function TerminalPage() {
     if (!session) {
         return (
             <div className="flex h-full items-center justify-center">
-                <LoadingState label="Loading session…" className="text-sm" />
+                <LoadingState label={t('loading.session')} className="text-sm" />
             </div>
         )
     }
@@ -575,7 +575,7 @@ export default function TerminalPage() {
                         <BackIcon />
                     </button>
                     <div className="min-w-0 flex-1">
-                        <div className="truncate font-semibold">Terminal</div>
+                        <div className="truncate font-semibold">{t('chat.terminal')}</div>
                         <div className="truncate text-xs text-[var(--app-hint)]">{subtitle}</div>
                     </div>
                     <ConnectionIndicator status={status} />

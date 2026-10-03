@@ -97,7 +97,7 @@ export function TeamPanel(props: { teamState: TeamState }) {
                     {/* Tasks */}
                     {tasks.length > 0 && (
                         <div className="mb-2">
-                            <div className="mb-1 text-xs font-medium text-[var(--app-hint)]">Tasks</div>
+                            <div className="mb-1 text-xs font-medium text-[var(--app-hint)]">{t('team.tasks')}</div>
                             <div className="flex flex-col gap-0.5">
                                 {tasks.map((task, idx) => (
                                     <div key={task.id ?? String(idx)} className={`text-xs ${taskStatusColor(task.status)}`}>

@@ -568,6 +568,8 @@ export default {
   'tool.plan.continue': 'Continue planning',
   'tool.patch': 'Patch',
   'tool.input': 'Input',
+  'tool.label': 'Tool',
+  'tool.more': '+{count} more',
   'tool.trace': 'Trace',
   'tool.trace.callsSuffix': 'calls',
   'tool.result': 'Result',
@@ -1255,9 +1257,28 @@ export default {
 
   // Team panel
   'team.members': 'Members',
+  'team.tasks': 'Tasks',
   'team.recentMessages': 'Recent Messages',
 
   // Terminal / app shell
   'terminal.inactiveSession': 'Session is inactive. Terminal is unavailable.',
   'app.sessionUnavailable': 'Session unavailable',
+
+  // Tool result states
+  'tool.state.waitingForPermission': 'Waiting for permission…',
+  'tool.state.running': 'Running…',
+  'tool.state.noOutput': '(no output)',
+  'tool.result.done': 'Done',
+  'tool.result.agentLaunched': 'Agent launched',
+  'tool.result.timedOut': 'Timed out',
+  'tool.result.noStatus': 'No status',
+  'tool.result.skillLoaded': 'Skill loaded',
+  'tool.result.skillLoadedNamed': 'Skill "{name}" loaded',
+  'tool.result.fieldName': 'Name',
+  'tool.result.fieldTask': 'Task',
+  'tool.result.fieldId': 'ID',
+  'tool.result.agentCount': 'Agents: {count}',
+
+  // Session shell
+  'session.notFound.returning': 'Session not found. Returning to sessions…',
 } as const

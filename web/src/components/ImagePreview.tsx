@@ -364,7 +364,7 @@ export function ImagePreview(props: {
                             type="button"
                             onClick={closeViewer}
                             className="flex h-8 w-8 items-center justify-center rounded bg-white/10 hover:bg-white/20"
-                            title="Close"
+                            title={t('button.close')}
                         >
                             <CloseIcon className="h-4 w-4" />
                         </button>
