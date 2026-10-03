@@ -24,11 +24,11 @@
 
 ```
 shared/fixtures/
-├── VERSION                  # current fixtureVersion (single integer + \n)
-├── chat/<name>.json         # one fixture per case
+├── VERSION                  # текущий fixtureVersion (одно целое + \n)
+├── chat/<name>.json         # один фикстур на кейс
 ├── sse/<name>.json
 ├── pagination/<name>.json
-├── catalogs/modes.json      # reference tables (see Catalogs below)
+├── catalogs/modes.json      # справочные таблицы (см. «Каталоги» ниже)
 └── README.md
 ```
 
@@ -324,7 +324,7 @@ keep-alive изменением, падает на вердикте, даже к
 # Перегенерация и гейт дрейфа
 
 ```bash
-bun run gen:fixtures        # from the repo root (runs web/scripts/generate-fixtures.ts)
+bun run gen:fixtures        # из корня репозитория (запускает web/scripts/generate-fixtures.ts)
 ```
 
 Вывод байтово детерминирован (каноническая сериализация), поэтому `git status` после
