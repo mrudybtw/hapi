@@ -1001,7 +1001,7 @@ export class Store {
     /** v26→v27: remember the platform-reported language for localized messages. */
     private migrateFromV26ToV27(): void {
         const columns = this.db.prepare('PRAGMA table_info(users)').all() as Array<{ name: string }>
-        if (!columns.some((column) => column.name === 'language')) {
+        if (columns.length > 0 && !columns.some((column) => column.name === 'language')) {
             this.db.exec('ALTER TABLE users ADD COLUMN language TEXT')
         }
     }
