@@ -32,14 +32,21 @@ struct ToolGroupPresentation: Identifiable, Equatable {
             let count = countsByKind[kind] ?? 0
             guard count > 0 else { return nil }
             // Interpolated lookups pass the count to the catalog so the Russian
-            // plural variations are selected.
+            // plural variations are selected; the explicit singular keys keep
+            // the English labels grammatical.
             switch kind {
-            case .read: return String(localized: "\(count) reads")
-            case .search: return String(localized: "\(count) searches")
-            case .command: return String(localized: "\(count) commands")
-            case .mutation: return String(localized: "\(count) edits")
-            case .web: return String(localized: "\(count) web requests")
-            case .other: return String(localized: "\(count) other tools")
+            case .read:
+                return count == 1 ? String(localized: "1 read") : String(localized: "\(count) reads")
+            case .search:
+                return count == 1 ? String(localized: "1 search") : String(localized: "\(count) searches")
+            case .command:
+                return count == 1 ? String(localized: "1 command") : String(localized: "\(count) commands")
+            case .mutation:
+                return count == 1 ? String(localized: "1 edit") : String(localized: "\(count) edits")
+            case .web:
+                return count == 1 ? String(localized: "1 web request") : String(localized: "\(count) web requests")
+            case .other:
+                return count == 1 ? String(localized: "1 other tool") : String(localized: "\(count) other tools")
             }
         }
         return parts.joined(separator: " · ")
