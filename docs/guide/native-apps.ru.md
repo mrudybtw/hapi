@@ -11,10 +11,10 @@ HAPI включает нативные клиенты iOS и Android для уп
 
 | Платформа | Требование к устройству | Инструкция по сборке |
 |---|---|---|
-| iOS | iOS 17 или новее | [iOS README](https://github.com/tiann/hapi/blob/main/ios/README.md): Xcode 16 или новее, общая схема `Hapi`; сборки на устройство требуют подписи. |
-| Android | Android 8.0 (API 26) или новее | [Android README](https://github.com/tiann/hapi/blob/main/android/README.md): JDK 17+, Android SDK, обёртка Gradle; соберите/установите debug-APK или настройте release-подпись. |
+| iOS | iOS 17 или новее | [iOS README](https://github.com/mrudybtw/hapi/blob/main/ios/README.md): Xcode 16 или новее, общая схема `Hapi`; сборки на устройство требуют подписи. |
+| Android | Android 8.0 (API 26) или новее | [Android README](https://github.com/mrudybtw/hapi/blob/main/android/README.md): JDK 17+, Android SDK, обёртка Gradle; соберите/установите debug-APK или настройте release-подпись. |
 
-Мейнтейнеры могут использовать [воркфлоу Android Official Build](https://github.com/tiann/hapi/blob/main/.github/workflows/android-release.yml)
+Мейнтейнеры могут использовать [воркфлоу Android Official Build](https://github.com/mrudybtw/hapi/blob/main/.github/workflows/android-release.yml)
 для получения подписанных APK/AAB-артефактов с официальной конфигурацией Firebase.
 Этот воркфлоу не публикует в Google Play. Настройка push зависит от устанавливаемой
 сборки; см. [Уведомления](#уведомления).
