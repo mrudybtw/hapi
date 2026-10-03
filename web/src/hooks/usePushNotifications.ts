@@ -114,6 +114,36 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
         return result === 'granted'
     }, [])
 
+    const languageWrites = useRef<Promise<void>>(Promise.resolve())
+    const latestLanguage = useRef<string | undefined>(undefined)
+
+    /**
+     * Hub writes for this subscription run on a serialized queue, so an older
+     * language can never land after a newer one.
+     */
+    const enqueueWrite = useCallback(<T,>(write: () => Promise<T>): Promise<T> => {
+        const run = languageWrites.current.then(write)
+        languageWrites.current = run.then(() => undefined, () => undefined)
+        return run
+    }, [])
+
+    /**
+     * After a write, the hub must only keep an endpoint the browser still
+     * holds: a replacement or unsubscription during the request would
+     * otherwise leave the previous endpoint registered.
+     */
+    const pruneReplacedEndpoint = useCallback(async (
+        registration: ServiceWorkerRegistration,
+        endpoint: string
+    ): Promise<boolean> => {
+        const current = await registration.pushManager.getSubscription()
+        if (!current || current.endpoint !== endpoint) {
+            await api?.unsubscribePushNotifications({ endpoint })
+            return false
+        }
+        return true
+    }, [api])
+
     const subscribe = useCallback(async (): Promise<boolean> => {
         if (!api || !isPushSupported()) {
             return false
@@ -163,14 +193,21 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
                 return false
             }
 
-            await api.subscribePushNotifications({
-                endpoint: json.endpoint,
-                keys: {
-                    p256dh: keys.p256dh,
-                    auth: keys.auth
-                },
-                language: notificationLanguage(language)
+            const endpoint = json.endpoint
+            const pushKeys = { p256dh: keys.p256dh, auth: keys.auth }
+            const registered = await enqueueWrite(async () => {
+                await api.subscribePushNotifications({
+                    endpoint,
+                    keys: pushKeys,
+                    // Resolved inside the queue so a newer language wins even
+                    // when this call started earlier.
+                    language: latestLanguage.current ?? notificationLanguage(language)
+                })
+                return await pruneReplacedEndpoint(registration, endpoint)
             })
+            if (!registered) {
+                return false
+            }
             // Only record the key after the hub registration succeeded. A
             // failed registration must leave the previous key in place so the
             // next load retries the replacement instead of reusing a
@@ -182,11 +219,9 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
             console.error('[PushNotifications] Failed to subscribe:', error)
             return false
         }
-    }, [api, language])
+    }, [api, language, enqueueWrite, pruneReplacedEndpoint])
 
     const lastSentLanguage = useRef<string | undefined>(undefined)
-    const languageWrites = useRef<Promise<void>>(Promise.resolve())
-    const latestLanguage = useRef<string | undefined>(undefined)
 
     /**
      * Writes the subscription's language to the hub on a serialized queue, so
@@ -196,7 +231,8 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
      */
     const writeSubscriptionLanguage = useCallback((nextLanguage: string): Promise<boolean> => {
         latestLanguage.current = nextLanguage
-        const task = languageWrites.current.then(async () => {
+        return enqueueWrite(async () => {
+            // A newer switch queued behind this one already owns the write.
             if (latestLanguage.current !== nextLanguage) return false
             if (!api || !isPushSupported()) return false
             if (Notification.permission !== 'granted') return false
@@ -217,20 +253,13 @@ export function usePushNotifications(api: ApiClient | null, language?: string) {
                     language: nextLanguage
                 })
 
-                const current = await registration.pushManager.getSubscription()
-                if (!current) {
-                    await api.unsubscribePushNotifications({ endpoint })
-                    return false
-                }
-                return true
+                return await pruneReplacedEndpoint(registration, endpoint)
             } catch (error) {
                 console.error('[PushNotifications] Failed to refresh subscription language:', error)
                 return false
             }
         })
-        languageWrites.current = task.then(() => undefined, () => undefined)
-        return task
-    }, [api])
+    }, [api, enqueueWrite, pruneReplacedEndpoint])
 
     useEffect(() => {
         if (!isSubscribed) return

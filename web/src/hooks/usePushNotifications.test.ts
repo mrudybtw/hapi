@@ -26,9 +26,15 @@ function createSubscription(endpoint: string, unsubscribeResult: boolean | Error
 }
 
 function setupPushEnvironment(existing: PushSubscriptionMock, replacement: PushSubscriptionMock) {
+    // Model the browser: `getSubscription()` follows whatever the last
+    // `subscribe()` returned, so post-write checks see the live subscription.
+    let current: PushSubscriptionMock | null = existing
     const pushManager = {
-        getSubscription: vi.fn().mockResolvedValue(existing),
-        subscribe: vi.fn().mockResolvedValue(replacement)
+        getSubscription: vi.fn(async () => current),
+        subscribe: vi.fn(async () => {
+            current = replacement
+            return replacement
+        })
     }
     Object.defineProperty(navigator, 'serviceWorker', {
         configurable: true,
@@ -208,6 +214,66 @@ describe('usePushNotifications VAPID rotation', () => {
 
         // Once by `unsubscribe()` and once by the stale write cleanup.
         await waitFor(() => expect(api.unsubscribePushNotifications).toHaveBeenCalledTimes(2))
+    })
+
+    it('does not let an explicit subscribe overwrite a newer language', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
+        const existing = createSubscription('https://push.test/current', true)
+        setupPushEnvironment(existing, existing)
+        const api = createApi()
+        const languages: Array<string | undefined> = []
+        let releaseFirst: () => void = () => {}
+        api.subscribePushNotifications = vi.fn((payload: { language?: string }) => {
+            languages.push(payload.language)
+            if (languages.length === 1) {
+                return new Promise<void>((resolve) => {
+                    releaseFirst = () => resolve()
+                })
+            }
+            return Promise.resolve()
+        })
+        const { result, rerender } = renderHook(
+            ({ language }: { language: string }) => usePushNotifications(api as unknown as ApiClient, language),
+            { initialProps: { language: 'en' } }
+        )
+
+        await waitFor(() => expect(languages).toEqual(['en']))
+
+        localStorage.setItem('hapi-lang', 'ru')
+        rerender({ language: 'ru' })
+        let subscribed = false
+        const subscribePromise = act(async () => {
+            subscribed = await result.current.subscribe()
+        })
+        releaseFirst()
+        await subscribePromise
+
+        expect(subscribed).toBe(true)
+        expect(languages.at(-1)).toBe('ru')
+    })
+
+    it('prunes the endpoint it wrote when the browser switched subscriptions', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
+        const existing = createSubscription('https://push.test/current', true)
+        const replacement = createSubscription('https://push.test/other', true)
+        const pushManager = setupPushEnvironment(existing, replacement)
+        const api = createApi()
+        let releaseWrite: () => void = () => {}
+        api.subscribePushNotifications = vi.fn(() => new Promise<void>((resolve) => {
+            releaseWrite = () => resolve()
+        }))
+        renderHook(() => usePushNotifications(api as unknown as ApiClient, 'en'))
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledTimes(1))
+
+        pushManager.getSubscription.mockResolvedValue(replacement)
+        releaseWrite()
+
+        await waitFor(() => expect(api.unsubscribePushNotifications).toHaveBeenCalledWith({
+            endpoint: existing.endpoint
+        }))
     })
 
     it('keeps a re-created subscription that reuses the same endpoint', async () => {
