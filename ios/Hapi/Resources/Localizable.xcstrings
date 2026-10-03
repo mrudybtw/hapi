@@ -24,7 +24,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ (%lld правок)"
+            "value" : "%@ (правки: %lld)"
           }
         },
         "zh-Hans" : {
@@ -160,7 +160,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ · %lld запросов"
+            "value" : "%@ · запросы: %lld"
           }
         },
         "zh-Hans" : {
@@ -193,9 +193,33 @@
           }
         },
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@, %lld сессий"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%@, %lld сессия"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%@, %lld сессии"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%@, %lld сессий"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%@, %lld сессий"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -212,7 +236,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld вопросов"
+            "value" : "Вопросы: %lld"
           }
         },
         "zh-Hans" : {
@@ -262,9 +286,33 @@
           }
         },
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld вложений"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld вложение"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld вложения"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld вложений"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld вложений"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -281,7 +329,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld символов"
+            "value" : "Символы: %lld"
           }
         },
         "zh-Hans" : {
@@ -315,7 +363,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld правок"
+            "value" : "Правки: %lld"
           }
         },
         "zh-Hans" : {
@@ -332,7 +380,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld сбойных инструментов"
+            "value" : "Сбойные инструменты: %lld"
           }
         },
         "zh-Hans" : {
@@ -349,7 +397,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld замечаний"
+            "value" : "Замечания: %lld"
           }
         },
         "zh-Hans" : {
@@ -366,7 +414,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld строк"
+            "value" : "Строки: %lld"
           }
         },
         "zh-Hans" : {
@@ -400,7 +448,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld заметок"
+            "value" : "Заметки: %lld"
           }
         },
         "zh-Hans" : {
@@ -417,7 +465,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld других инструментов"
+            "value" : "Другие инструменты: %lld"
           }
         },
         "zh-Hans" : {
@@ -434,7 +482,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld сообщений в очереди"
+            "value" : "Сообщения в очереди: %lld"
           }
         },
         "zh-Hans" : {
@@ -468,7 +516,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld запросов · вход %@ · выход %@"
+            "value" : "Запросы: %lld · вход %@ · выход %@"
           }
         },
         "zh-Hans" : {
@@ -518,9 +566,33 @@
           }
         },
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld сессий"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld сессия"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld сессии"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld сессий"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld сессий"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -554,7 +626,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld вызовов инструментов"
+            "value" : "Вызовы инструментов: %lld"
           }
         },
         "zh-Hans" : {
@@ -571,7 +643,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld инструментов"
+            "value" : "Инструменты: %lld"
           }
         },
         "zh-Hans" : {
@@ -588,7 +660,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%lld веб-запросов"
+            "value" : "Веб-запросы: %lld"
           }
         },
         "zh-Hans" : {
@@ -894,7 +966,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Заметка может содержать не более %lld вложений"
+            "value" : "Максимум вложений в заметке: %lld"
           }
         },
         "zh-Hans" : {
@@ -4600,7 +4672,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вход"
+            "value" : "Ввод"
           }
         },
         "zh-Hans" : {
@@ -6130,7 +6202,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Выход"
+            "value" : "Вывод"
           }
         },
         "zh-Hans" : {
@@ -8119,7 +8191,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Показать все %lld строк"
+            "value" : "Показать все строки: %lld"
           }
         },
         "zh-Hans" : {
