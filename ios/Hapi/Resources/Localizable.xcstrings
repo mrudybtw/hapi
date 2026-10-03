@@ -126,7 +126,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ токенов · %lld запр. · вход %@ / выход %@"
+            "value" : "Токены: %@ · запросов: %lld · вход %@ / выход %@"
           }
         },
         "zh-Hans" : {
@@ -251,9 +251,33 @@
       "extractionState" : "manual",
       "localizations" : {
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld шагов агента"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld шаг агента"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld шага агента"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld шагов агента"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld шага агента"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -344,9 +368,33 @@
       "extractionState" : "manual",
       "localizations" : {
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld команд"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld команда"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld команды"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld команд"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld команды"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -429,9 +477,33 @@
       "extractionState" : "manual",
       "localizations" : {
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld новых сообщений ↓"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld новое сообщение ↓"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld новых сообщения ↓"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld новых сообщений ↓"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld новых сообщения ↓"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -497,9 +569,33 @@
       "extractionState" : "manual",
       "localizations" : {
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld чтений"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld чтение"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld чтения"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld чтений"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld чтения"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -531,9 +627,33 @@
       "extractionState" : "manual",
       "localizations" : {
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld поисков"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld поиск"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld поиска"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld поисков"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld поиска"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
@@ -9719,9 +9839,33 @@
       "extractionState" : "manual",
       "localizations" : {
         "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Показать процесс · %lld шагов"
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Показать процесс · %lld шаг"
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Показать процесс · %lld шага"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Показать процесс · %lld шагов"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Показать процесс · %lld шага"
+                }
+              }
+            }
           }
         },
         "zh-Hans" : {
