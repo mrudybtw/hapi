@@ -72,7 +72,8 @@ const en = {
     'push.ready.body': '{agent} is waiting in {session}',
     'push.permission.title': 'Permission Request',
     'push.task.completed': 'Task completed',
-    'push.task.failed': 'Task failed'
+    'push.task.failed': 'Task failed',
+    'native.session': 'Session: {name}'
 } as const
 
 export type HubMessageKey = keyof typeof en
@@ -130,7 +131,8 @@ const ru: Record<HubMessageKey, string> = {
     'push.ready.body': '{agent} ждёт в сессии {session}',
     'push.permission.title': 'Запрос разрешения',
     'push.task.completed': 'Задача выполнена',
-    'push.task.failed': 'Задача не удалась'
+    'push.task.failed': 'Задача не удалась',
+    'native.session': 'Сессия: {name}'
 }
 
 const catalogs: Record<HubLocale, Record<HubMessageKey, string>> = { en, ru }

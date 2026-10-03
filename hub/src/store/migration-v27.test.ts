@@ -31,7 +31,7 @@ describe('schema migration v27 to v28', () => {
         const migrated = new Store(dbPath)
         const internalDb = (migrated as unknown as { db: Database }).db
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
-        expect(version.user_version).toBe(28)
+        expect(version.user_version).toBe(29)
 
         migrated.push.addPushSubscription('default', {
             endpoint: 'https://push.example/1',
@@ -72,7 +72,7 @@ describe('schema migration v27 to v28', () => {
         const migrated = new Store(dbPath)
         const internalDb = (migrated as unknown as { db: Database }).db
         const version = internalDb.prepare('PRAGMA user_version').get() as { user_version: number }
-        expect(version.user_version).toBe(28)
+        expect(version.user_version).toBe(29)
 
         const table = internalDb
             .prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'push_subscriptions'")
