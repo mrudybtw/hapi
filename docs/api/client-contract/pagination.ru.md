@@ -1,6 +1,6 @@
 # Пагинация сообщений, окно и оптимистичная отправка
 
-**Аудитория:** разработчики нативных клиентов HAPI (iOS / Android). Эта страница описывает протокол постраничного чтения сообщений (`GET /api/sessions/:id/messages`), контракт сброса эпохи, цикл синхронизации хвоста, рекомендуемое клиентское окно и жизненный цикл оптимистичной отправки/отмены. Смежные страницы: [sse](./sse.md) (англ.), [messages](./messages.ru.md), [rest](./rest.ru.md).
+**Аудитория:** разработчики нативных клиентов HAPI (iOS / Android). Эта страница описывает протокол постраничного чтения сообщений (`GET /api/sessions/:id/messages`), контракт сброса эпохи, цикл синхронизации хвоста, рекомендуемое клиентское окно и жизненный цикл оптимистичной отправки/отмены. Смежные страницы: [sse](./sse.ru.md), [messages](./messages.ru.md), [rest](./rest.ru.md).
 
 Источник истины: `shared/src/apiTypes.ts` (`MessagesQuerySchema`, `MessagesResponse`, `SendMessageRequestSchema`), `hub/src/web/routes/messages.ts`, `hub/src/sync/messageService.ts`, `hub/src/store/messages.ts`, эталонный клиент `web/src/lib/message-window-store.ts` + `web/src/lib/messages.ts`.
 

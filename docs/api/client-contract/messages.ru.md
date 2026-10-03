@@ -1,6 +1,6 @@
 # Дерево декодирования сообщений
 
-**Аудитория:** разработчики нативных клиентов HAPI (iOS / Android). Эта страница описывает, как декодировать `DecryptedMessage.content` в отображаемую структуру чата. Это самая большая поверхность портирования — эталонный конвейер `web/src/chat/` (~4600 строк); эта страница — его контракт на уровне проводного протокола. Смежные страницы: [pagination](./pagination.ru.md) (как приходят сообщения), [sse](./sse.md) (англ.) (живая доставка).
+**Аудитория:** разработчики нативных клиентов HAPI (iOS / Android). Эта страница описывает, как декодировать `DecryptedMessage.content` в отображаемую структуру чата. Это самая большая поверхность портирования — эталонный конвейер `web/src/chat/` (~4600 строк); эта страница — его контракт на уровне проводного протокола. Смежные страницы: [pagination](./pagination.ru.md) (как приходят сообщения), [sse](./sse.ru.md) (живая доставка).
 
 Источник истины: `shared/src/schemas.ts` (`DecryptedMessageSchema`), `shared/src/messages.ts` (помощники конверта), `web/src/chat/normalize.ts`, `web/src/chat/normalizeUser.ts`, `web/src/chat/normalizeAgent.ts`, `web/src/chat/types.ts`, `hub/src/store/contentCodec.ts`.
 
@@ -255,7 +255,7 @@ session.agentState = {
 }
 ```
 
-Обновления `agentState` приходят как версионированный SSE-патч — применяйте его под гейтом версии, описанным в [sse.md](./sse.md#versioned-patch-algorithm) (англ.). Отрисовывайте ожидающие `requests` как карточки одобрения, вставленные в чат (веб-редьюсер привязывает их к соответствующему `tool_use`, когда он есть); при разрешении запись переходит в `completedRequests`, чьи `status`/`answers` дополняют состояние разрешений карточки инструмента. Решайте через `POST /api/sessions/:id/permissions/:requestId/approve` (`{mode?, allowTools?, decision?, answers?}`) или `…/deny` (`{decision?}`) — см. [rest.ru.md](./rest.ru.md). Бейджи списка сессий приходят предвычисленными в `SessionSummary.pendingRequestsCount` / `pendingRequests` (≤ 5 записей).
+Обновления `agentState` приходят как версионированный SSE-патч — применяйте его под гейтом версии, описанным в [sse.md](./sse.ru.md#алгоритм-версионированного-патча). Отрисовывайте ожидающие `requests` как карточки одобрения, вставленные в чат (веб-редьюсер привязывает их к соответствующему `tool_use`, когда он есть); при разрешении запись переходит в `completedRequests`, чьи `status`/`answers` дополняют состояние разрешений карточки инструмента. Решайте через `POST /api/sessions/:id/permissions/:requestId/approve` (`{mode?, allowTools?, decision?, answers?}`) или `…/deny` (`{decision?}`) — см. [rest.ru.md](./rest.ru.md). Бейджи списка сессий приходят предвычисленными в `SessionSummary.pendingRequestsCount` / `pendingRequests` (≤ 5 записей).
 
 `resolved` означает, что нативное завершение известно, но победивший ответ/решение —
 нет. Отрисовывайте нейтрально; никогда не выводите одобрение и не заполняйте ответы из
