@@ -123,7 +123,9 @@ describe('usePushNotifications VAPID rotation', () => {
         expect(pushManager.subscribe).toHaveBeenCalledTimes(1)
         expect(api.subscribePushNotifications).toHaveBeenCalledWith({
             endpoint: replacement.endpoint,
-            keys: { p256dh: 'p256dh', auth: 'auth' }
+            keys: { p256dh: 'p256dh', auth: 'auth' },
+            // The hub stores this to render web-push payloads in the user's language.
+            language: expect.any(String)
         })
         expect(localStorage.getItem(VAPID_STORAGE_KEY)).toBe(CURRENT_VAPID_KEY)
     })

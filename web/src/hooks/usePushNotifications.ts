@@ -22,6 +22,20 @@ function base64UrlToUint8Array(base64Url: string): Uint8Array {
 }
 
 /**
+ * Language reported to the hub with the subscription so web-push payloads can
+ * be rendered in the user's language. Mirrors what the i18n provider stores.
+ */
+function notificationLanguage(): string | undefined {
+    try {
+        const stored = localStorage.getItem('hapi-lang')
+        if (stored) return stored
+    } catch {
+        // Storage can be unavailable (private mode / blocked cookies).
+    }
+    return typeof navigator !== 'undefined' ? navigator.language : undefined
+}
+
+/**
  * VAPID public key that the currently stored push subscription was created
  * with. When the hub changes (or its keys rotate), existing browser
  * subscriptions become undeliverable (push services reject them with
@@ -151,7 +165,8 @@ export function usePushNotifications(api: ApiClient | null) {
                 keys: {
                     p256dh: keys.p256dh,
                     auth: keys.auth
-                }
+                },
+                language: notificationLanguage()
             })
             // Only record the key after the hub registration succeeded. A
             // failed registration must leave the previous key in place so the
