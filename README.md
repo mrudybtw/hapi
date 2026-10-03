@@ -2,6 +2,8 @@
 
 > 🇬🇧 [English version](README.en.md)
 
+> **Форк с русской локализацией.** Интерфейс и документация переведены на русский язык — [mrudybtw](https://github.com/mrudybtw). Оригинальный проект: [tiann/hapi](https://github.com/tiann/hapi).
+
 Запускайте официальные сессии Claude Code / Codex / Cursor Agent / Grok Build / OpenCode / Kimi / Copilot / Antigravity / Pi / DeepSeek Harness и управляйте ими удалённо через нативные приложения iOS/Android, Web/PWA или Telegram Mini App.
 
 > **Почему HAPI?** HAPI — это локально-ориентированная (local-first) альтернатива Happy. Ключевые отличия: [Why Not Happy?](docs/guide/why-hapi.md) (англ.).

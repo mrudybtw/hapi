@@ -1,34 +1,33 @@
-# Notifications
+# Уведомления
 
-Get notified when sessions need input, request permissions, fail, or complete — via native app notifications, Telegram, Server酱 (ServerChan), Web Push, or voice.
+Получайте уведомления, когда сессиям нужен ввод, когда они запрашивают разрешения, завершаются с ошибкой или успешно — через нативные уведомления, Telegram, Server酱 (ServerChan), Web Push или голос.
 
-Web Push needs no provider configuration: [install the PWA](./pwa.md) and allow notifications. The channels below are optional.
+Web Push не требует настройки провайдера: [установите PWA](./pwa.md) и разрешите уведомления. Каналы ниже — опциональные.
 
-## Native app notifications
+## Уведомления нативных приложений
 
-See [Native apps](./native-apps.md) for build, pairing and platform requirements.
+Сборка, сопряжение и требования платформ: [Нативные приложения](./native-apps.md).
 
-For official Android and iOS apps, pair an updated hub and allow notifications.
-No Firebase project or Apple developer account is needed. Notification content
-is end-to-end encrypted through the official push relay, which also works when
-you access the hub through Tailscale or your own HTTPS setup. Android requires
-Google Play services and FCM connectivity.
+Для официальных приложений Android и iOS свяжите обновлённый хаб и разрешите уведомления.
+Проект Firebase или аккаунт разработчика Apple не нужны. Содержимое уведомлений
+шифруется сквозным образом через официальное push-реле, которое работает и при
+доступе к хабу через Tailscale или собственный HTTPS. Android требует
+сервисов Google Play и доступности FCM.
 
-Private app builds need matching Firebase/APNs credentials. An Android build
-without Firebase configuration has no FCM push. For a self-signed iOS build,
-the signing account, bundle ID and APNs environment must match the provider
-configuration; the official relay cannot deliver to an arbitrary self-build.
-See the [native push contract](../api/native-companion-contract.md) for settings
-and delivery details. This push relay is independent of the `--relay` network
-tunnel.
+Собственные сборки приложений требуют соответствующих учётных данных Firebase/APNs. Сборка Android
+без конфигурации Firebase не получает FCM-push. Для самоподписанной iOS-сборки
+аккаунт подписи, bundle ID и окружение APNs должны совпадать с конфигурацией
+провайдера; официальное реле не может доставлять в произвольную самосборку.
+См. [контракт нативного push](../api/native-companion-contract.md) — настройки
+и детали доставки. Это push-реле не зависит от сетевого туннеля `--relay`.
 
-## Telegram Setup
+## Настройка Telegram
 
-Enable Telegram notifications and Mini App access:
+Включите уведомления Telegram и доступ к Mini App:
 
-1. Message [@BotFather](https://t.me/BotFather) and create a bot
-2. Set the bot token and public URL
-3. Start the hub and bind your account
+1. Напишите [@BotFather](https://t.me/BotFather) и создайте бота
+2. Задайте токен бота и публичный URL
+3. Запустите хаб и привяжите свой аккаунт
 
 ```bash
 export TELEGRAM_BOT_TOKEN="your-bot-token"
@@ -37,24 +36,24 @@ export HAPI_PUBLIC_URL="https://your-public-url"
 hapi hub
 ```
 
-Then message your bot with `/start`, open the app, and bind using
-`CLI_API_TOKEN:<namespace>` (for example, `your-token:default`).
+Затем напишите своему боту `/start`, откройте приложение и привяжитесь, используя
+`CLI_API_TOKEN:<namespace>` (например, `your-token:default`).
 
-Related environment variables:
+Связанные переменные окружения:
 
-- `TELEGRAM_NOTIFICATION` - Enable/disable Telegram notifications (default: `true`)
+- `TELEGRAM_NOTIFICATION` — включить/выключить уведомления Telegram (по умолчанию `true`)
 
-**Troubleshooting:**
+**Решение проблем:**
 
-- If binding fails, verify `HAPI_PUBLIC_URL` is accessible from the internet
-- Telegram Mini App requires HTTPS (not HTTP)
+- Если привязка не удаётся, проверьте, что `HAPI_PUBLIC_URL` доступен из интернета
+- Telegram Mini App требует HTTPS (не HTTP)
 
-## ServerChan (Server酱) Setup
+## Настройка ServerChan (Server酱)
 
-Server酱 pushes notifications to WeChat and other channels. The hub sends ServerChan messages when a session is ready for input, requests a permission, a task fails, or a session completes.
+Server酱 отправляет уведомления в WeChat и другие каналы. Хаб отправляет сообщения ServerChan, когда сессия готова к вводу, запрашивает разрешение, задача завершается с ошибкой или сессия завершается.
 
-1. Get a SendKey from [sct.ftqq.com](https://sct.ftqq.com/)
-2. Set the SendKey and start the hub:
+1. Получите SendKey на [sct.ftqq.com](https://sct.ftqq.com/)
+2. Задайте SendKey и запустите хаб:
 
 ```bash
 export SERVERCHAN_SENDKEY="your-sendkey"
@@ -63,27 +62,27 @@ export HAPI_PUBLIC_URL="https://your-public-url"
 hapi hub
 ```
 
-Messages include a link back to the session, built from `HAPI_PUBLIC_URL`.
+Сообщения включают ссылку обратно на сессию, построенную из `HAPI_PUBLIC_URL`.
 
-Related environment variables:
+Связанные переменные окружения:
 
-- `SERVERCHAN_NOTIFICATION` - Enable/disable ServerChan notifications (default: `true`)
-- `SERVERCHAN_BACKGROUND_ONLY` - Only send ServerChan notifications when the namespace has no visible HAPI connection (default: `false`)
+- `SERVERCHAN_NOTIFICATION` — включить/выключить уведомления ServerChan (по умолчанию `true`)
+- `SERVERCHAN_BACKGROUND_ONLY` — отправлять уведомления ServerChan только когда у пространства имён нет видимого подключения HAPI (по умолчанию `false`)
 
-When `SERVERCHAN_BACKGROUND_ONLY=true`, a visible HAPI connection suppresses ServerChan for the entire namespace. Hidden, disconnected, or closed HAPI pages do not count as visible, so ServerChan can act as a background fallback. This is namespace-wide and does not select a particular device.
+Когда `SERVERCHAN_BACKGROUND_ONLY=true`, видимое подключение HAPI подавляет ServerChan для всего пространства имён. Скрытые, отключённые или закрытые страницы HAPI не считаются видимыми, поэтому ServerChan может работать как фоновый запасной канал. Это действует на всё пространство имён и не выбирает конкретное устройство.
 
-These values can also be set in `settings.json` (`serverChanSendKey`, `serverChanNotification`, `serverChanBackgroundOnly`).
+Эти значения также можно задать в `settings.json` (`serverChanSendKey`, `serverChanNotification`, `serverChanBackgroundOnly`).
 
-## Voice assistant setup
+## Настройка голосового ассистента
 
-Enable voice control:
+Включите голосовое управление:
 
-1. Get an API key from [elevenlabs.io](https://elevenlabs.io/app/settings/api-keys)
-2. Set the environment variable:
+1. Получите API-ключ на [elevenlabs.io](https://elevenlabs.io/app/settings/api-keys)
+2. Задайте переменную окружения:
 
 ```bash
 export ELEVENLABS_API_KEY="your-api-key"
 hapi hub --relay
 ```
 
-See [Voice Assistant](./voice-assistant.md) for usage details.
+Детали использования: [Голосовой ассистент](./voice-assistant.md).

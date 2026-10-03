@@ -1,86 +1,86 @@
-# Voice input and assistant
+# Голосовой ввод и ассистент
 
-Control your AI coding agent with your voice. The built-in voice assistant supports three backends: **ElevenLabs** Conversational AI, **Gemini Live**, and **Qwen Realtime**. Pick whichever provider you have credentials for — the hub detects what's configured and the web app lets you switch.
+Управляйте своим ИИ-агентом голосом. Встроенный голосовой ассистент поддерживает три бэкенда: **ElevenLabs** Conversational AI, **Gemini Live** и **Qwen Realtime**. Выбирайте того провайдера, для которого у вас есть учётные данные, — хаб определяет, что настроено, а веб-приложение позволяет переключаться.
 
-In the web app, for speech-to-text without a spoken assistant, open **Settings → Voice**, choose **Dictation**, then select a configured provider. Dictation records until you tap the microphone again, inserts the transcript into the composer, and never sends it automatically. Standard mode is the default. Realtime mode shows a live transcript while you speak and inserts the final result when you stop.
+В веб-приложении для преобразования речи в текст без голосового ассистента откройте **Settings → Voice**, выберите **Dictation**, затем выберите настроенного провайдера. Диктовка записывает до повторного нажатия микрофона, вставляет расшифровку в редактор и никогда не отправляет автоматически. По умолчанию — стандартный режим. Режим реального времени показывает живой текст во время речи и вставляет итоговый результат, когда вы останавливаетесь.
 
-[Native iOS and Android apps](./native-apps.md#sessions-and-everyday-use)
-currently use standard dictation only. They select the first hub provider that
-supports standard transcription and show the microphone once discovery
-succeeds. Recording is uploaded when stopped; the transcript is inserted into
-the draft for review. Configure credentials on the hub or through **Web
-Settings → Voice**. The realtime dictation, assistant and provider-selection
-controls described below are web features.
+[Нативные приложения iOS и Android](./native-apps.md)
+сейчас используют только стандартную диктовку. Они выбирают первого провайдера хаба, который
+поддерживает стандартную транскрипцию, и показывают микрофон после успешного
+обнаружения. Запись загружается при остановке; расшифровка вставляется в
+черновик для проверки. Настройте учётные данные на хабе или через **Web
+Settings → Voice**. Диктовка в реальном времени, ассистент и выбор
+провайдера, описанные ниже, — это веб-функции.
 
-Dictation and voice-assistant provider credentials can be added in **Web Settings → Voice** (saved on the hub, masked in the UI). Environment variables still win when set at process start, and remain the preferred ops/bootstrap path:
+Учётные данные диктовки и голосового ассистента можно добавить в **Web Settings → Voice** (сохраняются на хабе, маскируются в UI). Переменные окружения по-прежнему имеют приоритет, когда заданы при старте процесса, и остаются предпочтительным путём для ops/начальной настройки:
 
 ```bash
-# Voice assistant backends (any of these enables the assistant)
+# Бэкенды голосового ассистента (любой из них включает ассистента)
 export ELEVENLABS_API_KEY="..."       # ElevenLabs ConvAI
-export GEMINI_API_KEY="..."           # Gemini Live (GOOGLE_API_KEY also works)
-export DASHSCOPE_API_KEY="..."        # Qwen Realtime (QWEN_API_KEY also works)
+export GEMINI_API_KEY="..."           # Gemini Live (GOOGLE_API_KEY тоже работает)
+export DASHSCOPE_API_KEY="..."        # Qwen Realtime (QWEN_API_KEY тоже работает)
 
-# Optional: pin the hub's default assistant backend
+# Опционально: зафиксировать бэкенд ассистента хаба по умолчанию
 export VOICE_BACKEND="elevenlabs"     # elevenlabs | gemini-live | qwen-realtime
 
-# Dictation transcription providers (pick any you use)
+# Провайдеры транскрипции для диктовки (выберите любой используемый)
 export OPENAI_API_KEY="..."           # gpt-transcribe / gpt-live-transcribe
 export ELEVENLABS_API_KEY="..."       # scribe_v2 / scribe_v2_realtime
 export DEEPGRAM_API_KEY="..."         # nova-3 standard / realtime
 export GROQ_API_KEY="..."             # whisper-large-v3
 
-# Or an OpenAI-compatible local server such as Speaches
+# Или OpenAI-совместимый локальный сервер, например Speaches
 export TRANSCRIPTION_BASE_URL="http://127.0.0.1:8000/v1"
 export TRANSCRIPTION_MODEL="Systran/faster-whisper-large-v3"
-export TRANSCRIPTION_API_KEY="..."    # optional
+export TRANSCRIPTION_API_KEY="..."    # опционально
 ```
 
-Settings-managed keys apply immediately (no hub restart). Restart is only required when you change process environment variables outside the UI. API keys are never returned in full to the browser.
-Realtime OpenAI, ElevenLabs, and Deepgram dictation sessions receive only short-lived credentials minted by the hub. Gemini Live and Qwen Realtime assistant sessions connect through hub-side WebSocket proxies, so those API keys never reach the browser either. Eligible desktop browsers with the on-device `SpeechRecognition` API expose **Browser on-device** as a realtime-only dictation provider. HAPI checks the selected language pack when dictation starts and never falls back from that option to browser-hosted recognition. Mobile and unknown browser environments fail closed because this API is experimental and some Android WebViews expose unsafe partial implementations.
+Ключи, управляемые через настройки, применяются немедленно (без перезапуска хаба). Перезапуск нужен только при изменении переменных окружения процесса вне UI. API-ключи никогда не возвращаются браузеру в полном виде.
+Realtime-сессии OpenAI, ElevenLabs и Deepgram получают только короткоживущие учётные данные, выпускаемые хабом. Сессии ассистента Gemini Live и Qwen Realtime подключаются через WebSocket-прокси на стороне хаба, поэтому эти API-ключи тоже не попадают в браузер. Подходящие настольные браузеры с on-device API `SpeechRecognition` показывают **Browser on-device** как провайдера диктовки только для realtime. HAPI проверяет выбранный языковой пакет при старте диктовки и никогда не откатывается с этого варианта на распознавание, размещённое в браузере. Мобильные и неизвестные браузерные окружения закрываются с ошибкой (fail closed), потому что этот API экспериментальный, а некоторые Android WebView предоставляют небезопасные частичные реализации.
 
-## Overview
+## Обзор
 
-The voice assistant lets you:
+Голосовой ассистент позволяет:
 
-- **Talk to your agent** - Ask questions, give instructions, and request code changes hands-free
-- **Approve permissions by voice** - Say "yes" or "no" to approve or deny permission requests
-- **Monitor progress** - Receive spoken updates when tasks complete or errors occur
+- **Говорить с агентом** — задавать вопросы, давать инструкции и запрашивать изменения кода без рук
+- **Одобрять разрешения голосом** — говорить «да» или «нет», чтобы одобрить или отклонить запрос разрешения
+- **Следить за прогрессом** — получать голосовые обновления, когда задачи завершаются или возникают ошибки
 
-The assistant bridges voice communication with your active coding session, whatever agent flavor it runs. It relays your requests to the agent and summarizes responses in natural speech.
+Ассистент соединяет голосовое общение с вашей активной сессией кодинга, какой бы агент в ней ни работал. Он передаёт ваши запросы агенту и резюмирует ответы естественной речью.
 
-## Prerequisites
+## Предварительные требования
 
-You need API credentials for at least one assistant backend:
+Нужны API-учётные данные хотя бы для одного бэкенда ассистента:
 
-- **ElevenLabs** - an [ElevenLabs](https://elevenlabs.io) account with API access
-- **Gemini Live** - a Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
-- **Qwen Realtime** - a DashScope API key from [Alibaba Cloud Model Studio](https://www.alibabacloud.com/help/en/model-studio/get-api-key)
+- **ElevenLabs** — аккаунт [ElevenLabs](https://elevenlabs.io) с доступом к API
+- **Gemini Live** — API-ключ Gemini из [Google AI Studio](https://aistudio.google.com/apikey)
+- **Qwen Realtime** — API-ключ DashScope из [Alibaba Cloud Model Studio](https://www.alibabacloud.com/help/en/model-studio/get-api-key)
 
-Dictation needs at least one configured transcription provider from the list above, or an OpenAI-compatible local server. In **Settings → Voice → Dictation**, the credential presets are **ElevenLabs**, **OpenAI**, and **Groq**; already-configured Deepgram / OpenAI-compatible credentials stay manageable there too. Saving a key updates the provider list without restarting the hub.
+Для диктовки нужен хотя бы один настроенный провайдер транскрипции из списка выше или OpenAI-совместимый локальный сервер. В **Settings → Voice → Dictation** пресеты учётных данных — **ElevenLabs**, **OpenAI** и **Groq**; уже настроенные Deepgram / OpenAI-совместимые учётные данные тоже остаются управляемыми там. Сохранение ключа обновляет список провайдеров без перезапуска хаба.
 
-## Setup
+## Настройка
 
 ### ElevenLabs
 
-1. Sign up or log in at [elevenlabs.io](https://elevenlabs.io)
-2. Go to [API Keys](https://elevenlabs.io/app/settings/api-keys) in your account settings
-3. Create a new API key and copy it
-4. Set the environment variable before starting the hub:
+1. Зарегистрируйтесь или войдите на [elevenlabs.io](https://elevenlabs.io)
+2. Перейдите в [API Keys](https://elevenlabs.io/app/settings/api-keys) в настройках аккаунта
+3. Создайте новый API-ключ и скопируйте его
+4. Задайте переменную окружения перед запуском хаба:
 
 ```bash
 export ELEVENLABS_API_KEY="your-api-key"
 hapi hub --relay
 ```
 
-The hub automatically creates a "Hapi Voice Assistant" agent in your ElevenLabs account on first use. When you pick a non-default voice, the hub creates a dedicated per-voice agent named `Hapi Voice Assistant [voice:<id>]` so the selection always takes effect.
+Хаб автоматически создаёт агента «Hapi Voice Assistant» в вашем аккаунте ElevenLabs при первом использовании. Когда вы выбираете нестандартный голос, хаб создаёт отдельного агента на голос с именем `Hapi Voice Assistant [voice:<id>]`, чтобы выбор всегда применялся.
 
-To use your own ElevenLabs agent instead of the auto-created one:
+Чтобы использовать собственного агента ElevenLabs вместо автоматически созданного:
 
 ```bash
 export ELEVENLABS_AGENT_ID="your-agent-id"
 ```
 
-To map specific voices to your own agents (overrides per-voice auto-creation):
+Чтобы сопоставить конкретные голоса со своими агентами (переопределяет автоматическое создание на голос):
 
 ```bash
 export ELEVENLABS_VOICE_AGENT_MAP='{"<voice-id>": "<agent-id>"}'
@@ -89,138 +89,138 @@ export ELEVENLABS_VOICE_AGENT_MAP='{"<voice-id>": "<agent-id>"}'
 ### Gemini Live
 
 ```bash
-export GEMINI_API_KEY="your-api-key"   # or GOOGLE_API_KEY
+export GEMINI_API_KEY="your-api-key"   # или GOOGLE_API_KEY
 hapi hub --relay
 ```
 
 ### Qwen Realtime
 
 ```bash
-export DASHSCOPE_API_KEY="your-api-key"   # or QWEN_API_KEY
+export DASHSCOPE_API_KEY="your-api-key"   # или QWEN_API_KEY
 hapi hub --relay
 ```
 
-When more than one backend is configured, the hub default is ElevenLabs unless you set `VOICE_BACKEND`. Users can override the backend per browser in **Settings → Voice**.
+Когда настроено больше одного бэкенда, хаб по умолчанию использует ElevenLabs, если не задан `VOICE_BACKEND`. Пользователи могут переопределить бэкенд для каждого браузера в **Settings → Voice**.
 
-## Usage
+## Использование
 
-### Starting a Voice Session
+### Запуск голосовой сессии
 
-1. Open a session in the web app
-2. Click the **microphone button** in the composer (the send button shows a mic icon when the composer is empty)
-3. Grant microphone permission when prompted
-4. Start speaking
+1. Откройте сессию в веб-приложении
+2. Нажмите **кнопку микрофона** в редакторе (кнопка отправки показывает иконку микрофона, когда редактор пуст)
+3. Выдайте разрешение микрофона по запросу
+4. Начните говорить
 
-While the assistant is connected, a voice pill in the status bar shows its state (Connecting, Active, Muted, Error), and you can mute the microphone without ending the session.
+Пока ассистент подключён, «таблетка» голоса в строке статуса показывает его состояние (Connecting, Active, Muted, Error), и вы можете выключить микрофон, не завершая сессию.
 
-### Voice Commands
+### Голосовые команды
 
-| Say this | What happens |
+| Скажите | Что произойдёт |
 |----------|--------------|
-| "Ask Claude to..." / "Have it..." | Sends your request to the coding agent |
-| "Refactor the auth module" | Coding requests are forwarded automatically |
-| "Yes" / "Allow" / "Go ahead" | Approves pending permission requests |
-| "No" / "Deny" / "Cancel" | Denies pending permission requests |
-| Direct questions | The voice assistant answers itself if it can |
+| «Спроси Claude…» / «Пусть он…» | Отправляет ваш запрос агенту кодинга |
+| «Отрефактори модуль auth» | Запросы на код пересылаются автоматически |
+| «Да» / «Разрешить» / «Действуй» | Одобряет ожидающие запросы разрешений |
+| «Нет» / «Запретить» / «Отмена» | Отклоняет ожидающие запросы разрешений |
+| Прямые вопросы | Голосовой ассистент отвечает сам, если может |
 
-## Settings
+## Настройки
 
-Everything user-facing lives under **Settings → Voice**:
+Всё, что видит пользователь, находится в **Settings → Voice**:
 
-- **Voice mode** - Voice assistant (two-way conversation) or Dictation (speech-to-text only)
-- **Voice backend** - ElevenLabs, Gemini Live, or Qwen Realtime (shown when the hub has more than one configured)
-- **Voice Language** - Auto-detect or a specific language; shared by the assistant and dictation
-- **Voice** - Pick the assistant's voice. ElevenLabs lists your account voices (including clones) with audio previews; Gemini Live and Qwen Realtime offer their built-in voice catalogs
-- **Opening** (assistant) - "Greet me" for a simple hello, or "Brief me" for a spoken summary of recent agent activity when you connect
-- **Response length** (assistant) - Brief, Balanced, or Detailed answers
+- **Режим голоса** — голосовой ассистент (двусторонний разговор) или диктовка (только речь в текст)
+- **Бэкенд голоса** — ElevenLabs, Gemini Live или Qwen Realtime (показывается, когда на хабе настроено больше одного)
+- **Язык голоса** — автоопределение или конкретный язык; общий для ассистента и диктовки
+- **Голос** — выберите голос ассистента. ElevenLabs показывает голоса вашего аккаунта (включая клоны) с аудиопревью; Gemini Live и Qwen Realtime предлагают встроенные каталоги голосов
+- **Начало** (ассистент) — «Greet me» для простого приветствия или «Brief me» для озвученной сводки недавней активности агента при подключении
+- **Длина ответа** (ассистент) — краткие, сбалансированные или подробные ответы
 
-**Settings → Voice → Advanced** additionally offers:
+**Settings → Voice → Advanced** дополнительно предлагает:
 
-- **Persona & instructions** - Rename/rebrand the assistant and shape its character and speaking style (preset or custom text)
-- **How it sounds** - ElevenLabs tuning sliders (stability, style, speed, similarity boost, speaker boost) and Gemini's affective dialog option
-- **Voice diagnostics** - Check the composed system prompt size against per-backend wire limits, see truncation warnings and the last voice session's context notice, and preview the read-only platform rules
+- **Персона и инструкции** — переименуйте/ребрендируйте ассистента и настройте его характер и стиль речи (пресет или свой текст)
+- **Как это звучит** — ползунки настройки ElevenLabs (стабильность, стиль, скорость, усиление схожести, усиление голоса) и опция аффективного диалога Gemini
+- **Диагностика голоса** — проверьте размер собранного системного промпта относительно лимитов канала каждого бэкенда, увидьте предупреждения об обрезке и заметку о контексте последней голосовой сессии, а также предпросмотрите правила платформы (только чтение)
 
-## How It Works
+## Как это работает
 
-### Context Synchronization
+### Синхронизация контекста
 
-The voice assistant automatically receives updates when:
+Голосовой ассистент автоматически получает обновления, когда:
 
-- You focus on a session (full history is loaded)
-- The agent sends messages or uses tools
-- Permission requests arrive
-- Tasks complete
+- вы фокусируетесь на сессии (загружается полная история);
+- агент отправляет сообщения или использует инструменты;
+- приходят запросы разрешений;
+- задачи завершаются.
 
-You don't need to ask for status updates - the assistant proactively summarizes relevant changes.
+Вам не нужно просить обновить статус — ассистент проактивно резюмирует значимые изменения.
 
-### Tools
+### Инструменты
 
-The voice assistant has two tools to interact with your coding agent, on every backend:
+У голосового ассистента два инструмента для взаимодействия с вашим агентом кодинга, на любом бэкенде:
 
-1. **messageCodingAgent** - Forwards your requests to the active agent
-2. **processPermissionRequest** - Handles permission approvals and denials
+1. **messageCodingAgent** — пересылает ваши запросы активному агенту
+2. **processPermissionRequest** — обрабатывает одобрение и отклонение разрешений
 
-### Architecture
+### Архитектура
 
-ElevenLabs sessions stream audio over WebRTC directly to ElevenLabs; the hub only mints short-lived conversation tokens:
-
-```
-Browser → WebRTC → ElevenLabs ConvAI → Voice Assistant → HAPI Hub → Coding Agent
-```
-
-Gemini Live and Qwen Realtime sessions connect over WebSocket to a hub-side proxy, which injects the API key and session configuration server-side:
+Сессии ElevenLabs передают аудио по WebRTC напрямую в ElevenLabs; хаб только выпускает короткоживущие токены диалога:
 
 ```
-Browser → WebSocket → HAPI Hub proxy → Gemini Live / Qwen Realtime → Coding Agent
+Браузер → WebRTC → ElevenLabs ConvAI → Голосовой ассистент → HAPI Hub → Агент кодинга
 ```
 
-The voice connection uses WebRTC (ElevenLabs) or WebSocket (Gemini Live, Qwen Realtime) for low-latency audio streaming. The HAPI hub provides tokens and proxies and handles authentication; provider API keys never reach the browser.
+Сессии Gemini Live и Qwen Realtime подключаются по WebSocket к прокси на стороне хаба, который подставляет API-ключ и конфигурацию сессии на сервере:
 
-## Tips
+```
+Браузер → WebSocket → прокси HAPI Hub → Gemini Live / Qwen Realtime → Агент кодинга
+```
 
-- **Be specific** - Clear, complete requests get better results
-- **Wait for completion** - The assistant stays silent while the agent works, then summarizes results
-- **Use natural language** - No special command syntax needed
-- **Keep sessions focused** - One active session at a time for clearest context
+Голосовое соединение использует WebRTC (ElevenLabs) или WebSocket (Gemini Live, Qwen Realtime) для потоковой передачи аудио с низкой задержкой. HAPI hub выдаёт токены, проксирует и обрабатывает аутентификацию; API-ключи провайдеров никогда не попадают в браузер.
 
-## Troubleshooting
+## Советы
 
-### "ElevenLabs API key not configured"
+- **Будьте конкретны** — ясные, полные запросы дают лучшие результаты
+- **Ждите завершения** — ассистент молчит, пока агент работает, затем резюмирует результаты
+- **Используйте естественный язык** — специальный синтаксис команд не нужен
+- **Держите сессии сфокусированными** — одна активная сессия за раз для наиболее ясного контекста
 
-Set `ELEVENLABS_API_KEY` in your environment and restart the hub.
+## Решение проблем
 
-### "Gemini API key not configured"
+### «ElevenLabs API key not configured»
 
-Set `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) in your environment and restart the hub.
+Задайте `ELEVENLABS_API_KEY` в окружении и перезапустите хаб.
 
-### "DashScope API key not configured"
+### «Gemini API key not configured»
 
-Set `DASHSCOPE_API_KEY` (or `QWEN_API_KEY`) in your environment and restart the hub.
+Задайте `GEMINI_API_KEY` (или `GOOGLE_API_KEY`) в окружении и перезапустите хаб.
 
-### "Microphone permission denied"
+### «DashScope API key not configured»
 
-- Check browser permissions for microphone access
-- Ensure no other app is using the microphone
-- Try refreshing the page
+Задайте `DASHSCOPE_API_KEY` (или `QWEN_API_KEY`) в окружении и перезапустите хаб.
 
-### Microphone permission fails on Xiaomi/MIUI devices
+### «Microphone permission denied»
 
-If voice cannot start on a Xiaomi/MIUI device, or the browser cannot request microphone permission, check the "Display over other apps" permission for Xiaomi Wallet and similar apps. Floating windows, payment or wallet overlays, chat bubbles, screen recorders, translation tools, eye-comfort tools, and game assistants may interfere with the browser's microphone permission prompt. Disable active overlays, reopen HAPI, and grant microphone access again.
+- Проверьте разрешения браузера на доступ к микрофону
+- Убедитесь, что микрофон не использует другое приложение
+- Попробуйте обновить страницу
 
-### Voice not responding
+### Разрешение микрофона не работает на Xiaomi/MIUI
 
-- Verify the session is connected (green dot in status bar)
-- Check that the voice status pill shows "Connecting..." or the active state
-- Ensure you have a stable internet connection
+Если голос не запускается на устройстве Xiaomi/MIUI или браузер не может запросить разрешение микрофона, проверьте разрешение «Отображение поверх других приложений» для Xiaomi Wallet и похожих приложений. Плавающие окна, оверлеи платёжных/кошельковых приложений, пузыри чатов, записи экрана, инструменты перевода, инструменты защиты глаз и игровые ассистенты могут мешать запросу разрешения микрофона в браузере. Отключите активные оверлеи, снова откройте HAPI и выдайте доступ к микрофону заново.
 
-### "Failed to create ElevenLabs agent automatically"
+### Голос не отвечает
 
-- Verify your API key is valid
-- Check your ElevenLabs account has available quota
-- Try setting a custom `ELEVENLABS_AGENT_ID`
+- Проверьте, что сессия подключена (зелёная точка в строке статуса)
+- Проверьте, что «таблетка» голоса показывает «Connecting...» или активное состояние
+- Убедитесь в стабильном интернет-соединении
 
-### Poor audio quality
+### «Failed to create ElevenLabs agent automatically»
 
-- Use a headset to avoid echo
-- Reduce background noise
-- Check your internet connection stability
+- Проверьте, что ваш API-ключ действителен
+- Проверьте доступную квоту в аккаунте ElevenLabs
+- Попробуйте задать свой `ELEVENLABS_AGENT_ID`
+
+### Плохое качество звука
+
+- Используйте гарнитуру, чтобы избежать эха
+- Уменьшите фоновый шум
+- Проверьте стабильность интернет-соединения

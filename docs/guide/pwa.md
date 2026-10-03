@@ -1,237 +1,237 @@
 # Progressive Web App (PWA)
 
-HAPI's web interface is a fully-featured PWA that can be installed on your phone for a native app-like experience.
+Веб-интерфейс HAPI — это полнофункциональная PWA, которую можно установить на телефон и получить опыт, близкий к нативному приложению.
 
-This page covers browser installation. For the SwiftUI/UIKit and Kotlin
-Compose clients, see [Native apps (iOS / Android)](./native-apps.md).
+Эта страница описывает установку в браузере. О клиентах SwiftUI/UIKit и Kotlin
+Compose см. [Нативные приложения (iOS / Android)](./native-apps.md).
 
-## What is PWA?
+## Что такое PWA?
 
-A Progressive Web App (PWA) is a web application that can be installed on your device and works like a native app:
+Progressive Web App (PWA) — это веб-приложение, которое можно установить на устройство и которое работает как нативное:
 
-- **Home screen icon** - Launch HAPI like any other app
-- **Full screen mode** - No browser chrome, immersive experience
-- **Offline support** - Basic functionality works without internet
-- **Auto-updates** - Always get the latest version
+- **Иконка на главном экране** — запускайте HAPI как любое другое приложение
+- **Полноэкранный режим** — без браузерной обвязки, погружающий опыт
+- **Офлайн-поддержка** — базовые функции работают без интернета
+- **Автообновление** — всегда последняя версия
 
-## Installing HAPI PWA
+## Установка HAPI PWA
 
 ### Android (Chrome/Edge)
 
-1. Open HAPI in Chrome or Edge browser
-2. Look for the **"Install HAPI"** banner at the bottom
-3. Tap **"Install"**
-4. HAPI appears on your home screen
+1. Откройте HAPI в Chrome или Edge
+2. Найдите баннер **«Install HAPI»** внизу
+3. Нажмите **«Install»**
+4. HAPI появится на главном экране
 
 ::: tip
-If you don't see the install banner, tap the three-dot menu and select **"Add to Home screen"** or **"Install app"**.
+Если баннер установки не появляется, нажмите меню с тремя точками и выберите **«Add to Home screen»** или **«Install app»**.
 :::
 
 ### iOS (Safari)
 
-1. Open HAPI in Safari browser
-2. Tap the **Share** button (square with arrow)
-3. Scroll down and tap **"Add to Home Screen"**
-4. Tap **"Add"** in the top right corner
+1. Откройте HAPI в Safari
+2. Нажмите кнопку **Поделиться** (квадрат со стрелкой)
+3. Прокрутите вниз и нажмите **«Add to Home Screen»**
+4. Нажмите **«Add»** в правом верхнем углу
 
 ::: warning
-iOS requires Safari for PWA installation. Chrome/Firefox on iOS don't support the "Add to Home Screen" feature.
+Для установки PWA на iOS требуется Safari. Chrome/Firefox на iOS не поддерживают функцию «Add to Home Screen».
 :::
 
-### Desktop (Chrome/Edge)
+### Рабочий стол (Chrome/Edge)
 
-1. Open HAPI in your browser
-2. Click the install icon in the address bar (⊕)
-3. Or use the menu: **"Install HAPI..."**
-4. HAPI opens as a standalone window
+1. Откройте HAPI в браузере
+2. Нажмите значок установки в адресной строке (⊕)
+3. Или используйте меню: **«Install HAPI...»**
+4. HAPI откроется как отдельное окно
 
-## PWA Features
+## Возможности PWA
 
-### Offline Mode
+### Офлайн-режим
 
-When offline, HAPI can:
+В офлайне HAPI может:
 
-- Display cached session lists
-- Show previously loaded messages
+- показывать кэшированные списки сессий;
+- показывать ранее загруженные сообщения.
 
-HAPI does not queue actions taken while offline — an offline banner appears at the top when you lose connection, and live features resume once you're back online.
+HAPI не ставит в очередь действия, выполненные офлайн — при потере соединения сверху появляется офлайн-баннер, а живые функции возобновляются после возвращения в сеть.
 
-### Auto-Update
+### Автообновление
 
-HAPI checks for updates in the background and lets you choose when to reload:
+HAPI проверяет обновления в фоне и даёт вам выбрать, когда перезагрузиться:
 
-- Updates are checked hourly and when you return to the tab
-- When a new version is available, a persistent in-app banner appears at the top
-- Tap **Reload** when you're ready to apply the update — the banner stays until you do
-- Expand **"Why can't I dismiss this?"** on the banner for the rationale
+- обновления проверяются каждый час и при возврате на вкладку;
+- когда доступна новая версия, сверху появляется постоянный баннер в приложении;
+- нажмите **Reload**, когда будете готовы применить обновление — баннер остаётся, пока вы это не сделаете;
+- разверните **«Why can't I dismiss this?»** на баннере для объяснения.
 
-HAPI uses a user-controlled reload instead of forcing an automatic refresh, so you choose when to reload. The banner cannot be dismissed without upgrading, so you won't forget you're on an old build.
+HAPI использует перезагрузку под контролем пользователя вместо принудительного автоматического обновления, поэтому вы сами выбираете, когда перезагрузиться. Баннер нельзя закрыть без обновления, так что вы не забудете, что работаете на старой сборке.
 
 ### Share Target (Android)
 
-On Android, HAPI appears in the system share sheet. When you share content to HAPI:
+На Android HAPI появляется в системном меню «Поделиться». Когда вы делитесь контентом с HAPI:
 
-1. Chrome sends a `POST /share` multipart form (title, text, URL, and files) to the app
-2. The service worker intercepts the request and stores the payload in IndexedDB
-3. The app is then redirected (303) to the share picker, which reads the stored content
+1. Chrome отправляет приложению multipart-форму `POST /share` (заголовок, текст, URL и файлы)
+2. Service worker перехватывает запрос и сохраняет данные в IndexedDB
+3. Затем приложение перенаправляется (303) в выбор сессии, который читает сохранённый контент
 
-This lets you share images, PDFs, text, and other files directly into a session from any app.
+Это позволяет делиться изображениями, PDF, текстом и другими файлами прямо в сессию из любого приложения.
 
-### Native / deep-link ingest
+### Нативный / deep-link приём
 
-Companions that cannot use Web Share Target (for example a native app on a headset share sheet) can open the same picker with a fragment deep link:
+Компаньоны, которые не могут использовать Web Share Target (например, нативное приложение в меню «Поделиться» на гарнитуре), могут открыть тот же выбор сессии по fragment-ссылке:
 
 ```
 {hapiOrigin}/share#url=…&text=…&title=…
 ```
 
-- Fragment params: `url`, `text`, `title` (all optional; omit empty). Optional companion file hand-off: `fileUrl`, `fileName`, `fileType` — the page fetches `fileUrl` (CORS) into the same IndexedDB `files[]` as Web Share Target (capped at the same 50 MiB upload limit). The fragment is **not** sent on the HTTP request, so shared content does not appear in hub access logs.
-- When any are present and query `id` is absent, the web app synthesizes the same IndexedDB transfer used by the POST path, scrubs the fragment, then continues with the session picker / create-new flow (`?id=`).
-- When query `id` is present (Web Share Target redirect), that path wins; fragment content is ignored for ingest.
-- Deep links cannot embed binaries in the fragment; a companion may hand off one file with `fileUrl`. Use Web Share Target POST for direct or multi-file payloads.
+- Параметры фрагмента: `url`, `text`, `title` (все опциональны; пустые опускайте). Опциональная передача файла компаньоном: `fileUrl`, `fileName`, `fileType` — страница загружает `fileUrl` (CORS) в тот же `files[]` в IndexedDB, что и Web Share Target (с тем же лимитом загрузки 50 МиБ). Фрагмент **не** отправляется в HTTP-запросе, поэтому общий контент не появляется в логах доступа хаба.
+- Когда присутствуют какие-либо из них и отсутствует query-параметр `id`, веб-приложение синтезирует тот же перенос через IndexedDB, что используется в POST-пути, очищает фрагмент, затем продолжает поток выбора сессии / создания новой (`?id=`).
+- Когда query-параметр `id` присутствует (редирект Web Share Target), побеждает этот путь; содержимое фрагмента для приёма игнорируется.
+- Deep-ссылки не могут встраивать бинарники во фрагмент; компаньон может передать один файл через `fileUrl`. Для прямых или многофайловых данных используйте POST Web Share Target.
 
-See [Web Share Target](https://developer.chrome.com/docs/capabilities/web-apis/web-share-target) for the POST vs GET distinction.
+О различии POST и GET см. [Web Share Target](https://developer.chrome.com/docs/capabilities/web-apis/web-share-target).
 
-## Caching Strategy
+## Стратегия кэширования
 
-HAPI uses intelligent caching:
+HAPI использует умное кэширование:
 
-| Content | Strategy | Duration |
+| Контент | Стратегия | Длительность |
 |---------|----------|----------|
-| App shell | Cache first | Until update |
-| Sessions API | Network first | 5 minutes |
-| Machines API | Network first | 10 minutes |
-| Session detail API | Network first | 5 minutes |
-| CDN (cdn.socket.io) | Cache first | 30 days |
-| CDN (telegram.org) | Cache first | 7 days |
-| Static assets | Cache first | Forever |
+| Оболочка приложения | Cache first | До обновления |
+| API сессий | Network first | 5 минут |
+| API машин | Network first | 10 минут |
+| API деталей сессии | Network first | 5 минут |
+| CDN (cdn.socket.io) | Cache first | 30 дней |
+| CDN (telegram.org) | Cache first | 7 дней |
+| Статические ресурсы | Cache first | Навсегда |
 
-## Notifications
+## Уведомления
 
-HAPI supports push notifications to alert you when agents need attention.
+HAPI поддерживает push-уведомления, чтобы предупреждать вас, когда агентам нужно внимание.
 
-### Enable Notifications
+### Включение уведомлений
 
-1. Open HAPI - a permission popup appears automatically
-2. Tap **Allow** to enable notifications
-3. If you missed the popup, go to system settings to grant permission
+1. Откройте HAPI — всплывающее окно разрешения появляется автоматически
+2. Нажмите **Allow**, чтобы включить уведомления
+3. Если вы пропустили окно, выдайте разрешение в системных настройках
 
-### Notification Types
+### Типы уведомлений
 
-| Type | When Sent |
+| Тип | Когда отправляется |
 |------|-----------|
-| Permission Request | Agent needs your approval |
-| Ready | Agent finished and awaits input |
-| Task completed / Task failed | A background task finishes (success or failure) |
+| Запрос разрешения | Агенту нужно ваше одобрение |
+| Готово | Агент завершил и ожидает ввод |
+| Задача завершена / не удалась | Фоновая задача завершается (успех или ошибка) |
 
-### Native app notifications
+### Уведомления нативных приложений
 
-The [native Android and iOS apps](./native-apps.md#notifications) use FCM and
-APNs. Official builds use encrypted push relay delivery by default; private
-builds need matching provider configuration. If a native provider accepts a
-notification for any device in your namespace, the hub skips the Web Push
-duplicate for that dispatch. Missing registrations or failed sends retain the
-Web Push fallback. Provider acceptance is not a handset receipt. See
-[Native app notifications](./notifications.md#native-app-notifications).
+[Нативные приложения Android и iOS](./native-apps.md) используют FCM и
+APNs. Официальные сборки по умолчанию используют зашифрованную доставку через push-реле; приватные
+сборки требуют соответствующую конфигурацию провайдера. Если нативный провайдер принимает
+уведомление для любого устройства в вашем пространстве имён, хаб пропускает дублирующий Web Push
+для этой отправки. Отсутствующие регистрации или неудачные отправки сохраняют
+запасной Web Push. Принятие провайдером не является подтверждением доставки на устройство. См.
+[Уведомления нативных приложений](./notifications.md).
 
 ::: tip
-If push notifications don't work in your region (e.g., FCM unavailable), use [Telegram integration](./notifications.md#telegram-setup) instead.
+Если push-уведомления не работают в вашем регионе (например, FCM недоступен), используйте [интеграцию с Telegram](./notifications.md).
 :::
 
-### Windows taskbar badge
+### Бейдж на панели задач Windows
 
-When HAPI is installed as a PWA from Microsoft Edge or Chrome on Windows, users can show the number of sessions with activity newer than the local last-seen watermark on its taskbar icon. The setting is disabled by default because some Edge/Windows configurations render the same host badge as overlapping layers, with one layer offset and clipped by the taskbar. Use Settings > Display > Session list > Taskbar unread badge to opt in or out for this PWA. The badge is updated while the PWA has a current session snapshot; it is not shown for a normal browser tab, and the read state remains local to that browser/PWA profile.
+Когда HAPI установлен как PWA из Microsoft Edge или Chrome в Windows, пользователи могут показывать на иконке панели задач количество сессий с активностью новее локальной отметки последнего просмотра. Настройка по умолчанию выключена, потому что некоторые конфигурации Edge/Windows отображают тот же бейдж хоста как перекрывающиеся слои, причём один слой смещён и обрезается панелью задач. Используйте Settings > Display > Session list > Taskbar unread badge, чтобы включить или выключить это для данной PWA. Бейдж обновляется, пока у PWA есть актуальный снимок сессий; он не показывается для обычной вкладки браузера, а состояние прочитанности остаётся локальным для этого профиля браузера/PWA.
 
-## Managing Your PWA
+## Управление вашей PWA
 
-### Check Install Status
+### Проверка статуса установки
 
-HAPI shows different UI based on install status:
+HAPI показывает разный UI в зависимости от статуса установки:
 
-- **Not installed** - Shows install prompt
-- **Installing** - Shows progress indicator
-- **Installed** - No prompt shown
+- **Не установлено** — показывает приглашение к установке
+- **Устанавливается** — показывает индикатор прогресса
+- **Установлено** — приглашение не показывается
 
-### Uninstalling
+### Удаление
 
 **Android:**
-1. Long-press the HAPI icon
-2. Drag to "Uninstall" or tap the X
+1. Зажмите иконку HAPI
+2. Перетащите на «Удалить» или нажмите X
 
 **iOS:**
-1. Long-press the HAPI icon
-2. Tap "Remove App" → "Delete App"
+1. Зажмите иконку HAPI
+2. Нажмите «Remove App» → «Delete App»
 
-**Desktop:**
-1. Open HAPI
-2. Click the three-dot menu
-3. Select "Uninstall HAPI"
+**Рабочий стол:**
+1. Откройте HAPI
+2. Нажмите меню с тремя точками
+3. Выберите «Uninstall HAPI»
 
-### Clearing Cache
+### Очистка кэша
 
-If you experience issues:
+Если возникают проблемы:
 
-1. Open HAPI in browser (not installed version)
-2. Open Developer Tools (F12)
-3. Go to Application → Storage
-4. Click "Clear site data"
+1. Откройте HAPI в браузере (не установленную версию)
+2. Откройте Developer Tools (F12)
+3. Перейдите в Application → Storage
+4. Нажмите «Clear site data»
 
-## Best Practices
+## Лучшие практики
 
-### Battery Optimization
+### Оптимизация батареи
 
-On Android, disable battery optimization for HAPI to ensure notifications arrive promptly.
+На Android отключите оптимизацию батареи для HAPI, чтобы уведомления приходили своевременно.
 
 Settings → Apps → HAPI → Battery → Unrestricted
 
-### Data Usage
+### Использование данных
 
-HAPI uses minimal data:
+HAPI использует минимум данных:
 
-- Initial load: ~500KB
-- Cached after first load
-- Only syncs changed data
+- Первоначальная загрузка: ~500 КБ
+- Кэшируется после первой загрузки
+- Синхронизируются только изменённые данные
 
-### Multiple Devices
+### Несколько устройств
 
-You can install HAPI on multiple devices:
+Вы можете установить HAPI на несколько устройств:
 
-- All devices use the same server
-- Sessions sync across devices
-- Same access token works everywhere
+- Все устройства используют один сервер
+- Сессии синхронизируются между устройствами
+- Один токен доступа работает везде
 
-## Troubleshooting
+## Решение проблем
 
-### Install Button Not Showing
+### Кнопка установки не появляется
 
-- Ensure you're using HTTPS (required for PWA)
-- Try refreshing the page
-- Check if already installed
+- Убедитесь, что используете HTTPS (требуется для PWA)
+- Попробуйте обновить страницу
+- Проверьте, не установлено ли уже
 
-### App Not Updating
+### Приложение не обновляется
 
-1. Close the app completely
-2. Reopen and wait for update prompt
-3. If stuck, clear cache and reinstall
+1. Полностью закройте приложение
+2. Откройте заново и дождитесь запроса обновления
+3. Если застряло — очистите кэш и переустановите
 
-### Offline Mode Not Working
+### Офлайн-режим не работает
 
-- Ensure you've loaded the app at least once online
-- Check if ServiceWorker is registered (DevTools → Application)
-- Clear cache and reload
+- Убедитесь, что вы загружали приложение хотя бы раз онлайн
+- Проверьте, зарегистрирован ли ServiceWorker (DevTools → Application)
+- Очистите кэш и перезагрузите
 
-### iOS-Specific Issues
+### Проблемы, специфичные для iOS
 
-- Must use Safari for installation
-- Limited offline capabilities
+- Для установки нужно использовать Safari
+- Ограниченные офлайн-возможности
 
-## Telegram Mini App Alternative
+## Альтернатива — Telegram Mini App
 
-If PWA doesn't suit your needs, consider the Telegram Mini App:
+Если PWA вам не подходит, рассмотрите Telegram Mini App:
 
-- Works inside Telegram
-- No separate installation
-- Same features as PWA
-- Integrated notifications
+- работает внутри Telegram;
+- без отдельной установки;
+- те же функции, что у PWA;
+- встроенные уведомления.
 
-See [Notifications](./notifications.md#telegram-setup) for Telegram setup.
+О настройке Telegram см. [Уведомления](./notifications.md).

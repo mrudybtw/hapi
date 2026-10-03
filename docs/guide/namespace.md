@@ -1,34 +1,34 @@
-# Namespace (Advanced)
+# Пространства имён (Namespace, продвинуто)
 
-Namespaces are intended for small teams sharing a single public HAPI hub. Each team member uses a different namespace to isolate their sessions and machines without running separate hubs.
+Пространства имён предназначены для небольших команд, использующих один общий публичный хаб HAPI. Каждый участник команды использует своё пространство имён, чтобы изолировать свои сессии и машины без запуска отдельных хабов.
 
-This is not a default setup path for most users.
+Для большинства пользователей это не стандартный путь настройки.
 
-## How it works
+## Как это работает
 
-- The hub uses a single base `CLI_API_TOKEN`.
-- Clients append `:<namespace>` to the token for isolation.
+- Хаб использует один базовый `CLI_API_TOKEN`.
+- Клиенты добавляют `:<namespace>` к токену для изоляции.
 
-## Setup
+## Настройка
 
-1. On the hub, configure only the base token:
+1. На хабе задайте только базовый токен:
 
 ```
 CLI_API_TOKEN="your-base-token"
 ```
 
-2. For each user, append a namespace in the client token:
+2. Для каждого пользователя добавьте пространство имён в токен клиента:
 
 ```
 CLI_API_TOKEN="your-base-token:alice"
 ```
 
-3. Web login and Telegram binding should use the same `base:namespace` token.
+3. Веб-вход и привязка Telegram должны использовать тот же токен `base:namespace`.
 
-## Limitations and gotchas
+## Ограничения и подводные камни
 
-- Hub-side `CLI_API_TOKEN` must not include `:<namespace>`. The hub validates the token from both the environment variable and `settings.json`, and refuses to start with an error if a suffix is present.
-- Namespaces are isolated: sessions, machines, and users are not visible across namespaces.
-- One machine ID cannot be reused across namespaces.
-  - To run multiple namespaces on one machine, use a separate `HAPI_HOME` per namespace, or clear the machine ID with `hapi auth logout` before switching.
-- Remote spawn is namespace-scoped. If you need remote spawning for multiple namespaces on the same machine, run a separate runner per namespace (use separate `HAPI_HOME`).
+- `CLI_API_TOKEN` на стороне хаба не должен содержать `:<namespace>`. Хаб проверяет токен и из переменной окружения, и из `settings.json`, и отказывается запускаться с ошибкой, если суффикс присутствует.
+- Пространства имён изолированы: сессии, машины и пользователи не видны между пространствами.
+- Один идентификатор машины нельзя переиспользовать в разных пространствах имён.
+  - Чтобы запустить несколько пространств имён на одной машине, используйте отдельный `HAPI_HOME` на каждое пространство, или очистите идентификатор машины командой `hapi auth logout` перед переключением.
+- Удалённый запуск ограничен пространством имён. Если нужен удалённый запуск для нескольких пространств на одной машине, запускайте отдельный раннер на каждое пространство (с отдельным `HAPI_HOME`).
