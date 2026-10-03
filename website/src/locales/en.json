@@ -123,6 +123,11 @@
     "subtitle": "Join the revolution. Stop watching progress bars and start enjoying your life.",
     "btn": "Get Started Now"
   },
+  "notFound": {
+    "title": "Page Not Found",
+    "desc": "Sorry, the page you are looking for doesn't exist. It may have been moved or deleted.",
+    "home": "Go Home"
+  },
   "footer": {
     "desc": "Vibe Coding Anytime, Anywhere. <br/> The local-first AI agent platform for developers who love freedom.",
     "product": "Product",

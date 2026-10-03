@@ -49,6 +49,7 @@ export function SEO({ title, description, image, url }: SEOProps) {
       {/* Hreflang Tags for SEO */}
       <link rel="alternate" hrefLang="en" href={`${siteUrl}?lng=en`} />
       <link rel="alternate" hrefLang="zh" href={`${siteUrl}?lng=zh`} />
+      <link rel="alternate" hrefLang="ru" href={`${siteUrl}?lng=ru`} />
       <link rel="alternate" hrefLang="x-default" href={siteUrl} />
 
       {/* Open Graph / Facebook */}
@@ -57,7 +58,7 @@ export function SEO({ title, description, image, url }: SEOProps) {
       <meta property="og:title" content={metaTitle} />
       <meta property="og:description" content={metaDescription} />
       <meta property="og:image" content={metaImage} />
-      <meta property="og:locale" content={currentLang === 'zh' ? 'zh_CN' : 'en_US'} />
+      <meta property="og:locale" content={currentLang === 'zh' ? 'zh_CN' : currentLang === 'ru' ? 'ru_RU' : 'en_US'} />
       <meta property="og:site_name" content="HAPI" />
 
       {/* Twitter */}
