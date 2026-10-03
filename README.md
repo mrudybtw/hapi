@@ -1,66 +1,77 @@
 # HAPI
 
-Run official Claude Code / Codex / Cursor Agent / Grok Build / OpenCode / Kimi / Copilot / Antigravity / Pi / DeepSeek Harness sessions and control them remotely through native iOS / Android apps, Web / PWA, or Telegram Mini App.
+> 🇬🇧 [English version](README.en.md)
 
-> **Why HAPI?** HAPI is a local-first alternative to Happy. See [Why Not Happy?](docs/guide/why-hapi.md) for the key differences.
+Запускайте официальные сессии Claude Code / Codex / Cursor Agent / Grok Build / OpenCode / Kimi / Copilot / Antigravity / Pi / DeepSeek Harness и управляйте ими удалённо через нативные приложения iOS/Android, Web/PWA или Telegram Mini App.
 
-## Features
+> **Почему HAPI?** HAPI — это локально-ориентированная (local-first) альтернатива Happy. Ключевые отличия: [Why Not Happy?](docs/guide/why-hapi.md) (англ.).
 
-- **Seamless Handoff** - Work locally, switch to remote when needed, switch back anytime. No context loss, no session restart.
-- **Shared Codex Sessions** - Use Codex from your terminal and phone at the same time. Requires Codex 0.154.0+. [Usage and limits](docs/guide/codex-shared-sessions.md).
-- **Native First** - HAPI wraps your AI agent instead of replacing it. Same terminal, same experience, same muscle memory.
-- **AFK Without Stopping** - Step away from your desk? Approve AI requests from your phone with one tap.
-- **Your AI, Your Choice** - Claude Code, Codex, Cursor Agent, Grok Build, OpenCode, Kimi, Copilot, Antigravity, Pi, DeepSeek Harness—different agents, one unified workflow.
-- **Terminal Anywhere** - Run commands from your phone's browser or desktop web app, directly connected to the working machine.
-- **Voice Control** - Use dictation in native apps, or talk to your AI agent hands-free with the web voice assistant.
-- **Workspace Browser** - Opt-in via one or more `hapi runner start --workspace-root <path>` flags: browse scoped file trees from the web and start sessions in allowed subdirectories.
+## Возможности
 
-## Demo
+- **Бесшовная передача** — работайте локально, при необходимости переключайтесь на удалённое управление и обратно в любой момент. Без потери контекста и без перезапуска сессии.
+- **Общие сессии Codex** — используйте Codex из терминала и с телефона одновременно. Требуется Codex 0.154.0+. [Использование и ограничения](docs/guide/codex-shared-sessions.md) (англ.).
+- **Нативно прежде всего** — HAPI оборачивает ваш ИИ-агент, а не заменяет его. Тот же терминал, тот же опыт, та же мышечная память.
+- **AFK без остановки** — отошли от рабочего места? Подтверждайте запросы ИИ с телефона одним касанием.
+- **Ваш ИИ — ваш выбор** — Claude Code, Codex, Cursor Agent, Grok Build, OpenCode, Kimi, Copilot, Antigravity, Pi, DeepSeek Harness — разные агенты, единый рабочий процесс.
+- **Терминал отовсюду** — выполняйте команды из браузера телефона или веб-приложения, напрямую подключённого к рабочей машине.
+- **Голосовое управление** — диктовка в нативных приложениях или разговор с ИИ-агентом без рук через веб-голосового ассистента.
+- **Обзор рабочего пространства** — включается флагом `hapi runner start --workspace-root <путь>`: просматривайте ограниченное дерево файлов из веба и запускайте сессии в разрешённых подкаталогах.
 
-https://github.com/user-attachments/assets/38230353-94c6-4dbe-9c29-b2a2cc457546
-
-## Getting Started
+## Быстрый старт
 
 ```bash
-npx @twsxtd/hapi hub --relay     # start hub with E2E encrypted relay
-npx @twsxtd/hapi                 # choose an agent and start a session
+npx @twsxtd/hapi hub --relay     # запустить хаб с E2E-шифрованным релеем
+npx @twsxtd/hapi                 # выбрать агента и начать сессию
 ```
 
-`hapi server` remains supported as an alias.
+`hapi server` — это псевдоним `hapi hub`.
 
-Use `hapi <agent> [options]` to start an agent directly, for example `hapi claude`
-or `hapi codex`. Scripts must specify the agent explicitly. `hapi --help` shows
-HAPI's commands and supported agents.
+Используйте `hapi <агент> [опции]` для прямого запуска, например `hapi claude` или `hapi codex`. В скриптах агента нужно указывать явно. `hapi --help` покажет команды и поддерживаемых агентов.
 
-The hub displays a URL and two QR codes. Open the web URL in a browser, or pair a native app using the companion QR. See [Native apps](docs/guide/native-apps.md) for build and pairing instructions.
+Хаб выводит URL и два QR-кода. Откройте веб-URL в браузере или свяжите нативное приложение через QR компаньона. См. [Нативные приложения](docs/guide/native-apps.md) (англ.).
 
-> The relay uses WireGuard + TLS for end-to-end encryption. Your data is encrypted from your device to your machine.
+> Реле использует WireGuard + TLS для сквозного шифрования. Ваши данные шифруются от устройства до вашей машины.
 
-For self-hosted options (Cloudflare Tunnel, Tailscale), see [Installation](docs/guide/installation.md)
+Варианты самостоятельного развёртывания (Cloudflare Tunnel, Tailscale, фоновые службы и т.д.) — в [руководстве по развёртыванию](docs/guide/deployment.ru.md).
 
-## Docs
+## Русская локаль
 
-- [Native apps (iOS / Android)](docs/guide/native-apps.md)
-- [Web / PWA](docs/guide/pwa.md)
-- [How it Works](docs/guide/how-it-works.md)
-- [Supported Agents](docs/guide/agents.md)
-- [Voice Assistant](docs/guide/voice-assistant.md)
-- [Why HAPI](docs/guide/why-hapi.md)
-- [FAQ](docs/guide/faq.md)
+В этот форк добавлен полный перевод интерфейса веб-приложения на русский язык (1141 строка). Переключить язык можно через переключатель в шапке или в **Настройки → Язык**.
 
-## Native apps (iOS / Android)
+Локали лежат в `web/src/lib/locales/`:
 
-The repository includes SwiftUI/UIKit and Kotlin Compose clients with chat, approvals, session creation, files, dictation, and push notifications. See the [native app guide](docs/guide/native-apps.md) for capabilities, platform differences and pairing. Build instructions: [iOS](ios/README.md) and [Android](android/README.md). Developer protocol: [client contract](docs/api/client-contract/index.md).
+- `en.ts` — английский,
+- `zh-CN.ts` — китайский (упрощённый),
+- `ru.ts` — русский (добавлен в этом форке).
 
-## Build from source
+Как собрать бинарь с русской локалью — см. [развёртывание](docs/guide/deployment.ru.md#сборка-из-исходников-с-русской-локалью).
 
-Requires Bun 1.4.0.
+## Сборка из исходников
+
+Требуется Bun 1.4.0.
 
 ```bash
 bun install
 bun run build:single-exe
 ```
 
-## Credits
+Готовый бинарь появится в `cli/dist-exe/<платформа>/hapi`.
 
-HAPI means "哈皮" a Chinese transliteration of [Happy](https://github.com/slopus/happy). Great credit to the original project.
+## Документация
+
+- [Развёртывание (рус.)](docs/guide/deployment.ru.md)
+- [Нативные приложения (iOS / Android)](docs/guide/native-apps.md) (англ.)
+- [Web / PWA](docs/guide/pwa.md) (англ.)
+- [Как это работает](docs/guide/how-it-works.md) (англ.)
+- [Поддерживаемые агенты](docs/guide/agents.md) (англ.)
+- [Голосовой ассистент](docs/guide/voice-assistant.md) (англ.)
+- [Почему HAPI](docs/guide/why-hapi.md) (англ.)
+- [FAQ](docs/guide/faq.md) (англ.)
+
+## Нативные приложения (iOS / Android)
+
+Репозиторий включает клиенты на SwiftUI/UIKit и Kotlin Compose: чат, подтверждения, создание сессий, файлы, диктовка и push-уведомления. Возможности, отличия платформ и сопряжение — в [гайде по нативным приложениям](docs/guide/native-apps.md). Инструкции по сборке: [iOS](ios/README.md) и [Android](android/README.md). Протокол разработчика: [client contract](docs/api/client-contract/index.md).
+
+## Благодарности
+
+HAPI — это «哈皮», китайская транслитерация [Happy](https://github.com/slopus/happy). Большая благодарность оригинальному проекту.
