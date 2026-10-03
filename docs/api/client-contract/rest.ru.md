@@ -254,7 +254,7 @@ Id изображения — неизменяемый отпечаток сод
 
 ### Устройства (push Android / iOS)
 
-Источник: `hub/src/web/routes/devices.ts`; полный контракт push в [`native-companion-contract.md`](../native-companion-contract.md) (англ.).
+Источник: `hub/src/web/routes/devices.ts`; полный контракт push в [`native-companion-contract.md`](../native-companion-contract.ru.md).
 
 | Метод и путь | Запрос | Ответ |
 |---|---|---|
