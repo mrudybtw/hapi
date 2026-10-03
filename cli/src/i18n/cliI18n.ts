@@ -227,7 +227,12 @@ const en = {
     'doctor.clean.killing': 'Killing runaway process PID {pid}: {command}',
     'doctor.clean.force': 'Process PID {pid} ignored termination request, using force kill',
     'doctor.clean.killed': 'Successfully killed runaway process PID {pid}',
-    'doctor.clean.failed': 'Failed to kill process PID {pid}: {error}'
+    'doctor.clean.failed': 'Failed to kill process PID {pid}: {error}',
+    'doctor.auth.source.environment': 'environment variable',
+    'doctor.auth.source.settingsFile': 'settings file',
+    'doctor.auth.source.none': 'none',
+    'doctor.clean.summary': 'Cleaned up {count} runaway processes',
+    'doctor.clean.errors': 'Errors:'
 
 }
 
@@ -383,7 +388,12 @@ const ru: Record<keyof typeof en, string> = {
     'doctor.clean.killing': 'Завершаем зависший процесс PID {pid}: {command}',
     'doctor.clean.force': 'Процесс PID {pid} проигнорировал запрос на завершение, применяем принудительное завершение',
     'doctor.clean.killed': 'Зависший процесс PID {pid} успешно завершён',
-    'doctor.clean.failed': 'Не удалось завершить процесс PID {pid}: {error}'
+    'doctor.clean.failed': 'Не удалось завершить процесс PID {pid}: {error}',
+    'doctor.auth.source.environment': 'переменная окружения',
+    'doctor.auth.source.settingsFile': 'файл настроек',
+    'doctor.auth.source.none': 'нет',
+    'doctor.clean.summary': 'Очищено зависших процессов: {count}',
+    'doctor.clean.errors': 'Ошибки:'
 
 }
 

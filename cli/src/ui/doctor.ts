@@ -148,7 +148,9 @@ export async function runDoctorCommand(filter?: 'all' | 'runner'): Promise<void>
         const envToken = process.env.CLI_API_TOKEN;
         const settingsToken = settings.cliApiToken;
         const hasToken = Boolean(envToken || settingsToken);
-        const tokenSource = envToken ? 'environment variable' : (settingsToken ? 'settings file' : 'none');
+        const tokenSource = envToken
+            ? cliT('doctor.auth.source.environment')
+            : (settingsToken ? cliT('doctor.auth.source.settingsFile') : cliT('doctor.auth.source.none'));
         if (hasToken) {
             console.log(chalk.green(cliT('doctor.auth.set', { source: tokenSource })));
         } else {
