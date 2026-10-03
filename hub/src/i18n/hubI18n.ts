@@ -55,7 +55,19 @@ const en = {
     'inputRequest.more.one': '+{count} more question',
     'inputRequest.more.few': '+{count} more questions',
     'inputRequest.more.many': '+{count} more questions',
-    'inputRequest.more.other': '+{count} more questions'
+    'inputRequest.more.other': '+{count} more questions',
+    'toolArgs.file': 'File: {value}',
+    'toolArgs.old': 'Old: "{value}"',
+    'toolArgs.new': 'New: "{value}"',
+    'toolArgs.command': 'Command: {value}',
+    'toolArgs.task': 'Task: {value}',
+    'toolArgs.pattern': 'Pattern: {value}',
+    'toolArgs.path': 'Path: {value}',
+    'toolArgs.url': 'URL: {value}',
+    'toolArgs.args': 'Args: {value}',
+    'toolArgs.chars': '{n} chars',
+    'toolArgs.updatingTodos': 'Updating {n} todo items',
+    'toolArgs.unknownFile': 'unknown'
 } as const
 
 export type HubMessageKey = keyof typeof en
@@ -96,7 +108,19 @@ const ru: Record<HubMessageKey, string> = {
     'inputRequest.more.one': '+ещё {count} вопрос',
     'inputRequest.more.few': '+ещё {count} вопроса',
     'inputRequest.more.many': '+ещё {count} вопросов',
-    'inputRequest.more.other': '+ещё {count} вопросов'
+    'inputRequest.more.other': '+ещё {count} вопросов',
+    'toolArgs.file': 'Файл: {value}',
+    'toolArgs.old': 'Было: "{value}"',
+    'toolArgs.new': 'Стало: "{value}"',
+    'toolArgs.command': 'Команда: {value}',
+    'toolArgs.task': 'Задача: {value}',
+    'toolArgs.pattern': 'Шаблон: {value}',
+    'toolArgs.path': 'Путь: {value}',
+    'toolArgs.url': 'URL: {value}',
+    'toolArgs.args': 'Аргументы: {value}',
+    'toolArgs.chars': '{n} символов',
+    'toolArgs.updatingTodos': 'Обновление элементов todo: {n}',
+    'toolArgs.unknownFile': 'неизвестно'
 }
 
 const catalogs: Record<HubLocale, Record<HubMessageKey, string>> = { en, ru }
