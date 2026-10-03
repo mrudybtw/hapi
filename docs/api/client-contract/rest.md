@@ -102,7 +102,7 @@ Source: `hub/src/web/routes/sessions.ts`; flavor gates in `shared/src/modes.ts` 
 | Method & path | Request | Applies to |
 |---|---|---|
 | `POST /api/sessions/:id/permission-mode` | `{mode: PermissionMode}` | All flavors except `pi` and `dsh` (per-flavor allowed sets in `modes.ts`) |
-| `POST /api/sessions/:id/model` | `{model: string \| {provider, modelId} \| null}` | Flavors with `supportsModelChange` (not `dsh`); remote-only for codex/cursor/grok |
+| `POST /api/sessions/:id/model` | `{model: string \| {provider, modelId} \| null}` | Flavors with `supportsModelChange`; remote-only for codex/cursor/grok. `dsh` applies the switch through the ACP `model` config option at the next turn boundary, so the server must advertise one |
 | `POST /api/sessions/:id/effort` | `{effort: string \| null}` | claude, grok, pi (`supportsEffort`) |
 | `POST /api/sessions/:id/model-reasoning-effort` | `{modelReasoningEffort: string \| null}` | codex, opencode (remote-only) |
 | `POST /api/sessions/:id/service-tier` | `{serviceTier: 'fast' \| 'standard'}` | codex (remote-only) |
@@ -138,7 +138,7 @@ The configuration routes in the table above respond `{ok: true}`; apply-failures
 
 | Method & path | Notes |
 |---|---|
-| `GET /api/sessions/:id/codex-models`, `/opencode-models`, `/cursor-models`, `/grok-models`, `/copilot-models`, `/kimi-models`, `/pi-models` | Active session of the matching flavor; 400 otherwise |
+| `GET /api/sessions/:id/codex-models`, `/opencode-models`, `/cursor-models`, `/grok-models`, `/copilot-models`, `/kimi-models`, `/pi-models`, `/dsh-models` | Active session of the matching flavor; 400 otherwise. `dsh-models` is empty unless the configured DSH ACP server advertises a `model` config option |
 | `GET /api/sessions/:id/opencode-reasoning-effort-options`, `/grok-reasoning-effort-options` | Same pattern |
 | `GET /api/machines/:id/agy-models`, `/pi-models`, `/codex-models`, `/cursor-models` | Machine-level (pre-spawn pickers). `agy-models` takes `?refresh=true` to skip the machine's cached catalog, and may answer `success: true` with an advisory `error` (see [Errors](./errors.md#rpc-wrapped-endpoints)) |
 | `GET /api/machines/:id/opencode-models?cwd=`, `/grok-models?cwd=`, `/copilot-models?cwd=`, `/kimi-models?cwd=` | `cwd` query required (400 without) |
