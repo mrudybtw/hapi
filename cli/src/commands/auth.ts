@@ -90,7 +90,19 @@ export async function handleAuthCommand(args: string[]): Promise<void> {
 }
 
 function showHelp(): void {
-    console.log(`\n${cliT('auth.help')}\n`)
+    console.log(`
+${chalk.bold('hapi auth')} - ${cliT('auth.help.tagline')}
+
+${chalk.bold(cliT('auth.help.usage'))}
+  hapi auth status            ${cliT('auth.help.status')}
+  hapi auth login             ${cliT('auth.help.login')}
+  hapi auth logout            ${cliT('auth.help.logout')}
+
+${chalk.bold(cliT('auth.help.priority'))}
+  ${cliT('auth.help.priority1')}
+  ${cliT('auth.help.priority2')}
+  ${cliT('auth.help.priority3')}
+`)
 }
 
 export const authCommand: CommandDefinition = {
