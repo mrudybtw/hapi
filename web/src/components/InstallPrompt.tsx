@@ -124,7 +124,7 @@ export function InstallPrompt() {
                             dismissInstall()
                         }}
                         className="shrink-0 p-2 text-[var(--app-hint)] active:opacity-60"
-                        aria-label="Dismiss"
+                        aria-label={t('button.dismiss')}
                     >
                         <CloseIcon className="w-4 h-4" />
                     </button>
@@ -169,7 +169,7 @@ export function InstallPrompt() {
                         dismissInstall()
                     }}
                     className="shrink-0 p-2 text-[var(--app-hint)] active:opacity-60"
-                    aria-label="Dismiss"
+                    aria-label={t('button.dismiss')}
                 >
                     <CloseIcon className="w-4 h-4" />
                 </button>

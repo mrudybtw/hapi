@@ -566,6 +566,8 @@ export default {
   'tool.plan.continue': '继续规划',
   'tool.patch': '补丁',
   'tool.input': '输入',
+  'tool.label': '工具',
+  'tool.more': '还有 {count} 个',
   'tool.trace': '追踪',
   'tool.trace.callsSuffix': '次调用',
   'tool.result': '结果',
@@ -1253,9 +1255,28 @@ export default {
 
   // Team panel
   'team.members': '成员',
+  'team.tasks': '任务',
   'team.recentMessages': '最近消息',
 
   // Terminal / app shell
   'terminal.inactiveSession': '会话未激活。终端不可用。',
   'app.sessionUnavailable': '会话不可用',
+
+  // Tool result states
+  'tool.state.waitingForPermission': '等待授权…',
+  'tool.state.running': '运行中…',
+  'tool.state.noOutput': '（无输出）',
+  'tool.result.done': '完成',
+  'tool.result.agentLaunched': '代理已启动',
+  'tool.result.timedOut': '已超时',
+  'tool.result.noStatus': '无状态',
+  'tool.result.skillLoaded': '技能已加载',
+  'tool.result.skillLoadedNamed': '技能“{name}”已加载',
+  'tool.result.fieldName': '名称',
+  'tool.result.fieldTask': '任务',
+  'tool.result.fieldId': 'ID',
+  'tool.result.agentCount': '代理：{count}',
+
+  // Session shell
+  'session.notFound.returning': '未找到会话，正在返回会话列表…',
 } as const

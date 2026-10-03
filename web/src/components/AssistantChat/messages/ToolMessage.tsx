@@ -373,19 +373,19 @@ export function HappyToolMessage(props: ToolCallMessagePartProps) {
                 <div className="overflow-hidden rounded-[20px] bg-[var(--app-tool-card-bg)] p-3 shadow-none">
                     <div className="flex items-center gap-2 text-xs">
                         <div className="font-mono text-[var(--app-tool-card-accent)]">
-                            Tool: {props.toolName}
+                            {t('tool.label')}: {props.toolName}
                         </div>
                         {props.isError ? (
-                            <span className="text-red-500">Error</span>
+                            <span className="text-red-500">{t('toolGroup.rowStatus.error')}</span>
                         ) : null}
                         {props.status.type === 'running' && !hasResult ? (
-                            <span className="text-[var(--app-hint)]">Running…</span>
+                            <span className="text-[var(--app-hint)]">{t('tool.state.running')}</span>
                         ) : null}
                     </div>
 
                     {hasArgsText ? (
                         <div className="mt-2">
-                            <CodeBlock code={argsText} language="json" title="Input" />
+                            <CodeBlock code={argsText} language="json" title={t('tool.input')} />
                         </div>
                     ) : null}
 
