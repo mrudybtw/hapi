@@ -74,7 +74,7 @@ export function formatSessionNotification(
     const req = pending?.request
     if (req) {
         lines.push(hubT(locale, 'telegram.tool', { tool: req.tool }))
-        const args = formatToolArgumentsDetailed(req.tool, req.arguments)
+        const args = formatToolArgumentsDetailed(req.tool, req.arguments, { locale })
         if (args) {
             lines.push(args)
         }

@@ -141,7 +141,7 @@ describe('Telegram session notifications (ru)', () => {
             'Сессия: rotate HAPI secrets',
             'Путь: ~/infra',
             'Инструмент: Bash',
-            'Command: bun test'
+            'Команда: bun test'
         ].join('\n'))
     })
 })
