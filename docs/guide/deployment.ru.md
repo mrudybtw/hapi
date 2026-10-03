@@ -104,7 +104,9 @@ pm2 startup && pm2 save   # автозапуск при перезагрузке
 
 ### macOS: launchd
 
-Поместите плейлисты в `~/Library/LaunchAgents/` (пример — `com.hapi.hub.plist`):
+Создайте plist-файлы для автозапуска на macOS.
+
+**Хаб** (`~/Library/LaunchAgents/com.hapi.hub.plist`):
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -124,9 +126,44 @@ pm2 startup && pm2 save   # автозапуск при перезагрузке
 </plist>
 ```
 
+**Раннер** (`~/Library/LaunchAgents/com.hapi.runner.plist`):
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key><string>com.hapi.runner</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/local/bin/hapi</string><string>runner</string><string>start-sync</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>HAPI_RUNNER_SUPERVISED</key><string>1</string>
+    </dict>
+    <key>SoftResourceLimits</key>
+    <dict>
+        <key>NumberOfFiles</key><integer>65536</integer>
+    </dict>
+    <key>RunAtLoad</key><true/>
+    <key>KeepAlive</key><true/>
+    <key>StandardOutPath</key><string>/Users/ВАШ_ПОЛЬЗОВАТЕЛЬ/.hapi/logs/runner.log</string>
+    <key>StandardErrorPath</key><string>/Users/ВАШ_ПОЛЬЗОВАТЕЛЬ/.hapi/logs/runner.log</string>
+</dict>
+</plist>
+```
+
+Загрузка/выгрузка служб:
+
 ```bash
+# Запуск
 launchctl load ~/Library/LaunchAgents/com.hapi.hub.plist
+launchctl load ~/Library/LaunchAgents/com.hapi.runner.plist
+
+# Остановка
 launchctl unload ~/Library/LaunchAgents/com.hapi.hub.plist
+launchctl unload ~/Library/LaunchAgents/com.hapi.runner.plist
 ```
 
 > **Сон macOS:** при засыпании дисплея macOS может приостанавливать фоновые процессы. Используйте `caffeinate -dimsu hapi hub --relay`, чтобы этого избежать.
@@ -212,28 +249,3 @@ hapi hub
 - Не включайте `NODE_TLS_REJECT_UNAUTHORIZED=0` в публичных сетях.
 - `DSH_PERMISSION_MODE=danger-full-access` отключает подтверждения — используйте только на доверенных машинах.
 
-## Сборка из исходников с русской локалью
-
-Требуется Bun 1.4.0.
-
-```bash
-git clone <этот-форк> && cd hapi
-bun install
-bun run build:single-exe
-```
-
-Скрипт соберёт веб (включая русскую локаль `web/src/lib/locales/ru.ts`), встроит ассеты и скомпилирует один бинарь в `cli/dist-exe/<платформа>/hapi`.
-
-### Обновление установленного бинаря (вручную)
-
-Замените нативный бинарь на собранный (путь для npm-установки):
-
-```bash
-BIN="$HOME/.local/lib/node_modules/@twsxtd/hapi/node_modules/@twsxtd/hapi-darwin-arm64/bin/hapi"
-cp -p "$BIN" "$BIN.bak.$(date +%Y%m%d-%H%M%S)"   # бэкап
-cp -p cli/dist-exe/bun-darwin-arm64/hapi "$BIN"  # замена
-```
-
-После замены перезапустите хаб и раннер. Откат — вернуть файл из бэкапа.
-
-> Учтите: `npm update -g @twsxtd/hapi` перезапишет бинарь и уберёт русскую локаль. Чтобы изменения сохранялись, соберите свой форк или предложите перевод в апстрим через PR.
