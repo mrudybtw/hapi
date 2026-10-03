@@ -203,13 +203,15 @@ controls for DSH.
 
 ### Language
 
-`hapi auth` and the credential/connection prompts are available in English and
-Russian. The locale is resolved as: `HAPI_LANG` → `language` in
-`~/.hapi/settings.json` → `LC_ALL` / `LC_MESSAGES` / `LANG` → English.
+`hapi auth` and `hapi runner`, plus the credential/connection prompts, are
+available in English and Russian. The locale is resolved as: `HAPI_LANG` →
+`language` in `~/.hapi/settings.json` → `LC_ALL` / `LC_MESSAGES` / `LANG` →
+English (`LC_ALL` wins even when it is set to `C`).
 
 ```bash
 export HAPI_LANG=ru        # or: {"language": "ru"} in ~/.hapi/settings.json
 hapi auth status
+hapi runner
 ```
 
 ### Runner
