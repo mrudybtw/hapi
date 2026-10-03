@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState, useCallback, type ReactNode } from 'react'
-import { getTelegramWebApp } from '@/hooks/useTelegram'
+import { getTelegramWebApp, isTelegramEnvironment } from '@/hooks/useTelegram'
 import { en, zhCN, ru } from './locales'
 
 export type Locale = 'en' | 'zh-CN' | 'ru'
@@ -71,6 +71,25 @@ function interpolate(str: string, params?: Record<string, string | number>): str
   })
 }
 
+/**
+ * Telegram loads its SDK asynchronously and `loadTelegramSdk` gives up after a
+ * timeout, so the user's `language_code` can appear after the first render.
+ * Poll briefly for the WebApp and resolve the language once it shows up.
+ */
+export async function resolveLateTelegramLocale(
+  intervalMs = 500,
+  maxAttempts = 20
+): Promise<Locale | null> {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    const telegramLocale = normalizeLocaleTag(
+      getTelegramWebApp()?.initDataUnsafe?.user?.language_code
+    )
+    if (telegramLocale) return telegramLocale
+    await new Promise((resolve) => setTimeout(resolve, intervalMs))
+  }
+  return null
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => detectInitialLocale())
 
@@ -90,6 +109,23 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = locale
   }, [locale])
+
+  // The Telegram SDK can finish loading after `detectInitialLocale` ran, so
+  // pick up the Telegram language then — unless the user chose one explicitly.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (readStoredLocale()) return
+    if (!isTelegramEnvironment()) return
+    if (normalizeLocaleTag(getTelegramWebApp()?.initDataUnsafe?.user?.language_code)) return
+
+    let cancelled = false
+    void resolveLateTelegramLocale().then((detected) => {
+      if (!cancelled && detected) setLocaleState(detected)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <I18nContext.Provider value={{ t, locale, setLocale }}>
