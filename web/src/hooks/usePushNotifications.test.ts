@@ -186,13 +186,10 @@ describe('usePushNotifications VAPID rotation', () => {
         }))
     })
 
-    it('undoes an in-flight language refresh when the browser subscription goes away', async () => {
+    it('undoes an in-flight language refresh when the browser subscription was removed', async () => {
         localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
         localStorage.setItem('hapi-lang', 'en')
-        // `unsubscribe()` returning false means the browser kept the
-        // subscription, so the hub call asserted below can only come from the
-        // refresh cleanup.
-        const existing = createSubscription('https://push.test/current', false)
+        const existing = createSubscription('https://push.test/current', true)
         setupPushEnvironment(existing, existing)
         const api = createApi()
         let releaseRefresh: () => void = () => {}
@@ -208,9 +205,63 @@ describe('usePushNotifications VAPID rotation', () => {
         })
         releaseRefresh()
 
-        await waitFor(() => expect(api.unsubscribePushNotifications).toHaveBeenCalledWith({
-            endpoint: existing.endpoint
+        // Once by `unsubscribe()` and once by the stale refresh cleanup.
+        await waitFor(() => expect(api.unsubscribePushNotifications).toHaveBeenCalledTimes(2))
+    })
+
+    it('keeps the hub registration when the browser refuses to unsubscribe', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
+        const existing = createSubscription('https://push.test/current', false)
+        setupPushEnvironment(existing, existing)
+        const api = createApi()
+        let releaseRefresh: () => void = () => {}
+        api.subscribePushNotifications = vi.fn(() => new Promise<void>((resolve) => {
+            releaseRefresh = () => resolve()
         }))
+        const { result } = renderHook(() => usePushNotifications(api as unknown as ApiClient, 'en'))
+
+        await waitFor(() => expect(api.subscribePushNotifications).toHaveBeenCalledTimes(1))
+
+        await act(async () => {
+            await result.current.unsubscribe()
+        })
+        releaseRefresh()
+        await Promise.resolve()
+
+        // The browser still owns the subscription, so the refresh must survive.
+        expect(api.unsubscribePushNotifications).not.toHaveBeenCalled()
+    })
+
+    it('applies only the latest language when refreshes overlap', async () => {
+        localStorage.setItem(VAPID_STORAGE_KEY, CURRENT_VAPID_KEY)
+        localStorage.setItem('hapi-lang', 'en')
+        const existing = createSubscription('https://push.test/current', true)
+        setupPushEnvironment(existing, existing)
+        const api = createApi()
+        const calls: string[] = []
+        let releaseFirst: () => void = () => {}
+        api.subscribePushNotifications = vi.fn((payload: { language?: string }) => {
+            calls.push(payload.language ?? '')
+            if (calls.length === 1) {
+                return new Promise<void>((resolve) => {
+                    releaseFirst = () => resolve()
+                })
+            }
+            return Promise.resolve()
+        })
+        const { rerender } = renderHook(
+            ({ language }: { language: string }) => usePushNotifications(api as unknown as ApiClient, language),
+            { initialProps: { language: 'en' } }
+        )
+
+        await waitFor(() => expect(calls).toEqual(['en']))
+
+        localStorage.setItem('hapi-lang', 'ru')
+        rerender({ language: 'ru' })
+        releaseFirst()
+
+        await waitFor(() => expect(calls).toEqual(['en', 'ru']))
     })
 
     it('registers the browser language when the web UI ships no matching locale', async () => {
