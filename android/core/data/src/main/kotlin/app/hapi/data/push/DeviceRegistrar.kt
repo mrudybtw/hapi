@@ -127,6 +127,15 @@ class DeviceRegistrar(
     }
 
     /**
+     * Re-registers with every paired hub, refreshing hub-side metadata that the
+     * client only knows at registration time (currently the device language, so
+     * the hub localizes this device's notification text).
+     */
+    fun refreshRegistration() {
+        scope.launch { registerHubs(registry.state.value.hubs) }
+    }
+
+    /**
      * Re-registers [hubUrl] once, letting failures propagate — the worker
      * retry path owns backoff. No-op when push is unavailable.
      */
