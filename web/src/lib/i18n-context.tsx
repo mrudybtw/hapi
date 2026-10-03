@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { getTelegramWebApp } from '@/hooks/useTelegram'
 import { en, zhCN, ru } from './locales'
 
 export type Locale = 'en' | 'zh-CN' | 'ru'
@@ -15,6 +16,53 @@ export const I18nContext = createContext<I18nContextValue | null>(null)
 
 const locales: Record<Locale, Translations> = { en, 'zh-CN': zhCN, ru }
 
+/**
+ * Map a BCP-47-ish language tag (`ru`, `ru-RU`, `zh-Hans`, `en-US`) onto a
+ * supported locale. Returns null for anything we do not ship.
+ */
+export function normalizeLocaleTag(tag: string | null | undefined): Locale | null {
+  if (!tag) return null
+  const lower = tag.trim().toLowerCase().replace(/_/g, '-')
+  if (!lower) return null
+  if (lower === 'ru' || lower.startsWith('ru-')) return 'ru'
+  if (lower === 'zh' || lower.startsWith('zh-')) return 'zh-CN'
+  if (lower === 'en' || lower.startsWith('en-')) return 'en'
+  return null
+}
+
+function readStoredLocale(): Locale | null {
+  try {
+    return normalizeLocaleTag(localStorage.getItem('hapi-lang'))
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Pick the locale for a fresh session: an explicit user choice wins, then the
+ * Telegram Mini App user's language, then the browser language, then English.
+ * Telegram runs the app in its own web view, so `localStorage` from a normal
+ * browser visit is not available and the language must be detected here.
+ */
+export function detectInitialLocale(): Locale {
+  const stored = readStoredLocale()
+  if (stored) return stored
+
+  if (typeof window !== 'undefined') {
+    const telegramLocale = normalizeLocaleTag(
+      getTelegramWebApp()?.initDataUnsafe?.user?.language_code
+    )
+    if (telegramLocale) return telegramLocale
+  }
+
+  if (typeof navigator !== 'undefined') {
+    const browserLocale = normalizeLocaleTag(navigator.language)
+    if (browserLocale) return browserLocale
+  }
+
+  return 'en'
+}
+
 function interpolate(str: string, params?: Record<string, string | number>): string {
   if (!params) return str
   return str.replace(/\{(\w+)\}/g, (match, key) => {
@@ -24,10 +72,7 @@ function interpolate(str: string, params?: Record<string, string | number>): str
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(() => {
-    const saved = localStorage.getItem('hapi-lang')
-    return (saved === 'en' || saved === 'zh-CN' || saved === 'ru') ? saved : 'en'
-  })
+  const [locale, setLocaleState] = useState<Locale>(() => detectInitialLocale())
 
   const setLocale = useCallback((newLocale: Locale) => {
     setLocaleState(newLocale)
