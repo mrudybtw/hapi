@@ -59,7 +59,7 @@ function writeStoredVapidKey(publicKey: string): void {
     }
 }
 
-export function usePushNotifications(api: ApiClient | null) {
+export function usePushNotifications(api: ApiClient | null, language?: string) {
     const [isSupported, setIsSupported] = useState(false)
     const [permission, setPermission] = useState<NotificationPermission>('default')
     const [isSubscribed, setIsSubscribed] = useState(false)
@@ -166,7 +166,7 @@ export function usePushNotifications(api: ApiClient | null) {
                     p256dh: keys.p256dh,
                     auth: keys.auth
                 },
-                language: notificationLanguage()
+                language: language ?? notificationLanguage()
             })
             // Only record the key after the hub registration succeeded. A
             // failed registration must leave the previous key in place so the
@@ -179,7 +179,39 @@ export function usePushNotifications(api: ApiClient | null) {
             console.error('[PushNotifications] Failed to subscribe:', error)
             return false
         }
+    }, [api, language])
+
+    /**
+     * Browsers keep one subscription per SW registration, so a language change
+     * only needs to refresh the hub's copy instead of re-subscribing.
+     */
+    const refreshSubscriptionLanguage = useCallback(async (nextLanguage: string): Promise<void> => {
+        if (!api || !isPushSupported()) return
+        if (Notification.permission !== 'granted') return
+
+        try {
+            const registration = await navigator.serviceWorker.ready
+            const subscription = await registration.pushManager.getSubscription()
+            if (!subscription) return
+
+            const json = subscription.toJSON()
+            const keys = json.keys
+            if (!json.endpoint || !keys?.p256dh || !keys.auth) return
+
+            await api.subscribePushNotifications({
+                endpoint: json.endpoint,
+                keys: { p256dh: keys.p256dh, auth: keys.auth },
+                language: nextLanguage
+            })
+        } catch (error) {
+            console.error('[PushNotifications] Failed to refresh subscription language:', error)
+        }
     }, [api])
+
+    useEffect(() => {
+        if (!language) return
+        void refreshSubscriptionLanguage(language)
+    }, [language, refreshSubscriptionLanguage])
 
     const unsubscribe = useCallback(async (): Promise<boolean> => {
         if (!api || !isPushSupported()) {
