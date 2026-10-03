@@ -568,6 +568,8 @@ export default {
   'tool.plan.continue': 'Продолжить планирование',
   'tool.patch': 'Патч',
   'tool.input': 'Ввод',
+  'tool.label': 'Инструмент',
+  'tool.more': '+ещё {count}',
   'tool.trace': 'Трассировка',
   'tool.trace.callsSuffix': 'вызовов',
   'tool.result': 'Результат',
@@ -1255,9 +1257,28 @@ export default {
 
   // Team panel
   'team.members': 'Участники',
+  'team.tasks': 'Задачи',
   'team.recentMessages': 'Недавние сообщения',
 
   // Terminal / app shell
   'terminal.inactiveSession': 'Сессия неактивна. Терминал недоступен.',
   'app.sessionUnavailable': 'Сессия недоступна',
+
+  // Tool result states
+  'tool.state.waitingForPermission': 'Ожидание разрешения…',
+  'tool.state.running': 'Выполняется…',
+  'tool.state.noOutput': '(нет вывода)',
+  'tool.result.done': 'Готово',
+  'tool.result.agentLaunched': 'Агент запущен',
+  'tool.result.timedOut': 'Тайм-аут',
+  'tool.result.noStatus': 'Нет статуса',
+  'tool.result.skillLoaded': 'Навык загружен',
+  'tool.result.skillLoadedNamed': 'Навык «{name}» загружен',
+  'tool.result.fieldName': 'Имя',
+  'tool.result.fieldTask': 'Задача',
+  'tool.result.fieldId': 'ID',
+  'tool.result.agentCount': 'Агентов: {count}',
+
+  // Session shell
+  'session.notFound.returning': 'Сессия не найдена. Возвращаемся к списку…',
 } as const
