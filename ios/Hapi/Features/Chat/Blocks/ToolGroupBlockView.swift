@@ -31,16 +31,16 @@ struct ToolGroupPresentation: Identifiable, Equatable {
         let parts = ToolGroupActionKind.allCases.compactMap { kind -> String? in
             let count = countsByKind[kind] ?? 0
             guard count > 0 else { return nil }
-            let format: String
+            // Interpolated lookups pass the count to the catalog so the Russian
+            // plural variations are selected.
             switch kind {
-            case .read: format = count == 1 ? String(localized: "1 read") : String(localized: "%lld reads")
-            case .search: format = count == 1 ? String(localized: "1 search") : String(localized: "%lld searches")
-            case .command: format = count == 1 ? String(localized: "1 command") : String(localized: "%lld commands")
-            case .mutation: format = count == 1 ? String(localized: "1 edit") : String(localized: "%lld edits")
-            case .web: format = count == 1 ? String(localized: "1 web request") : String(localized: "%lld web requests")
-            case .other: format = count == 1 ? String(localized: "1 other tool") : String(localized: "%lld other tools")
+            case .read: return String(localized: "\(count) reads")
+            case .search: return String(localized: "\(count) searches")
+            case .command: return String(localized: "\(count) commands")
+            case .mutation: return String(localized: "\(count) edits")
+            case .web: return String(localized: "\(count) web requests")
+            case .other: return String(localized: "\(count) other tools")
             }
-            return String(format: format, Int64(count))
         }
         return parts.joined(separator: " · ")
     }
