@@ -1,12 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Home } from "lucide-react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "wouter";
 
 export default function NotFound() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [, setLocation] = useLocation();
+
+  useEffect(() => {
+    document.documentElement.lang = i18n.language;
+  }, [i18n.language]);
 
   const handleGoHome = () => {
     setLocation("/");
