@@ -213,7 +213,7 @@ ${chalk.bold(cliT('runner.help.options'))}
                                  ${cliT('runner.help.workspaceRoot.part4')}
                                  ${cliT('runner.help.workspaceRoot.part5')}
 
-  ${cliT('runner.help.killHint')} 
+  ${cliT('runner.help.killHint')}
   ${doctorClean}
 
 ${chalk.bold(cliT('runner.help.note'))} ${cliT('runner.help.noteBody')}
