@@ -198,6 +198,16 @@ export HAPI_DSH_ACP_ARGS_JSON='["--dir", "/path/to/deepseek-harness", "run", "de
 - `HAPI_DSH_ACP_CONFIG` — необязательный путь `dsh-acp-demo --config`.
 - `HAPI_DSH_ACP_ARGS_JSON` — необязательный JSON-массив аргументов ACP-сервера.
 - `HAPI_HTTP_MCP_URL` — цель MCP по умолчанию для `hapi mcp`.
+- `HAPI_LANG` — язык сообщений CLI (`en`, `ru`); приоритетнее настройки `language` и POSIX-локали.
+
+### Язык
+
+Сообщения `hapi auth` и запросы учётных данных доступны на английском и русском. Локаль определяется так: `HAPI_LANG` → `language` в `~/.hapi/settings.json` → `LC_ALL` / `LC_MESSAGES` / `LANG` → английский.
+
+```bash
+export HAPI_LANG=ru        # или: {"language": "ru"} в ~/.hapi/settings.json
+hapi auth status
+```
 
 ### Раннер
 
